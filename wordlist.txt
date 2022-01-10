@@ -1513,7 +1513,6 @@ erous
 error
 erste
 eruca
-erunt
 espri
 essay
 essen
@@ -4773,7 +4772,6 @@ turin
 turki
 turns
 turpi
-turvy
 tutee
 tutor
 tutti
