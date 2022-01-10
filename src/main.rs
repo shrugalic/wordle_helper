@@ -1,5 +1,5 @@
 use rand::prelude::*;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::io;
 
 const WORDLIST: &str = include_str!("../wordlist.txt");
@@ -8,9 +8,9 @@ const WORDLIST: &str = include_str!("../wordlist.txt");
 struct Wordle {
     words: Vec<Vec<char>>,
     illegal_chars: HashSet<char>,
-    correct_chars: HashMap<usize, char>,
+    correct_chars: [Option<char>; 5],
     illegal_at_pos: [HashSet<char>; 5],
-    must_have_chars: HashSet<char>,
+    mandatory_chars: HashSet<char>,
     guessed_words: HashSet<Vec<char>>,
     rng: ThreadRng,
 }
@@ -31,9 +31,9 @@ impl Wordle {
         Wordle {
             words,
             illegal_chars: HashSet::new(),
-            correct_chars: HashMap::new(),
+            correct_chars: [None; 5],
             illegal_at_pos: illegal_position_for_char,
-            must_have_chars: HashSet::new(),
+            mandatory_chars: HashSet::new(),
             guessed_words: HashSet::new(),
             rng,
         }
@@ -46,7 +46,7 @@ impl Wordle {
         self.print_result();
     }
     fn is_game_over(&self) -> bool {
-        self.correct_chars.len() == 5 || self.words.len() <= 1
+        self.correct_chars.iter().all(|o| o.is_some()) || self.words.len() <= 1
     }
     fn print_remaining_word_count(&self) {
         if self.words.len() > 10 {
@@ -66,12 +66,12 @@ impl Wordle {
     fn single_round(&mut self) {
         let guess = self.ask_for_guess();
         self.guessed_words.insert(guess.clone());
-        let correct_pos = self.ask_about_correct_chars_in_correct_position();
-        if self.correct_chars.len() == 5 {
+        self.ask_about_correct_chars_in_correct_position();
+        if self.is_game_over() {
             return;
         }
-        let wrong_pos = self.ask_about_correct_chars_in_wrong_position();
-        self.update_illegal_chars(guess, correct_pos, wrong_pos);
+        self.ask_about_correct_chars_in_wrong_position();
+        self.update_illegal_chars(guess);
 
         self.update_words();
     }
@@ -98,53 +98,48 @@ impl Wordle {
         }
     }
 
-    fn ask_about_correct_chars_in_correct_position(&mut self) -> Vec<char> {
+    fn ask_about_correct_chars_in_correct_position(&mut self) {
         println!("Enter characters in the correct spot. Use _ as prefix if necessary.");
         let mut input = String::new();
         io::stdin().read_line(&mut input).unwrap();
 
         let correct_pos: Vec<_> = input.trim().chars().collect();
         for (i, c) in correct_pos.iter().enumerate().filter(|(_, &c)| c != '_') {
-            // println!("Inserting '{}' as correct character @ {}", c, i);
-            self.correct_chars.insert(i, *c);
+            println!("Inserting '{}' as correct character @ {}", c, i);
+            self.correct_chars[i] = Some(*c);
         }
-        correct_pos
     }
 
-    fn ask_about_correct_chars_in_wrong_position(&mut self) -> Vec<char> {
+    fn ask_about_correct_chars_in_wrong_position(&mut self) {
         let mut input = String::new();
         println!("Enter correct characters in the wrong spot. Use _ as prefix if necessary");
         io::stdin().read_line(&mut input).unwrap();
 
         let wrong_pos: Vec<_> = input.trim().chars().collect();
         for (i, c) in wrong_pos.iter().enumerate().filter(|(_, &c)| c != '_') {
-            // println!("Inserting '{}' as wrong character @ {}", c, i);
+            println!("Inserting '{}' as illegal @ {}", c, i);
             self.illegal_at_pos[i].insert(*c);
-            self.must_have_chars.insert(*c);
+            self.mandatory_chars.insert(*c);
         }
-        wrong_pos
     }
 
-    fn update_illegal_chars(
-        &mut self,
-        guess: Vec<char>,
-        correct_pos: Vec<char>,
-        wrong_pos: Vec<char>,
-    ) {
+    fn update_illegal_chars(&mut self, guess: Vec<char>) {
         // println!("guess {:?}", guess);
-        // println!("correct_pos {:?}", correct_pos);
-        // println!("wrong_pos {:?}", wrong_pos);
-        // println!("self.must_have_chars {:?}", self.must_have_chars);
+        // println!("self.mandatory_chars {:?}", self.mandatory_chars);
         // println!("self.correct_chars {:?}", self.correct_chars);
 
-        for c in guess.into_iter().filter(|c| {
-            !correct_pos.contains(c)
-                && !wrong_pos.contains(c)
-                && !self.must_have_chars.contains(c)
-                && !self.correct_chars.values().any(|correct| correct == c)
-        }) {
-            // println!("Inserting illegal char '{}'", c);
-            self.illegal_chars.insert(c);
+        for (i, c) in guess
+            .into_iter()
+            .enumerate()
+            .filter(|(_, c)| !self.mandatory_chars.contains(c))
+        {
+            if !self.correct_chars.iter().any(|&o| o == Some(c)) {
+                println!("Inserting globally illegal char '{}'", c);
+                self.illegal_chars.insert(c);
+            } else if self.correct_chars[i] != Some(c) {
+                println!("Inserting '{}' as illegal @ {}", c, i);
+                self.illegal_at_pos[i].insert(c);
+            }
         }
     }
 
@@ -159,11 +154,17 @@ impl Wordle {
                     .any(|illegal| word.contains(illegal))
             })
             .filter(|word| {
-                self.must_have_chars
+                self.mandatory_chars
                     .iter()
                     .all(|mandatory| word.contains(mandatory))
             })
-            .filter(|word| self.correct_chars.iter().all(|(i, c)| word[*i] == *c))
+            .filter(|word| {
+                self.correct_chars
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, o)| o.is_some())
+                    .all(|(i, &o)| word[i] == o.unwrap())
+            })
             .filter(|word| {
                 !word
                     .iter()
@@ -180,9 +181,7 @@ impl Wordle {
                 self.words[0].iter().collect::<String>()
             );
         } else {
-            let mut word: Vec<_> = self.correct_chars.iter().collect();
-            word.sort_unstable_by_key(|(i, _)| *i);
-            let word: String = word.into_iter().map(|(_, c)| c).collect();
+            let word: String = self.correct_chars.iter().map(|c| c.unwrap()).collect();
             println!("\nThe word is '{}'", word);
         }
     }

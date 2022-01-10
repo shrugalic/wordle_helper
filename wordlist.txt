@@ -3325,7 +3325,6 @@ pedir
 peers
 peeve
 peice
-peine
 penal
 pence
 pengo
@@ -3529,7 +3528,6 @@ pubic
 pubis
 pudgy
 pudor
-pueri
 puffy
 pukka
 pulex
@@ -3906,7 +3904,6 @@ scope
 score
 scorn
 scots
-scott
 scour
 scout
 scowl
