@@ -93,12 +93,40 @@ impl Wordle {
     }
 
     fn suggest_a_word(&mut self) -> Vec<char> {
-        self.words
+        let unique_char_words: Vec<_> = self
+            .words
             .iter()
             .filter(|&word| !self.guessed_words.contains(word))
-            .choose(&mut self.rng)
-            .unwrap()
-            .to_vec()
+            .filter(|&word| {
+                let open_indices: Vec<_> = self
+                    .correct_chars
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, o)| o.is_none())
+                    .map(|(i, _)| i)
+                    .collect();
+                let unique_chars = open_indices
+                    .iter()
+                    .map(|i| word[*i])
+                    .collect::<HashSet<char>>();
+                unique_chars.len() == open_indices.len()
+            })
+            .collect();
+        println!(
+            "{}/{} words have unique chars in the open spots",
+            unique_char_words.len(),
+            self.words.len()
+        );
+        if let Some(suggestion) = unique_char_words.iter().choose(&mut self.rng) {
+            suggestion.to_vec()
+        } else {
+            self.words
+                .iter()
+                .filter(|&word| !self.guessed_words.contains(word))
+                .choose(&mut self.rng)
+                .unwrap()
+                .to_vec()
+        }
     }
 
     fn ask_about_correct_chars_in_correct_position(&mut self) {
@@ -174,6 +202,7 @@ impl Wordle {
                     .enumerate()
                     .any(|(i, c)| self.illegal_at_pos[i].contains(c))
             })
+            // .filter(|word| !self.guessed_words.contains(word))
             .collect();
     }
 
