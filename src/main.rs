@@ -1,5 +1,6 @@
 use rand::prelude::*;
-use std::collections::HashSet;
+use std::cmp::Reverse;
+use std::collections::{HashMap, HashSet};
 use std::io;
 
 const WORDLIST: &str = include_str!("../wordlist.txt");
@@ -57,7 +58,7 @@ impl Wordle {
                 self.words.len(),
                 self.words
                     .iter()
-                    .map(|word| word.iter().collect::<String>())
+                    .map(|word| word.to_string())
                     .collect::<Vec<_>>()
                     .join(", ")
             );
@@ -79,8 +80,8 @@ impl Wordle {
     fn ask_for_guess(&mut self) -> Vec<char> {
         let suggestion = self.suggest_a_word();
         println!(
-            "Enter the word you guessed, or nothing if you use the random suggestion '{}':",
-            suggestion.iter().collect::<String>()
+            "Enter the word you guessed, or use suggestion '{}':",
+            suggestion.to_string()
         );
         let mut input = String::new();
         io::stdin().read_line(&mut input).unwrap();
@@ -93,44 +94,114 @@ impl Wordle {
     }
 
     fn suggest_a_word(&mut self) -> Vec<char> {
-        let unique_char_words: Vec<_> = self
-            .words
-            .iter()
-            .filter(|&word| !self.guessed_words.contains(word))
-            .filter(|&word| {
-                let open_indices: Vec<_> = self
-                    .correct_chars
-                    .iter()
-                    .enumerate()
-                    .filter(|(_, o)| o.is_none())
-                    .map(|(i, _)| i)
-                    .collect();
-                let unique_chars = open_indices
-                    .iter()
-                    .map(|i| word[*i])
-                    .collect::<HashSet<char>>();
-                unique_chars.len() == open_indices.len()
-            })
-            .collect();
+        self.high_variety_suggestion()
+            .unwrap_or_else(|| self.random_suggestion())
+    }
+
+    fn high_variety_suggestion(&mut self) -> Option<Vec<char>> {
+        let open_positions = self.open_positions();
+        // println!("open positions {:?}", open_positions);
+        let freq = self.character_frequency_of_open_positions(&open_positions);
+        Self::print_char_counts(&freq);
+
+        let high_variety_words = self.high_variety_words(open_positions);
         println!(
-            "{}/{} words have unique chars in the open spots",
-            unique_char_words.len(),
+            "{}/{} words have different characters in all the open spots",
+            high_variety_words.len(),
             self.words.len()
         );
-        if let Some(suggestion) = unique_char_words.iter().choose(&mut self.rng) {
-            suggestion.to_vec()
+
+        let best_random = self.max_char_freq_sum_word(&self.words, &freq).unwrap();
+        println!("Best random word: '{}'", best_random.to_string());
+
+        if let Some(variety_word) = self.max_char_freq_sum_word(&high_variety_words, &freq) {
+            println!("Best high variety word: '{}'", variety_word.to_string());
+            Some(variety_word)
         } else {
-            self.words
-                .iter()
-                .filter(|&word| !self.guessed_words.contains(word))
-                .choose(&mut self.rng)
-                .unwrap()
-                .to_vec()
+            high_variety_words.into_iter().choose(&mut self.rng)
         }
     }
 
+    fn high_variety_words(&self, open_positions: Vec<usize>) -> Vec<Vec<char>> {
+        self.words
+            .iter()
+            // .filter(|&word| !self.guessed_words.contains(word))
+            .filter(|&word| {
+                let unique_chars = open_positions
+                    .iter()
+                    .map(|i| word[*i])
+                    .collect::<HashSet<char>>();
+                unique_chars.len() == open_positions.len()
+            })
+            .cloned()
+            .collect()
+    }
+
+    fn character_frequency_of_open_positions(
+        &mut self,
+        open_positions: &[usize],
+    ) -> HashMap<char, usize> {
+        let mut freq: HashMap<char, usize> = HashMap::new();
+        for word in &self.words {
+            for i in open_positions {
+                *freq.entry(word[*i]).or_default() += 1;
+            }
+        }
+        freq
+    }
+
+    fn max_char_freq_sum_word(
+        &self,
+        words: &[Vec<char>],
+        freq: &HashMap<char, usize>,
+    ) -> Option<Vec<char>> {
+        let open_indices = self.open_positions();
+        words
+            .iter()
+            .max_by_key(|&word| {
+                open_indices
+                    .iter()
+                    .map(|i| {
+                        let c = word[*i];
+                        freq[&c]
+                    })
+                    .sum::<usize>()
+            })
+            .cloned()
+    }
+
+    fn print_char_counts(freq: &HashMap<char, usize>) {
+        let mut freq: Vec<_> = freq.iter().collect();
+        freq.sort_unstable_by_key(|(_, i)| Reverse(*i));
+        println!(
+            "Character counts: {}",
+            freq.iter()
+                .map(|(c, i)| format!("{} {}", i, c))
+                .collect::<Vec<_>>()
+                .join(", ")
+        );
+    }
+
+    fn random_suggestion(&mut self) -> Vec<char> {
+        self.words
+            .iter()
+            // .filter(|&word| !self.guessed_words.contains(word))
+            .choose(&mut self.rng)
+            .unwrap()
+            .to_vec()
+    }
+
+    fn open_positions(&self) -> Vec<usize> {
+        self.correct_chars
+            .iter()
+            .enumerate()
+            .filter(|(_, o)| o.is_none())
+            .map(|(i, _)| i)
+            .collect()
+    }
+
     fn ask_about_correct_chars_in_correct_position(&mut self) {
-        println!("Enter characters in the correct spot. Use _ as prefix if necessary.");
+        println!("Enter characters in the correct spot. Use _ as prefix if necessary:");
         let mut input = String::new();
         io::stdin().read_line(&mut input).unwrap();
 
@@ -143,7 +214,7 @@ impl Wordle {
 
     fn ask_about_correct_chars_in_wrong_position(&mut self) {
         let mut input = String::new();
-        println!("Enter correct characters in the wrong spot. Use _ as prefix if necessary");
+        println!("Enter correct characters in the wrong spot. Use _ as prefix if necessary:");
         io::stdin().read_line(&mut input).unwrap();
 
         let wrong_pos: Vec<_> = input.trim().chars().collect();
@@ -202,7 +273,7 @@ impl Wordle {
                     .enumerate()
                     .any(|(i, c)| self.illegal_at_pos[i].contains(c))
             })
-            // .filter(|word| !self.guessed_words.contains(word))
+            .filter(|word| !self.guessed_words.contains(word))
             .collect();
     }
 
@@ -210,12 +281,21 @@ impl Wordle {
         if self.words.len() == 1 {
             println!(
                 "\nThe only word left in the list is '{}'",
-                self.words[0].iter().collect::<String>()
+                self.words[0].to_string()
             );
         } else {
             let word: String = self.correct_chars.iter().map(|c| c.unwrap()).collect();
             println!("\nThe word is '{}'", word);
         }
+    }
+}
+
+trait CharVecToString {
+    fn to_string(&self) -> String;
+}
+impl CharVecToString for Vec<char> {
+    fn to_string(&self) -> String {
+        self.iter().collect::<String>()
     }
 }
 
