@@ -77,13 +77,7 @@ impl Wordle {
     }
 
     fn ask_for_guess(&mut self) -> Vec<char> {
-        let suggestion = self
-            .words
-            .iter()
-            .filter(|&word| !self.guessed_words.contains(word))
-            .choose(&mut self.rng)
-            .unwrap()
-            .to_vec();
+        let suggestion = self.suggest_a_word();
         println!(
             "Enter the word you guessed, or nothing if you use the random suggestion '{}':",
             suggestion.iter().collect::<String>()
@@ -96,6 +90,15 @@ impl Wordle {
         } else {
             suggestion
         }
+    }
+
+    fn suggest_a_word(&mut self) -> Vec<char> {
+        self.words
+            .iter()
+            .filter(|&word| !self.guessed_words.contains(word))
+            .choose(&mut self.rng)
+            .unwrap()
+            .to_vec()
     }
 
     fn ask_about_correct_chars_in_correct_position(&mut self) {
