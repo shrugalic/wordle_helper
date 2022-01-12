@@ -3,7 +3,7 @@ use std::cmp::Reverse;
 use std::collections::{HashMap, HashSet};
 use std::io;
 
-const WORDLIST: &str = include_str!("../wordlist.txt");
+const WORDLIST: &str = include_str!("../data/subset_of_actual_wordles.txt");
 
 // Helper for https://www.powerlanguage.co.uk/wordle/
 struct Wordle {
