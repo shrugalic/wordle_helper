@@ -79,15 +79,33 @@ impl Wordle {
 
     fn ask_for_guess(&mut self) -> Vec<char> {
         let suggestion = self.suggest_a_word();
+        let mut input;
         println!(
             "Enter the word you guessed, or use suggestion '{}':",
             suggestion.to_string()
         );
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).unwrap();
-
+        loop {
+            input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
+            if !input.trim().is_empty()
+                && input
+                    .trim()
+                    .chars()
+                    .filter(|c| c.is_ascii_alphabetic())
+                    .count()
+                    != 5
+            {
+                println!("Please enter 5 alphabetic characters, or nothing to use the suggestion:")
+            } else {
+                break;
+            }
+        }
         if !input.trim().is_empty() {
-            input.trim().chars().collect()
+            input
+                .trim()
+                .chars()
+                .map(|c| c.to_ascii_lowercase())
+                .collect()
         } else {
             suggestion
         }
@@ -266,27 +284,39 @@ impl Wordle {
     }
 
     fn ask_about_correct_chars_in_correct_position(&mut self) {
-        println!("Enter characters in the correct spot. Use _ as prefix if necessary:");
+        println!(
+            "Enter characters in the correct spot. Use any non-alphabetic char as prefix if necessary:"
+        );
         let mut input = String::new();
         io::stdin().read_line(&mut input).unwrap();
 
         let correct_pos: Vec<_> = input.trim().chars().collect();
-        for (i, c) in correct_pos.iter().enumerate().filter(|(_, &c)| c != '_') {
+        for (i, c) in correct_pos
+            .iter()
+            .enumerate()
+            .filter(|(_, c)| c.is_ascii_alphabetic())
+            .map(|(i, c)| (i, c.to_ascii_lowercase()))
+        {
             println!("Inserting '{}' as correct character @ {}", c, i);
-            self.correct_chars[i] = Some(*c);
+            self.correct_chars[i] = Some(c);
         }
     }
 
     fn ask_about_correct_chars_in_wrong_position(&mut self) {
         let mut input = String::new();
-        println!("Enter correct characters in the wrong spot. Use _ as prefix if necessary:");
+        println!("Enter correct characters in the wrong spot. Use any non-alphabetic char as prefix if necessary:");
         io::stdin().read_line(&mut input).unwrap();
 
         let wrong_pos: Vec<_> = input.trim().chars().collect();
-        for (i, c) in wrong_pos.iter().enumerate().filter(|(_, &c)| c != '_') {
+        for (i, c) in wrong_pos
+            .iter()
+            .enumerate()
+            .filter(|(_, c)| c.is_ascii_alphabetic())
+            .map(|(i, c)| (i, c.to_ascii_lowercase()))
+        {
             println!("Inserting '{}' as illegal @ {}", c, i);
-            self.illegal_at_pos[i].insert(*c);
-            self.mandatory_chars.insert(*c);
+            self.illegal_at_pos[i].insert(c);
+            self.mandatory_chars.insert(c);
         }
     }
 
