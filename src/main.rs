@@ -1,5 +1,5 @@
 use rand::prelude::*;
-use std::cmp::Reverse;
+use std::cmp::{Ordering, Reverse};
 use std::collections::{HashMap, HashSet};
 use std::io;
 
@@ -102,43 +102,46 @@ impl Wordle {
         let open_positions = self.open_positions();
         // println!("open positions {:?}", open_positions);
         let freq = self.character_frequency_of_open_positions(&open_positions);
-        Self::print_char_counts(&freq);
+        // println!("Overall character counts: {}", freq.to_string());
+        let freqs = self.character_frequencies_of_open_positions(&open_positions);
+        // for (i, freq) in freqs.iter().enumerate() {
+        //     println!("Position[{}] character counts: {}", i, freq.to_string());
+        // }
 
-        let high_variety_words = self.high_variety_words(open_positions);
+        let high_variety_words = self.high_variety_words(&open_positions);
         println!(
             "{}/{} words have different characters in all the open spots",
             high_variety_words.len(),
             self.words.len()
         );
 
-        let best_random = self.max_char_freq_sum_word(&self.words, &freq).unwrap();
-        println!("Best random word: '{}'", best_random.to_string());
+        // Called just to print the top words
+        self.max_char_freqs_sum_word(&self.words, &freqs, &open_positions);
+        self.max_char_freq_sum_word(&self.words, &freq, &open_positions);
 
-        if let Some(variety_word) = self.max_char_freq_sum_word(&high_variety_words, &freq) {
-            println!("Best high variety word: '{}'", variety_word.to_string());
-            Some(variety_word)
+        println!("Enforced high-variety words only:");
+        if let Some(individual_variety_word) =
+            self.max_char_freqs_sum_word(&high_variety_words, &freqs, &open_positions)
+        {
+            // Called just to print the top high variety words
+            self.max_char_freq_sum_word(&high_variety_words, &freq, &open_positions);
+
+            Some(individual_variety_word)
         } else {
             high_variety_words.into_iter().choose(&mut self.rng)
         }
     }
 
-    fn high_variety_words(&self, open_positions: Vec<usize>) -> Vec<Vec<char>> {
+    fn high_variety_words(&self, open_positions: &[usize]) -> Vec<Vec<char>> {
         self.words
             .iter()
-            // .filter(|&word| !self.guessed_words.contains(word))
-            .filter(|&word| {
-                let unique_chars = open_positions
-                    .iter()
-                    .map(|i| word[*i])
-                    .collect::<HashSet<char>>();
-                unique_chars.len() == open_positions.len()
-            })
+            .filter(|&word| word.unique_chars_in(open_positions).len() == open_positions.len())
             .cloned()
             .collect()
     }
 
     fn character_frequency_of_open_positions(
-        &mut self,
+        &self,
         open_positions: &[usize],
     ) -> HashMap<char, usize> {
         let mut freq: HashMap<char, usize> = HashMap::new();
@@ -150,45 +153,107 @@ impl Wordle {
         freq
     }
 
+    fn character_frequencies_of_open_positions(
+        &self,
+        open_positions: &[usize],
+    ) -> [HashMap<char, usize>; 5] {
+        let empty = || ('a'..='z').into_iter().map(|c| (c, 0)).collect();
+        let mut freqs: [HashMap<char, usize>; 5] = [empty(), empty(), empty(), empty(), empty()];
+        for word in &self.words {
+            for i in open_positions {
+                *freqs[*i].get_mut(&word[*i]).unwrap() += 1;
+            }
+        }
+        freqs
+    }
+
     fn max_char_freq_sum_word(
         &self,
         words: &[Vec<char>],
         freq: &HashMap<char, usize>,
+        open_positions: &[usize],
     ) -> Option<Vec<char>> {
-        let open_indices = self.open_positions();
-        words
+        let mut scores: Vec<_> = words
             .iter()
-            .max_by_key(|&word| {
-                open_indices
+            .map(|word| {
+                let count = word
+                    .unique_chars_in(open_positions)
                     .iter()
-                    .map(|i| {
-                        let c = word[*i];
-                        freq[&c]
-                    })
-                    .sum::<usize>()
+                    .map(|c| freq[c])
+                    .sum::<usize>();
+                (count, word)
             })
-            .cloned()
-    }
+            .collect();
+        if scores.is_empty() {
+            return None;
+        }
+        scores.sort_unstable_by(|(a_cnt, a_word), (b_cnt, b_word)| match a_cnt.cmp(b_cnt) {
+            Ordering::Equal => a_word.cmp(b_word),
+            by_count => by_count,
+        });
 
-    fn print_char_counts(freq: &HashMap<char, usize>) {
-        let mut freq: Vec<_> = freq.iter().collect();
-        freq.sort_unstable_by_key(|(_, i)| Reverse(*i));
+        // Best overall with char_set_at (no duplicate counts):
+        // 4405 renal, 4405 learn, 4451 raise, 4451 arise, 4509 stare,
+        // 4511 irate, 4534 arose, 4559 alter, 4559 alert, 4559 later
+
+        // Best overall with char_vec_at (with duplicate counts):
+        // 4763 terse, 4795 tepee, 4833 easel, 4833 lease, 4843 tease,
+        // 4893 elate, 4909 rarer, 5013 erase, 5073 eater, 5269 eerie
         println!(
-            "Character counts: {}",
-            freq.iter()
-                .map(|(c, i)| format!("{} {}", i, c))
+            "Best overall:    {}",
+            scores
+                .iter()
+                .skip(scores.len().saturating_sub(10))
+                .map(|(count, word)| format!("{} {}", count, word.to_string()))
                 .collect::<Vec<_>>()
                 .join(", ")
         );
+        scores
+            .iter()
+            .max_by(|(a_cnt, a_word), (b_cnt, b_word)| match a_cnt.cmp(b_cnt) {
+                Ordering::Equal => a_word.cmp(b_word),
+                by_count => by_count,
+            })
+            .map(|(_count, word)| word.to_vec())
+    }
+
+    fn max_char_freqs_sum_word(
+        &self,
+        words: &[Vec<char>],
+        freqs: &[HashMap<char, usize>; 5],
+        open_positions: &[usize],
+    ) -> Option<Vec<char>> {
+        let mut scores: Vec<_> = words
+            .iter()
+            .map(|word| {
+                let count = open_positions
+                    .iter()
+                    .map(|&i| freqs[i][&word[i]])
+                    .sum::<usize>();
+                (count, word)
+            })
+            .collect();
+        if scores.is_empty() {
+            return None;
+        }
+        scores.sort_unstable_by_key(|(count, _word)| *count);
+        println!(
+            "Best individual: {}",
+            scores
+                .iter()
+                .skip(scores.len().saturating_sub(10))
+                .map(|(count, word)| format!("{} {}", count, word.to_string()))
+                .collect::<Vec<_>>()
+                .join(", ")
+        );
+        scores
+            .iter()
+            .max_by_key(|(count, _word)| *count)
+            .map(|(_count, word)| word.to_vec())
     }
 
     fn random_suggestion(&mut self) -> Vec<char> {
-        self.words
-            .iter()
-            // .filter(|&word| !self.guessed_words.contains(word))
-            .choose(&mut self.rng)
-            .unwrap()
-            .to_vec()
+        self.words.iter().choose(&mut self.rng).unwrap().to_vec()
     }
 
     fn open_positions(&self) -> Vec<usize> {
@@ -290,12 +355,34 @@ impl Wordle {
     }
 }
 
-trait CharVecToString {
+trait WordAsCharVec {
     fn to_string(&self) -> String;
+    fn unique_chars_in(&self, positions: &[usize]) -> HashSet<char>;
+    fn chars_in(&self, positions: &[usize]) -> Vec<char>;
 }
-impl CharVecToString for Vec<char> {
+impl WordAsCharVec for Vec<char> {
     fn to_string(&self) -> String {
         self.iter().collect::<String>()
+    }
+    fn unique_chars_in(&self, positions: &[usize]) -> HashSet<char> {
+        positions.iter().map(|&i| self[i]).collect()
+    }
+    fn chars_in(&self, positions: &[usize]) -> Vec<char> {
+        positions.iter().map(|&i| self[i]).collect()
+    }
+}
+
+trait CharFrequencyToString {
+    fn to_string(&self) -> String;
+}
+impl CharFrequencyToString for HashMap<char, usize> {
+    fn to_string(&self) -> String {
+        let mut freq: Vec<_> = self.iter().collect();
+        freq.sort_unstable_by_key(|(_, i)| Reverse(*i));
+        freq.iter()
+            .map(|(c, i)| format!("{} {}", i, c))
+            .collect::<Vec<_>>()
+            .join(", ")
     }
 }
 
