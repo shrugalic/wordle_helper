@@ -5,19 +5,21 @@ use std::io;
 
 const WORDLIST: &str = include_str!("../data/subset_of_actual_wordles.txt");
 
+type Word = Vec<char>;
+
 // Helper for https://www.powerlanguage.co.uk/wordle/
 struct Wordle {
-    words: Vec<Vec<char>>,
+    words: Vec<Word>,
     illegal_chars: HashSet<char>,
     correct_chars: [Option<char>; 5],
     illegal_at_pos: [HashSet<char>; 5],
     mandatory_chars: HashSet<char>,
-    guessed_words: HashSet<Vec<char>>,
+    guessed_words: HashSet<Word>,
     rng: ThreadRng,
 }
 impl Wordle {
     fn new(wordlist: &str) -> Self {
-        let words: Vec<Vec<char>> = wordlist
+        let words: Vec<Word> = wordlist
             .lines()
             .map(|word| word.chars().collect())
             .collect();
@@ -77,7 +79,7 @@ impl Wordle {
         self.update_words();
     }
 
-    fn ask_for_guess(&mut self) -> Vec<char> {
+    fn ask_for_guess(&mut self) -> Word {
         let suggestion = self.suggest_a_word();
         let mut input;
         println!(
@@ -111,13 +113,14 @@ impl Wordle {
         }
     }
 
-    fn suggest_a_word(&mut self) -> Vec<char> {
+    fn suggest_a_word(&mut self) -> Word {
         self.high_variety_suggestion()
             .unwrap_or_else(|| self.random_suggestion())
     }
 
-    fn high_variety_suggestion(&mut self) -> Option<Vec<char>> {
+    fn high_variety_suggestion(&mut self) -> Option<Word> {
         let open_positions = self.open_positions();
+
         // println!("open positions {:?}", open_positions);
         let freq = self.character_frequency_of_open_positions(&open_positions);
         // println!("Overall character counts: {}", freq.to_string());
@@ -126,31 +129,53 @@ impl Wordle {
         //     println!("Position[{}] character counts: {}", i, freq.to_string());
         // }
 
-        let high_variety_words = self.high_variety_words(&open_positions);
-        println!(
-            "{}/{} words have different characters in all the open spots",
-            high_variety_words.len(),
-            self.words.len()
-        );
-
         // Called just to print the top words
         self.max_char_freqs_sum_word(&self.words, &freqs, &open_positions);
         self.max_char_freq_sum_word(&self.words, &freq, &open_positions);
 
-        println!("Enforced high-variety words only:");
-        if let Some(individual_variety_word) =
-            self.max_char_freqs_sum_word(&high_variety_words, &freqs, &open_positions)
-        {
-            // Called just to print the top high variety words
-            self.max_char_freq_sum_word(&high_variety_words, &freq, &open_positions);
+        let high_variety_words = self.high_variety_words(&open_positions);
+        println!(
+            "{}/{} are \"high-variety\" words with different characters in all the open spots",
+            high_variety_words.len(),
+            self.words.len()
+        );
 
-            Some(individual_variety_word)
-        } else {
-            high_variety_words.into_iter().choose(&mut self.rng)
-        }
+        // Called just to print the top high variety words
+        self.max_char_freqs_sum_word(&high_variety_words, &freqs, &open_positions);
+        self.max_char_freq_sum_word(&high_variety_words, &freq, &open_positions);
+
+        self.find_word_matching_most_others_in(&open_positions)
     }
 
-    fn high_variety_words(&self, open_positions: &[usize]) -> Vec<Vec<char>> {
+    fn find_word_matching_most_others_in(&self, positions: &[usize]) -> Option<Word> {
+        // for each word, find out how many other words it matches in any open position
+        let mut scores: Vec<(usize, &Word)> = self.words.iter().map(|word| (0, word)).collect();
+        let char_position_sets: Vec<_> = self
+            .words
+            .iter()
+            .map(|word| (word, word.char_position_set(positions)))
+            .collect();
+        println!("open positions {:?}", positions);
+        for (i, (word_a, set_a)) in char_position_sets
+            .iter()
+            .enumerate()
+            .take(char_position_sets.len() - 1)
+        {
+            for (j, (word_b, set_b)) in char_position_sets.iter().enumerate().skip(i + 1) {
+                assert_ne!(i, j);
+                assert_ne!(word_a, word_b);
+                if !set_a.is_disjoint(set_b) {
+                    scores[i].0 += 1;
+                    scores[j].0 += 1;
+                }
+            }
+        }
+        scores.sort();
+        println!("Matching most:  {}", scores.to_string());
+        scores.best()
+    }
+
+    fn high_variety_words(&self, open_positions: &[usize]) -> Vec<Word> {
         self.words
             .iter()
             .filter(|&word| word.unique_chars_in(open_positions).len() == open_positions.len())
@@ -187,10 +212,10 @@ impl Wordle {
 
     fn max_char_freq_sum_word(
         &self,
-        words: &[Vec<char>],
+        words: &[Word],
         freq: &HashMap<char, usize>,
         open_positions: &[usize],
-    ) -> Option<Vec<char>> {
+    ) -> Option<Word> {
         let mut scores: Vec<_> = words
             .iter()
             .map(|word| {
@@ -205,10 +230,7 @@ impl Wordle {
         if scores.is_empty() {
             return None;
         }
-        scores.sort_unstable_by(|(a_cnt, a_word), (b_cnt, b_word)| match a_cnt.cmp(b_cnt) {
-            Ordering::Equal => a_word.cmp(b_word),
-            by_count => by_count,
-        });
+        scores.sort();
 
         // Best overall with char_set_at (no duplicate counts):
         // 4405 renal, 4405 learn, 4451 raise, 4451 arise, 4509 stare,
@@ -217,30 +239,16 @@ impl Wordle {
         // Best overall with char_vec_at (with duplicate counts):
         // 4763 terse, 4795 tepee, 4833 easel, 4833 lease, 4843 tease,
         // 4893 elate, 4909 rarer, 5013 erase, 5073 eater, 5269 eerie
-        println!(
-            "Best overall:    {}",
-            scores
-                .iter()
-                .skip(scores.len().saturating_sub(10))
-                .map(|(count, word)| format!("{} {}", count, word.to_string()))
-                .collect::<Vec<_>>()
-                .join(", ")
-        );
-        scores
-            .iter()
-            .max_by(|(a_cnt, a_word), (b_cnt, b_word)| match a_cnt.cmp(b_cnt) {
-                Ordering::Equal => a_word.cmp(b_word),
-                by_count => by_count,
-            })
-            .map(|(_count, word)| word.to_vec())
+        println!("Best overall:    {}", scores.to_string());
+        scores.best()
     }
 
     fn max_char_freqs_sum_word(
         &self,
-        words: &[Vec<char>],
+        words: &[Word],
         freqs: &[HashMap<char, usize>; 5],
         open_positions: &[usize],
-    ) -> Option<Vec<char>> {
+    ) -> Option<Word> {
         let mut scores: Vec<_> = words
             .iter()
             .map(|word| {
@@ -254,23 +262,12 @@ impl Wordle {
         if scores.is_empty() {
             return None;
         }
-        scores.sort_unstable_by_key(|(count, _word)| *count);
-        println!(
-            "Best individual: {}",
-            scores
-                .iter()
-                .skip(scores.len().saturating_sub(10))
-                .map(|(count, word)| format!("{} {}", count, word.to_string()))
-                .collect::<Vec<_>>()
-                .join(", ")
-        );
-        scores
-            .iter()
-            .max_by_key(|(count, _word)| *count)
-            .map(|(_count, word)| word.to_vec())
+        scores.sort();
+        println!("Best individual: {}", scores.to_string());
+        scores.best()
     }
 
-    fn random_suggestion(&mut self) -> Vec<char> {
+    fn random_suggestion(&mut self) -> Word {
         self.words.iter().choose(&mut self.rng).unwrap().to_vec()
     }
 
@@ -320,7 +317,7 @@ impl Wordle {
         }
     }
 
-    fn update_illegal_chars(&mut self, guess: Vec<char>) {
+    fn update_illegal_chars(&mut self, guess: Word) {
         // println!("guess {:?}", guess);
         // println!("self.mandatory_chars {:?}", self.mandatory_chars);
         // println!("self.correct_chars {:?}", self.correct_chars);
@@ -388,17 +385,21 @@ impl Wordle {
 trait WordAsCharVec {
     fn to_string(&self) -> String;
     fn unique_chars_in(&self, positions: &[usize]) -> HashSet<char>;
-    fn chars_in(&self, positions: &[usize]) -> Vec<char>;
+    fn chars_in(&self, positions: &[usize]) -> Word;
+    fn char_position_set(&self, positions: &[usize]) -> HashSet<(usize, char)>;
 }
-impl WordAsCharVec for Vec<char> {
+impl WordAsCharVec for Word {
     fn to_string(&self) -> String {
         self.iter().collect::<String>()
     }
     fn unique_chars_in(&self, positions: &[usize]) -> HashSet<char> {
         positions.iter().map(|&i| self[i]).collect()
     }
-    fn chars_in(&self, positions: &[usize]) -> Vec<char> {
+    fn chars_in(&self, positions: &[usize]) -> Word {
         positions.iter().map(|&i| self[i]).collect()
+    }
+    fn char_position_set(&self, positions: &[usize]) -> HashSet<(usize, char)> {
+        positions.iter().map(|&i| (i, self[i])).collect()
     }
 }
 
@@ -413,6 +414,35 @@ impl CharFrequencyToString for HashMap<char, usize> {
             .map(|(c, i)| format!("{} {}", i, c))
             .collect::<Vec<_>>()
             .join(", ")
+    }
+}
+
+trait ScoreTrait {
+    fn sort(&mut self);
+    fn to_string(&self) -> String;
+    fn best(&self) -> Option<Word>;
+}
+impl ScoreTrait for Vec<(usize, &Word)> {
+    fn sort(&mut self) {
+        self.sort_unstable_by(|(a_cnt, a_word), (b_cnt, b_word)| match a_cnt.cmp(b_cnt) {
+            Ordering::Equal => a_word.cmp(b_word),
+            by_count => by_count,
+        });
+    }
+    fn to_string(&self) -> String {
+        self.iter()
+            .skip(self.len().saturating_sub(10))
+            .map(|(count, word)| format!("{} {}", count, word.to_string()))
+            .collect::<Vec<_>>()
+            .join(", ")
+    }
+    fn best(&self) -> Option<Word> {
+        self.iter()
+            .max_by(|(a_cnt, a_word), (b_cnt, b_word)| match a_cnt.cmp(b_cnt) {
+                Ordering::Equal => a_word.cmp(b_word),
+                by_count => by_count,
+            })
+            .map(|(_count, word)| word.to_vec())
     }
 }
 
