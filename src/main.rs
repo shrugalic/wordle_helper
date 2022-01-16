@@ -4,13 +4,13 @@ use std::collections::{HashMap, HashSet};
 use std::fmt::{Display, Formatter};
 use std::io;
 
-const WORDLIST: &str = include_str!("../data/subset_of_actual_wordles.txt");
+const SOLUTIONS: &str = include_str!("../data/wordlists/solutions.txt");
 
 type Word = Vec<char>;
 
 // Helper for https://www.powerlanguage.co.uk/wordle/
 struct Wordle {
-    words: Vec<Word>,
+    solutions: Vec<Word>,
     illegal_chars: HashSet<char>,
     correct_chars: [Option<char>; 5],
     illegal_at_pos: [HashSet<char>; 5],
@@ -20,17 +20,13 @@ struct Wordle {
 }
 impl Wordle {
     fn new(wordlist: &str) -> Self {
-        let words: Vec<Word> = wordlist.lines().map(|word| word.to_word()).collect();
-        let illegal_position_for_char: [HashSet<char>; 5] = [
-            HashSet::new(),
-            HashSet::new(),
-            HashSet::new(),
-            HashSet::new(),
-            HashSet::new(),
-        ];
+        let solutions: Vec<Word> = wordlist.lines().map(|word| word.to_word()).collect();
+        let empty = HashSet::new;
+        let illegal_position_for_char: [HashSet<char>; 5] =
+            [empty(), empty(), empty(), empty(), empty()];
         let rng = thread_rng();
         Wordle {
-            words,
+            solutions,
             illegal_chars: HashSet::new(),
             correct_chars: [None; 5],
             illegal_at_pos: illegal_position_for_char,
@@ -47,16 +43,16 @@ impl Wordle {
         self.print_result();
     }
     fn is_game_over(&self) -> bool {
-        self.correct_chars.iter().all(|o| o.is_some()) || self.words.len() <= 1
+        self.correct_chars.iter().all(|o| o.is_some()) || self.solutions.len() <= 1
     }
     fn print_remaining_word_count(&self) {
-        if self.words.len() > 10 {
-            println!("\n{} words left", self.words.len());
+        if self.solutions.len() > 10 {
+            println!("\n{} words left", self.solutions.len());
         } else {
             println!(
                 "\n{} words left: {}",
-                self.words.len(),
-                self.words
+                self.solutions.len(),
+                self.solutions
                     .iter()
                     .map(|word| word.to_string())
                     .collect::<Vec<_>>()
@@ -121,15 +117,15 @@ impl Wordle {
         // println!("open positions {:?}", positions);
 
         // Called just to print the top words
-        MostFrequentGlobalCharacter.pick(&self.words, &positions);
-        MostFrequentCharacterPerPos.pick(&self.words, &positions);
-        MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&self.words, &positions);
+        MostFrequentGlobalCharacter.pick(&self.solutions, &positions);
+        MostFrequentCharacterPerPos.pick(&self.solutions, &positions);
+        MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&self.solutions, &positions);
 
         let high_variety_words = self.high_variety_words(&positions);
         println!(
             "{}/{} are 'high-variety' words with different characters in all open positions",
             high_variety_words.len(),
-            self.words.len()
+            self.solutions.len()
         );
 
         // Called just to print the top high variety words
@@ -137,7 +133,7 @@ impl Wordle {
         MostFrequentCharacterPerPos.pick(&high_variety_words, &positions);
         MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&high_variety_words, &positions);
 
-        let all_buckets = try_out_words_with_each_other(&self.words, &positions);
+        let all_buckets = try_out_words_with_each_other(&self.solutions, &positions);
         self.word_dividing_up_search_space_most_evenly(&all_buckets);
         self.word_that_results_in_fewest_remaining_possible_words(&all_buckets)
     }
@@ -162,7 +158,7 @@ impl Wordle {
             })
             .collect();
         let mut scores: Vec<(f64, &Word)> = self
-            .words
+            .solutions
             .iter()
             .enumerate()
             .map(|(i, word)| (variances[i], word))
@@ -180,7 +176,7 @@ impl Wordle {
         &self,
         all_buckets: &[[usize; 243]],
     ) -> Option<Word> {
-        let word_count = self.words.len() as f64;
+        let word_count = self.solutions.len() as f64;
         let mut scores: Vec<(f64, &Word)> = all_buckets
             .iter()
             .enumerate()
@@ -192,7 +188,7 @@ impl Wordle {
                         probability_of_bucket * bucket_size as f64
                     })
                     .sum();
-                (expected_remaining_word_count, &self.words[i])
+                (expected_remaining_word_count, &self.solutions[i])
             })
             .collect();
 
@@ -205,7 +201,7 @@ impl Wordle {
     }
 
     fn high_variety_words(&self, open_positions: &[usize]) -> Vec<Word> {
-        self.words
+        self.solutions
             .iter()
             .filter(|&word| word.unique_chars_in(open_positions).len() == open_positions.len())
             .cloned()
@@ -213,7 +209,11 @@ impl Wordle {
     }
 
     fn random_suggestion(&mut self) -> Word {
-        self.words.iter().choose(&mut self.rng).unwrap().to_vec()
+        self.solutions
+            .iter()
+            .choose(&mut self.rng)
+            .unwrap()
+            .to_vec()
     }
 
     fn open_positions(&self) -> Vec<usize> {
@@ -283,8 +283,8 @@ impl Wordle {
     }
 
     fn update_words(&mut self) {
-        self.words = self
-            .words
+        self.solutions = self
+            .solutions
             .drain(..)
             .filter(|word| {
                 !self
@@ -315,10 +315,10 @@ impl Wordle {
     }
 
     fn print_result(&self) {
-        if self.words.len() == 1 {
+        if self.solutions.len() == 1 {
             println!(
                 "\nThe only word left in the list is '{}'",
-                self.words[0].to_string()
+                self.solutions[0].to_string()
             );
         } else {
             let word: String = self.correct_chars.iter().map(|c| c.unwrap()).collect();
@@ -731,7 +731,7 @@ fn get_hints(word1: &Word, word2: &Word) -> (Hints, Hints) {
 }
 
 fn main() {
-    Wordle::new(WORDLIST).play()
+    Wordle::new(SOLUTIONS).play()
 }
 
 #[cfg(test)]
@@ -740,7 +740,7 @@ mod tests {
 
     #[test]
     fn test_pick_word_that_exactly_matches_most_others_in_at_least_one_open_position() {
-        let words: Vec<Word> = WORDLIST.lines().map(|word| word.to_word()).collect();
+        let words: Vec<Word> = SOLUTIONS.lines().map(|word| word.to_word()).collect();
         let word = MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&words, &[0, 1, 2, 3, 4]);
         assert_eq!(word.unwrap().to_string(), "sauce");
     }
