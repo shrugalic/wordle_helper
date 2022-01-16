@@ -121,9 +121,9 @@ impl Wordle {
         println!("open positions {:?}", open_positions);
 
         // println!("open positions {:?}", open_positions);
-        let freq = self.character_frequency_of_open_positions(&open_positions);
+        let freq = self.words.global_character_counts_in(&open_positions);
         // println!("Overall character counts: {}", freq.to_string());
-        let freqs = self.character_frequencies_of_open_positions(&open_positions);
+        let freqs = self.words.character_counts_per_position_in(&open_positions);
         // for (i, freq) in freqs.iter().enumerate() {
         //     println!("Position[{}] character counts: {}", i, freq.to_string());
         // }
@@ -454,6 +454,36 @@ impl CharFrequencyToString for HashMap<char, usize> {
             .map(|(c, i)| format!("{} {}", i, c))
             .collect::<Vec<_>>()
             .join(", ")
+    }
+}
+
+trait CharacterCounts {
+    /// Global character frequency
+    fn global_character_counts_in(&self, positions: &[usize]) -> HashMap<char, usize>;
+
+    /// Character counts per position
+    fn character_counts_per_position_in(&self, positions: &[usize]) -> [HashMap<char, usize>; 5];
+}
+impl CharacterCounts for Vec<Word> {
+    fn global_character_counts_in(&self, positions: &[usize]) -> HashMap<char, usize> {
+        let mut freq: HashMap<char, usize> = HashMap::new();
+        for word in self {
+            for i in positions {
+                *freq.entry(word[*i]).or_default() += 1;
+            }
+        }
+        freq
+    }
+    fn character_counts_per_position_in(&self, positions: &[usize]) -> [HashMap<char, usize>; 5] {
+        let empty = || ('a'..='z').into_iter().map(|c| (c, 0)).collect();
+        let mut frequencies: [HashMap<char, usize>; 5] =
+            [empty(), empty(), empty(), empty(), empty()];
+        for word in self {
+            for i in positions {
+                *frequencies[*i].get_mut(&word[*i]).unwrap() += 1;
+            }
+        }
+        frequencies
     }
 }
 
