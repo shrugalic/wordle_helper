@@ -141,7 +141,7 @@ impl Wordle {
         // Called just to print the top high variety words
         self.max_char_freqs_sum_word(&high_variety_words, &freqs, &open_positions);
         self.max_char_freq_sum_word(&high_variety_words, &freq, &open_positions);
-        self.find_word_matching_most_others_in(&open_positions);
+        MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&self.words, &open_positions);
 
         self.find_word_dividing_up_search_space_most_evenly(&open_positions)
     }
@@ -612,6 +612,47 @@ impl<T: PartialOrd + Display> ScoreTrait for Vec<(T, &Word)> {
     }
 }
 
+trait PickBestWord {
+    fn pick(&self, list: &[Word], positions: &[usize]) -> Option<Word>;
+}
+
+struct MatchingMostOtherWordsInAtLeastOneOpenPosition;
+impl PickBestWord for MatchingMostOtherWordsInAtLeastOneOpenPosition {
+    fn pick(&self, words: &[Word], positions: &[usize]) -> Option<Word> {
+        // for each word, find out how many other words it matches in any open position
+        let mut scores: Vec<(usize, &Word)> = words.iter().map(|word| (0, word)).collect();
+        let open_chars: Vec<_> = words.iter().map(|word| word.chars_in(positions)).collect();
+        for (i, chars_a) in open_chars.iter().enumerate().take(open_chars.len() - 1) {
+            for (j, chars_b) in open_chars.iter().enumerate().skip(i + 1) {
+                assert_ne!(i, j);
+                assert_ne!(chars_a, chars_b);
+                let any_open_position_matches_exactly =
+                    chars_a.iter().zip(chars_b.iter()).any(|(a, b)| a == b);
+                if any_open_position_matches_exactly {
+                    scores[i].0 += 1;
+                    scores[j].0 += 1;
+                }
+            }
+        }
+
+        scores.sort_asc();
+        println!("Matching fewest words: {}", scores.to_string());
+
+        scores.sort_desc();
+        println!("Matching most words:   {}", scores.to_string());
+
+        // Worst 10
+        // 320 lymph, 314 igloo, 313 umbra, 310 unzip, 308 affix,
+        // 304 ethos, 301 jumbo, 298 ethic, 282 nymph, 279 inbox
+
+        // Best 10
+        // 1077 slate, 1095 sooty, 1097 scree, 1098 gooey, 1099 spree,
+        // 1100 sense, 1104 saute, 1114 soapy, 1115 saucy, 1122 sauce
+
+        scores.highest()
+    }
+}
+
 trait ToWord {
     fn to_word(&self) -> Word;
 }
@@ -628,6 +669,13 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_pick_word_that_exactly_matches_most_others_in_at_least_one_open_position() {
+        let words: Vec<Word> = WORDLIST.lines().map(|word| word.to_word()).collect();
+        let word = MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&words, &[0, 1, 2, 3, 4]);
+        assert_eq!(word.unwrap().to_string(), "sauce");
+    }
 
     #[test]
     #[allow(clippy::identity_op, clippy::erasing_op)]
