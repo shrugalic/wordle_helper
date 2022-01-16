@@ -175,8 +175,7 @@ impl Wordle {
     }
 
     fn find_word_dividing_up_search_space_most_evenly(&self, positions: &[usize]) -> Option<Word> {
-        // Inspired by Sean Plays https://youtu.be/BN-Yan03m8s
-        let mut buckets: Vec<[usize; 243]> = vec![[0; 243]; self.words.len()];
+        let mut all_buckets: Vec<[usize; 243]> = vec![[0; 243]; self.words.len()];
         let word_and_open_chars: Vec<_> = self
             .words
             .iter()
@@ -192,36 +191,53 @@ impl Wordle {
                 assert_ne!(idx_a, idx_b);
                 assert_ne!(word_a, word_b);
                 let (bucket_a, bucket_b) = Wordle::result_bucket(chars_a, chars_b);
-                buckets[idx_a][bucket_a] += 1; // word_a was the guess
-                buckets[idx_b][bucket_b] += 1; // word_b was the guess
+                all_buckets[idx_a][bucket_a] += 1; // word_a was the guess
+                all_buckets[idx_b][bucket_b] += 1; // word_b was the guess
             }
         }
-        let averages: Vec<_> = buckets
-            .iter()
-            .map(|bucket| bucket.iter().sum::<usize>() as f64 / bucket.len() as f64)
-            .collect();
-        let variances: Vec<_> = buckets
-            .iter()
-            .enumerate()
-            .map(|(i, bucket)| {
-                bucket
-                    .iter()
-                    .map(|&v| ((v as f64) - averages[i]).powf(2.0))
-                    .sum::<f64>() as f64
-                    / bucket.len() as f64
-            })
-            .collect();
-        let mut scores: Vec<(f64, &Word)> = self
-            .words
-            .iter()
-            .enumerate()
-            .map(|(i, word)| (variances[i], word))
-            .collect();
+        let mut scores: Vec<(f64, &Word)> = if false {
+            let averages: Vec<_> = all_buckets
+                .iter()
+                .map(|bucket| bucket.iter().sum::<usize>() as f64 / bucket.len() as f64)
+                .collect();
+            let variances: Vec<_> = all_buckets
+                .iter()
+                .enumerate()
+                .map(|(i, bucket)| {
+                    bucket
+                        .iter()
+                        .map(|&v| ((v as f64) - averages[i]).powf(2.0))
+                        .sum::<f64>() as f64
+                        / bucket.len() as f64
+                })
+                .collect();
+            self.words
+                .iter()
+                .enumerate()
+                .map(|(i, word)| (variances[i], word))
+                .collect()
+        } else {
+            // probability of hint (bucket) given words and guess
+            let word_count = self.words.len() as f64;
+            all_buckets
+                .into_iter()
+                .enumerate()
+                .map(|(i, buckets)| {
+                    let expected_remaining_word_count = buckets
+                        .iter()
+                        .map(|&bucket_size| {
+                            let probability_of_bucket = bucket_size as f64 / word_count;
+                            probability_of_bucket * bucket_size as f64
+                        })
+                        .sum();
+                    (expected_remaining_word_count, &self.words[i])
+                })
+                .collect()
+        };
         scores.sort_desc();
-        println!("Dividing worst: {}", scores.to_string());
+        println!("Remaining worst: {}", scores.to_string());
         scores.sort_asc();
-        println!("Dividing best:  {}", scores.to_string());
-
+        println!("Remaining best:  {}", scores.to_string());
         scores.lowest()
     }
     /// Each guessed word results in a hint that depends on the wanted word.
