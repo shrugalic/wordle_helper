@@ -208,3 +208,5 @@ drink
 favor
 abbey
 tangy
+panic
+solar

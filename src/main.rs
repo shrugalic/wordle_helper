@@ -1,6 +1,7 @@
 use rand::prelude::*;
 use std::cmp::{Ordering, Reverse};
 use std::collections::{HashMap, HashSet};
+use std::fmt::Display;
 use std::io;
 
 const WORDLIST: &str = include_str!("../data/subset_of_actual_wordles.txt");
@@ -19,10 +20,7 @@ struct Wordle {
 }
 impl Wordle {
     fn new(wordlist: &str) -> Self {
-        let words: Vec<Word> = wordlist
-            .lines()
-            .map(|word| word.chars().collect())
-            .collect();
+        let words: Vec<Word> = wordlist.lines().map(|word| word.to_word()).collect();
         let illegal_position_for_char: [HashSet<char>; 5] = [
             HashSet::new(),
             HashSet::new(),
@@ -114,11 +112,11 @@ impl Wordle {
     }
 
     fn suggest_a_word(&mut self) -> Word {
-        self.high_variety_suggestion()
+        self.optimized_suggestion()
             .unwrap_or_else(|| self.random_suggestion())
     }
 
-    fn high_variety_suggestion(&mut self) -> Option<Word> {
+    fn optimized_suggestion(&mut self) -> Option<Word> {
         let open_positions = self.open_positions();
 
         // println!("open positions {:?}", open_positions);
@@ -143,8 +141,9 @@ impl Wordle {
         // Called just to print the top high variety words
         self.max_char_freqs_sum_word(&high_variety_words, &freqs, &open_positions);
         self.max_char_freq_sum_word(&high_variety_words, &freq, &open_positions);
+        self.find_word_matching_most_others_in(&open_positions);
 
-        self.find_word_matching_most_others_in(&open_positions)
+        self.find_word_dividing_up_search_space_most_evenly(&open_positions)
     }
 
     fn find_word_matching_most_others_in(&self, positions: &[usize]) -> Option<Word> {
@@ -170,9 +169,136 @@ impl Wordle {
                 }
             }
         }
-        scores.sort();
+        scores.sort_desc();
         println!("Matching most:  {}", scores.to_string());
-        scores.best()
+        scores.highest()
+    }
+
+    fn find_word_dividing_up_search_space_most_evenly(&self, positions: &[usize]) -> Option<Word> {
+        // Inspired by Sean Plays https://youtu.be/BN-Yan03m8s
+        let mut buckets: Vec<[usize; 243]> = vec![[0; 243]; self.words.len()];
+        let word_and_open_chars: Vec<_> = self
+            .words
+            .iter()
+            .map(|word| (word, word.chars_in(positions)))
+            .collect();
+        for (idx_a, (word_a, chars_a)) in word_and_open_chars
+            .iter()
+            .enumerate()
+            .take(word_and_open_chars.len() - 1)
+        {
+            for (idx_b, (word_b, chars_b)) in word_and_open_chars.iter().enumerate().skip(idx_a + 1)
+            {
+                assert_ne!(idx_a, idx_b);
+                assert_ne!(word_a, word_b);
+                let (bucket_a, bucket_b) = Wordle::result_bucket(chars_a, chars_b);
+                buckets[idx_a][bucket_a] += 1; // word_a was the guess
+                buckets[idx_b][bucket_b] += 1; // word_b was the guess
+            }
+        }
+        let averages: Vec<_> = buckets
+            .iter()
+            .map(|bucket| bucket.iter().sum::<usize>() as f64 / bucket.len() as f64)
+            .collect();
+        let variances: Vec<_> = buckets
+            .iter()
+            .enumerate()
+            .map(|(i, bucket)| {
+                bucket
+                    .iter()
+                    .map(|&v| ((v as f64) - averages[i]).powf(2.0))
+                    .sum::<f64>() as f64
+                    / bucket.len() as f64
+            })
+            .collect();
+        let mut scores: Vec<(f64, &Word)> = self
+            .words
+            .iter()
+            .enumerate()
+            .map(|(i, word)| (variances[i], word))
+            .collect();
+        scores.sort_desc();
+        println!("Dividing worst: {}", scores.to_string());
+        scores.sort_asc();
+        println!("Dividing best:  {}", scores.to_string());
+
+        scores.lowest()
+    }
+    /// Each guessed word results in a hint that depends on the wanted word.
+    /// For each character in a guess there are 3 options:
+    /// - The solution contains it in exactly this position: 🟩, given value 2
+    /// - The solution contains it, but a different position: 🟨, given value 1
+    /// - The solution does not contain this character anywhere: ⬛️, given value 0
+    ///
+    /// As each of the 5 positions can result in one of 3 states, there are 3^5 = 243 possible hints.
+    /// Let's assign a number to each one. We multiply the values 0, 1 or 2 with a multiplier 3 ^ i,
+    /// which depends on its index `i` within the word (the first index being 0).
+    ///
+    /// This function returns two values. The first with w1 as the guess and w2 as the solution,
+    /// and the second value with w2 as the guess and w1 as the solution
+    fn result_bucket(w1: &[char], w2: &[char]) -> (usize, usize) {
+        const MULTIPLIERS: [usize; 5] = [1, 3, 9, 27, 81];
+
+        // Exact matches
+        let mut exact_match_sum = 0;
+        let mut open_positions = vec![];
+        w1.iter().zip(w2).enumerate().for_each(|(i, (c1, c2))| {
+            if c1 == c2 {
+                exact_match_sum += MULTIPLIERS[i] * 2; // exact match
+            } else {
+                open_positions.push(i);
+            }
+        });
+        // println!("exact_match_sum {}", exact_match_sum);
+        let (mut sum1, mut sum2) = (exact_match_sum, exact_match_sum);
+
+        // Characters that are in in the solution, but at another position. These are a bit tricky,
+        // because we must only consider the open positions, and also the remaining number of
+        // these characters
+
+        let total_char_count = |solution: &[char], ch: &char| {
+            solution
+                .iter()
+                .enumerate()
+                .filter(|(i, _)| open_positions.contains(i))
+                .filter(|(_, c)| c == &ch)
+                .count()
+        };
+        for (i, (c1, c2)) in w1
+            .iter()
+            .zip(w2.iter())
+            .enumerate()
+            .filter(|(i, _)| open_positions.contains(i))
+        {
+            let considered_char_count = |word: &[char], ch: &char| {
+                word.iter()
+                    .take(i + 1) // include current pos
+                    .enumerate()
+                    .filter(|(i, _)| open_positions.contains(i))
+                    .filter(|(_, c)| c == &ch)
+                    .count()
+            };
+
+            // println!(
+            //     "({}, {}) @ {}: {} <= {} = {}, {} <= {} = {}",
+            //     c1,
+            //     c2,
+            //     i,
+            //     considered_char_count(w1, c1),
+            //     total_char_count(w2, c1),
+            //     considered_char_count(w1, c1) <= total_char_count(w2, c1),
+            //     considered_char_count(w2, c2),
+            //     total_char_count(w1, c2),
+            //     considered_char_count(w2, c2) <= total_char_count(w1, c2)
+            // );
+            if considered_char_count(w1, c1) <= total_char_count(w2, c1) {
+                sum1 += MULTIPLIERS[i];
+            }
+            if considered_char_count(w2, c2) <= total_char_count(w1, c2) {
+                sum2 += MULTIPLIERS[i];
+            }
+        }
+        (sum1, sum2)
     }
 
     fn high_variety_words(&self, open_positions: &[usize]) -> Vec<Word> {
@@ -230,7 +356,7 @@ impl Wordle {
         if scores.is_empty() {
             return None;
         }
-        scores.sort();
+        scores.sort_desc();
 
         // Best overall with char_set_at (no duplicate counts):
         // 4405 renal, 4405 learn, 4451 raise, 4451 arise, 4509 stare,
@@ -240,7 +366,7 @@ impl Wordle {
         // 4763 terse, 4795 tepee, 4833 easel, 4833 lease, 4843 tease,
         // 4893 elate, 4909 rarer, 5013 erase, 5073 eater, 5269 eerie
         println!("Best overall:    {}", scores.to_string());
-        scores.best()
+        scores.highest()
     }
 
     fn max_char_freqs_sum_word(
@@ -262,9 +388,9 @@ impl Wordle {
         if scores.is_empty() {
             return None;
         }
-        scores.sort();
+        scores.sort_desc();
         println!("Best individual: {}", scores.to_string());
-        scores.best()
+        scores.highest()
     }
 
     fn random_suggestion(&mut self) -> Word {
@@ -287,7 +413,7 @@ impl Wordle {
         let mut input = String::new();
         io::stdin().read_line(&mut input).unwrap();
 
-        let correct_pos: Vec<_> = input.trim().chars().collect();
+        let correct_pos: Word = input.trim().to_word();
         for (i, c) in correct_pos
             .iter()
             .enumerate()
@@ -304,7 +430,7 @@ impl Wordle {
         println!("Enter correct characters in the wrong spot. Use any non-alphabetic char as prefix if necessary:");
         io::stdin().read_line(&mut input).unwrap();
 
-        let wrong_pos: Vec<_> = input.trim().chars().collect();
+        let wrong_pos: Word = input.trim().to_word();
         for (i, c) in wrong_pos
             .iter()
             .enumerate()
@@ -418,15 +544,27 @@ impl CharFrequencyToString for HashMap<char, usize> {
 }
 
 trait ScoreTrait {
-    fn sort(&mut self);
+    fn sort_asc(&mut self);
+    fn sort_desc(&mut self);
     fn to_string(&self) -> String;
-    fn best(&self) -> Option<Word>;
+    fn lowest(&self) -> Option<Word>;
+    fn highest(&self) -> Option<Word>;
 }
-impl ScoreTrait for Vec<(usize, &Word)> {
-    fn sort(&mut self) {
-        self.sort_unstable_by(|(a_cnt, a_word), (b_cnt, b_word)| match a_cnt.cmp(b_cnt) {
-            Ordering::Equal => a_word.cmp(b_word),
-            by_count => by_count,
+impl<T: PartialOrd + Display> ScoreTrait for Vec<(T, &Word)> {
+    fn sort_asc(&mut self) {
+        self.sort_unstable_by(|(a_value, a_word), (b_value, b_word)| {
+            match b_value.partial_cmp(a_value) {
+                Some(Ordering::Equal) | None => a_word.cmp(b_word),
+                Some(by_value) => by_value,
+            }
+        });
+    }
+    fn sort_desc(&mut self) {
+        self.sort_unstable_by(|(a_value, a_word), (b_value, b_word)| {
+            match a_value.partial_cmp(b_value) {
+                Some(Ordering::Equal) | None => a_word.cmp(b_word),
+                Some(by_value) => by_value,
+            }
         });
     }
     fn to_string(&self) -> String {
@@ -436,16 +574,66 @@ impl ScoreTrait for Vec<(usize, &Word)> {
             .collect::<Vec<_>>()
             .join(", ")
     }
-    fn best(&self) -> Option<Word> {
+    fn lowest(&self) -> Option<Word> {
         self.iter()
-            .max_by(|(a_cnt, a_word), (b_cnt, b_word)| match a_cnt.cmp(b_cnt) {
-                Ordering::Equal => a_word.cmp(b_word),
-                by_count => by_count,
-            })
-            .map(|(_count, word)| word.to_vec())
+            .min_by(
+                |(a_value, a_word), (b_value, b_word)| match a_value.partial_cmp(b_value) {
+                    Some(Ordering::Equal) | None => a_word.cmp(b_word),
+                    Some(by_value) => by_value,
+                },
+            )
+            .map(|(_value, word)| word.to_vec())
+    }
+    fn highest(&self) -> Option<Word> {
+        self.iter()
+            .max_by(
+                |(a_value, a_word), (b_value, b_word)| match a_value.partial_cmp(b_value) {
+                    Some(Ordering::Equal) | None => a_word.cmp(b_word),
+                    Some(by_value) => by_value,
+                },
+            )
+            .map(|(_value, word)| word.to_vec())
+    }
+}
+
+trait ToWord {
+    fn to_word(&self) -> Word;
+}
+impl ToWord for &str {
+    fn to_word(&self) -> Word {
+        self.chars().collect()
     }
 }
 
 fn main() {
     Wordle::new(WORDLIST).play()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[allow(clippy::identity_op, clippy::erasing_op)]
+    fn test_bucket() {
+        let (s1, s2) = Wordle::result_bucket(&"guess".to_word(), &"truss".to_word());
+        assert_eq!(1 * 0 + 3 * 1 + 9 * 0 + 27 * 2 + 81 * 2, s1); // guess "guess" for solution "truss"
+        assert_eq!(1 * 0 + 3 * 0 + 9 * 1 + 27 * 2 + 81 * 2, s2); // guess "truss" for solution "guess"
+
+        let (s1, s2) = Wordle::result_bucket(&"briar".to_word(), &"error".to_word());
+        assert_eq!(1 * 0 + 3 * 2 + 9 * 0 + 27 * 0 + 81 * 2, s1); // guess "briar" for wanted "error"
+        assert_eq!(1 * 0 + 3 * 2 + 9 * 0 + 27 * 0 + 81 * 2, s2); // guess "error" for wanted "briar"
+
+        let (s1, s2) = Wordle::result_bucket(&"sissy".to_word(), &"truss".to_word());
+        assert_eq!(1 * 1 + 3 * 0 + 9 * 0 + 27 * 2 + 81 * 0, s1); // guess "sissy" for wanted "truss"
+        assert_eq!(1 * 0 + 3 * 0 + 9 * 0 + 27 * 2 + 81 * 1, s2); // guess "truss" for wanted "sissy"
+
+        let (s1, s2) = Wordle::result_bucket(&"abaca".to_word(), &"badaa".to_word());
+        assert_eq!(1 * 1 + 3 * 1 + 9 * 1 + 27 * 0 + 81 * 2, s1); // guess "abaca" for wanted "badae"
+        assert_eq!(1 * 1 + 3 * 1 + 9 * 0 + 27 * 1 + 81 * 2, s2); // guess "badae" for wanted "abaca"
+
+        let (s1, s2) = Wordle::result_bucket(&"aaabc".to_word(), &"axyaa".to_word());
+        assert_eq!(1 * 2 + 3 * 1 + 9 * 1 + 27 * 0 + 81 * 0, s1); // guess "aaabc" for wanted "axyaa"
+        assert_eq!(1 * 2 + 3 * 0 + 9 * 0 + 27 * 1 + 81 * 1, s2); // guess "axyaa" for wanted "aaabc"
+    }
 }
