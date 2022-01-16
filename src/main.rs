@@ -63,11 +63,10 @@ impl Wordle {
     fn single_round(&mut self) {
         let guess = self.ask_for_guess();
         self.guessed_words.insert(guess.clone());
-        self.ask_about_correct_chars_in_correct_position();
+        self.ask_for_feedback(&guess);
         if self.is_game_over() {
             return;
         }
-        self.ask_about_correct_chars_in_wrong_position();
         self.update_illegal_chars(guess);
 
         self.update_words();
@@ -131,11 +130,12 @@ impl Wordle {
         // Called just to print the top high variety words
         MostFrequentGlobalCharacter.pick(&high_variety_words, &positions);
         MostFrequentCharacterPerPos.pick(&high_variety_words, &positions);
-        MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&high_variety_words, &positions);
+        MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&high_variety_words, &positions)
 
-        let all_buckets = try_out_words_with_each_other(&self.solutions, &positions);
-        self.word_dividing_up_search_space_most_evenly(&all_buckets);
-        self.word_that_results_in_fewest_remaining_possible_words(&all_buckets)
+        // Slow
+        // let all_buckets = try_out_words_with_each_other(&self.solutions, &positions);
+        // self.word_dividing_up_search_space_most_evenly(&all_buckets);
+        // self.word_that_results_in_fewest_remaining_possible_words(&all_buckets)
     }
 
     fn word_dividing_up_search_space_most_evenly(
@@ -225,40 +225,35 @@ impl Wordle {
             .collect()
     }
 
-    fn ask_about_correct_chars_in_correct_position(&mut self) {
+    fn ask_for_feedback(&mut self, guess: &[char]) {
         println!(
-            "Enter characters in the correct spot. Use any non-alphabetic char as prefix if necessary:"
+            "Enter feedback using upper-case for correct and lower-case for wrong positions,\n\
+            or any non-alphabetic for illegal:"
         );
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).unwrap();
-
-        let correct_pos: Word = input.trim().to_word();
-        for (i, c) in correct_pos
-            .iter()
-            .enumerate()
-            .filter(|(_, c)| c.is_ascii_alphabetic())
-            .map(|(i, c)| (i, c.to_ascii_lowercase()))
-        {
-            println!("Inserting '{}' as correct character @ {}", c, i);
-            self.correct_chars[i] = Some(c);
+        let mut input = "123456".to_string();
+        while input.trim().chars().count() > 5 {
+            input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
+            if input.trim().chars().count() > 5 {
+                println!("Enter at most 5 characters:")
+            }
         }
-    }
 
-    fn ask_about_correct_chars_in_wrong_position(&mut self) {
-        let mut input = String::new();
-        println!("Enter correct characters in the wrong spot. Use any non-alphabetic char as prefix if necessary:");
-        io::stdin().read_line(&mut input).unwrap();
-
-        let wrong_pos: Word = input.trim().to_word();
-        for (i, c) in wrong_pos
+        let feedback: Word = input.trim().to_word();
+        for (i, feedback) in feedback
             .iter()
             .enumerate()
             .filter(|(_, c)| c.is_ascii_alphabetic())
-            .map(|(i, c)| (i, c.to_ascii_lowercase()))
         {
-            println!("Inserting '{}' as illegal @ {}", c, i);
-            self.illegal_at_pos[i].insert(c);
-            self.mandatory_chars.insert(c);
+            let c = guess[i];
+            if feedback.is_ascii_uppercase() {
+                println!("Inserting '{}' as correct character @ {}", c, i);
+                self.correct_chars[i] = Some(c.to_ascii_lowercase());
+            } else {
+                println!("Inserting '{}' as illegal @ {}", c, i);
+                self.illegal_at_pos[i].insert(c);
+                self.mandatory_chars.insert(c);
+            }
         }
     }
 
@@ -267,17 +262,21 @@ impl Wordle {
         // println!("self.mandatory_chars {:?}", self.mandatory_chars);
         // println!("self.correct_chars {:?}", self.correct_chars);
 
-        for (i, c) in guess
+        let open_positions = self.open_positions();
+        for (_, c) in guess
             .into_iter()
             .enumerate()
             .filter(|(_, c)| !self.mandatory_chars.contains(c))
+            .filter(|&(i, c)| self.correct_chars[i] != Some(c))
         {
             if !self.correct_chars.iter().any(|&o| o == Some(c)) {
                 println!("Inserting globally illegal char '{}'", c);
                 self.illegal_chars.insert(c);
-            } else if self.correct_chars[i] != Some(c) {
-                println!("Inserting '{}' as illegal @ {}", c, i);
-                self.illegal_at_pos[i].insert(c);
+            } else {
+                println!("Inserting '{}' as illegal @ {:?}", c, open_positions);
+                for i in &open_positions {
+                    self.illegal_at_pos[*i].insert(c);
+                }
             }
         }
     }
