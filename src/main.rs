@@ -1,9 +1,12 @@
 use rand::prelude::*;
+use rayon::prelude::*;
 use std::cmp::{Ordering, Reverse};
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Display, Formatter};
 use std::io;
 
+const ALLOWED: &str = include_str!("../data/wordlists/allowed.txt");
+const COMBINED: &str = include_str!("../data/wordlists/combined.txt");
 const SOLUTIONS: &str = include_str!("../data/wordlists/solutions.txt");
 
 type Word = Vec<char>;
@@ -130,74 +133,10 @@ impl Wordle {
         // Called just to print the top high variety words
         MostFrequentGlobalCharacter.pick(&high_variety_words, &positions);
         MostFrequentCharacterPerPos.pick(&high_variety_words, &positions);
-        MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&high_variety_words, &positions)
+        MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&high_variety_words, &positions);
 
         // Slow
-        // let all_buckets = try_out_words_with_each_other(&self.solutions, &positions);
-        // self.word_dividing_up_search_space_most_evenly(&all_buckets);
-        // self.word_that_results_in_fewest_remaining_possible_words(&all_buckets)
-    }
-
-    fn word_dividing_up_search_space_most_evenly(
-        &self,
-        all_buckets: &[[usize; 243]],
-    ) -> Option<Word> {
-        let averages: Vec<_> = all_buckets
-            .iter()
-            .map(|bucket| bucket.iter().sum::<usize>() as f64 / bucket.len() as f64)
-            .collect();
-        let variances: Vec<_> = all_buckets
-            .iter()
-            .enumerate()
-            .map(|(i, bucket)| {
-                bucket
-                    .iter()
-                    .map(|&v| ((v as f64) - averages[i]).powf(2.0))
-                    .sum::<f64>() as f64
-                    / bucket.len() as f64
-            })
-            .collect();
-        let mut scores: Vec<(f64, &Word)> = self
-            .solutions
-            .iter()
-            .enumerate()
-            .map(|(i, word)| (variances[i], word))
-            .collect();
-
-        scores.sort_desc();
-        println!("Remaining worst: {}", scores.to_string());
-        scores.sort_asc();
-        println!("Remaining best:  {}", scores.to_string());
-
-        scores.lowest()
-    }
-
-    fn word_that_results_in_fewest_remaining_possible_words(
-        &self,
-        all_buckets: &[[usize; 243]],
-    ) -> Option<Word> {
-        let word_count = self.solutions.len() as f64;
-        let mut scores: Vec<(f64, &Word)> = all_buckets
-            .iter()
-            .enumerate()
-            .map(|(i, buckets)| {
-                let expected_remaining_word_count = buckets
-                    .iter()
-                    .map(|&bucket_size| {
-                        let probability_of_bucket = bucket_size as f64 / word_count;
-                        probability_of_bucket * bucket_size as f64
-                    })
-                    .sum();
-                (expected_remaining_word_count, &self.solutions[i])
-            })
-            .collect();
-
-        scores.sort_desc();
-        println!("Remaining worst: {}", scores.to_string());
-        scores.sort_asc();
-        println!("Remaining best:  {}", scores.to_string());
-
-        scores.lowest()
+        WordThatResultsInFewestPossibleRemainingWords.pick(&self.solutions, &positions)
     }
 
     fn high_variety_words(&self, open_positions: &[usize]) -> Vec<Word> {
@@ -452,6 +391,69 @@ trait PickBestWord {
     fn pick(&self, words: &[Word], positions: &[usize]) -> Option<Word>;
 }
 
+struct WordThatResultsInFewestPossibleRemainingWords;
+impl PickBestWord for WordThatResultsInFewestPossibleRemainingWords {
+    fn pick(&self, words: &[Word], _positions: &[usize]) -> Option<Word> {
+        let all_buckets = try_out_all_words_with_each_other(words, &[0, 1, 2, 3, 4]);
+        let word_count = words.len() as f64;
+        let mut scores: Vec<(f64, &Word)> = all_buckets
+            .iter()
+            .enumerate()
+            .map(|(i, buckets)| {
+                let expected_remaining_word_count = buckets
+                    .iter()
+                    .map(|&bucket_size| {
+                        let probability_of_bucket = bucket_size as f64 / word_count;
+                        probability_of_bucket * bucket_size as f64
+                    })
+                    .sum();
+                (expected_remaining_word_count, &words[i])
+            })
+            .collect();
+
+        scores.sort_desc();
+        println!("Remaining worst: {}", scores.to_string());
+        scores.sort_asc();
+        println!("Remaining best:  {}", scores.to_string());
+
+        scores.lowest()
+    }
+}
+
+struct WordDividingSearchSpaceMostEvenly;
+impl PickBestWord for WordDividingSearchSpaceMostEvenly {
+    fn pick(&self, words: &[Word], _positions: &[usize]) -> Option<Word> {
+        let all_buckets = try_out_all_words_with_each_other(words, &[0, 1, 2, 3, 4]);
+        let averages: Vec<_> = all_buckets
+            .iter()
+            .map(|bucket| bucket.iter().sum::<usize>() as f64 / bucket.len() as f64)
+            .collect();
+        let variances: Vec<_> = all_buckets
+            .iter()
+            .enumerate()
+            .map(|(i, bucket)| {
+                bucket
+                    .iter()
+                    .map(|&v| ((v as f64) - averages[i]).powf(2.0))
+                    .sum::<f64>() as f64
+                    / bucket.len() as f64
+            })
+            .collect();
+        let mut scores: Vec<(f64, &Word)> = words
+            .iter()
+            .enumerate()
+            .map(|(i, word)| (variances[i], word))
+            .collect();
+
+        scores.sort_desc();
+        println!("Worst/highest variance: {}", scores.to_string());
+        scores.sort_asc();
+        println!("Best/lowest variance:   {}", scores.to_string());
+
+        scores.lowest()
+    }
+}
+
 struct MostFrequentGlobalCharacter;
 impl PickBestWord for MostFrequentGlobalCharacter {
     fn pick(&self, words: &[Word], positions: &[usize]) -> Option<Word> {
@@ -651,28 +653,19 @@ impl From<&str> for Hints {
     }
 }
 
-fn try_out_words_with_each_other(words: &[Word], positions: &[usize]) -> Vec<[usize; 243]> {
-    let mut all_buckets: Vec<[usize; 243]> = vec![[0; 243]; words.len()];
-    let word_and_open_chars: Vec<_> = words
-        .iter()
-        .map(|word| (word, word.chars_in(positions)))
-        .collect();
-    for (idx_a, (word_a, chars_a)) in word_and_open_chars
-        .iter()
-        .enumerate()
-        .take(word_and_open_chars.len() - 1)
-    {
-        for (idx_b, (word_b, chars_b)) in word_and_open_chars.iter().enumerate().skip(idx_a + 1) {
-            assert_ne!(idx_a, idx_b);
-            assert_ne!(word_a, word_b);
-            let (hint_a, hint_b) = get_hints(chars_a, chars_b);
-            let bucket_a = hint_a.value();
-            let bucket_b = hint_b.value();
-            all_buckets[idx_a][bucket_a] += 1; // word_a was the guess
-            all_buckets[idx_b][bucket_b] += 1; // word_b was the guess
-        }
-    }
-    all_buckets
+fn try_out_all_words_with_each_other(words: &[Word], positions: &[usize]) -> Vec<[usize; 243]> {
+    let open_chars: Vec<_> = words.iter().map(|word| word.chars_in(positions)).collect();
+    open_chars
+        .par_iter()
+        .map(|guess| {
+            let mut bucket = [0; 243];
+            for solution in open_chars.iter() {
+                let (hint, _) = get_hints(guess, solution);
+                bucket[hint.value()] += 1;
+            }
+            bucket
+        })
+        .collect()
 }
 
 /// Each guessed word results in a hint that depends on the wanted word.
@@ -736,6 +729,140 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // #[ignore]
+    // Takes around 6s for the 2'315 solution words
+    #[test]
+    fn test_word_that_results_in_fewest_remaining_possible_words() {
+        let words: Vec<Word> = SOLUTIONS.lines().map(|word| word.to_word()).collect();
+        let word = WordThatResultsInFewestPossibleRemainingWords.pick(&words, &[0, 1, 2, 3, 4]);
+
+        // Worst:
+        // - 701.8172786177106 jazzy
+        // - 723.4898488120951 fluff
+        // - 728.0306695464362 fizzy
+        // - 734.6820734341254 jiffy
+        // - 735.8388768898487 civic
+        // - 777.8172786177107 puppy
+        // - 781.710151187905 mamma
+        // - 815.412958963283 vivid
+        // - 820.7382289416845 mummy
+        // - 855.6807775377972 fuzzy
+
+        // Best:
+        // - 71.57278617710573 slate
+        // - 71.29460043196535 stare
+        // - 71.09762419006474 snare
+        // - 70.22332613390911 later
+        // - 70.12570194384439 saner
+        // - 69.9917926565873 alter
+        // - 66.02116630669536 arose
+        // - 63.779265658747335 irate
+        // - 63.725701943844534 arise
+        // - 61.000863930885565 raise
+
+        assert_eq!(word.unwrap().to_string(), "raise");
+    }
+
+    #[ignore]
+    // Takes around 207s for the 12'972 words in the combined list!
+    #[test]
+    fn test_word_that_results_in_fewest_remaining_possible_words_for_full_word_list() {
+        let words: Vec<Word> = COMBINED.lines().map(|word| word.to_word()).collect();
+        let word = WordThatResultsInFewestPossibleRemainingWords.pick(&words, &[0, 1, 2, 3, 4]);
+
+        // Worst:
+        // - 4935.9 jugum
+        // - 4955.1  yukky
+        // - 4975.4 bubby
+        // - 5027.8 cocco
+        // - 5041.8 fuzzy
+        // - 5226.3 immix
+        // - 5233.3 hyphy
+        // - 5379.7 gyppy
+        // - 5391.8 xylyl
+        // - 5396.1 fuffy
+
+        // Best:
+        // - 315.13 serai
+        // - 314.73 arles
+        // - 311.36 rates
+        // - 309.73 aeros
+        // - 305.55 nares
+        // - 304.76 reais
+        // - 303.83 soare
+        // - 302.49 tares
+        // - 292.11 rales
+        // - 288.74 lares
+
+        assert_eq!(word.unwrap().to_string(), "lares");
+    }
+
+    // #[ignore]
+    // Takes around 6s for the 2'315 solution words
+    #[test]
+    fn test_word_dividing_search_space_most_evenly() {
+        let words: Vec<Word> = SOLUTIONS.lines().map(|word| word.to_word()).collect();
+        let word = WordDividingSearchSpaceMostEvenly.pick(&words, &[0, 1, 2, 3, 4]);
+
+        // Worst/highest variance:
+        // - 6595.3 jazzy
+        // - 6801.7 fluff
+        // - 6845.0 fizzy
+        // - 6908.4 jiffy
+        // - 6919.4 civic
+        // - 7319.3 puppy
+        // - 7356.4 mamma
+        // - 7677.5 vivid
+        // - 7728.2 mummy
+        // - 8061.1 fuzzy
+
+        // Best/lowest variance:
+        // - 591.1 slate
+        // - 588.4 stare
+        // - 586.6 snare
+        // - 578.2 later
+        // - 577.3 saner
+        // - 576.0 alter
+        // - 538.2 arose
+        // - 516.9 irate
+        // - 516.3 arise
+        // - 490.3 raise
+
+        assert_eq!(word.unwrap().to_string(), "raise");
+    }
+    #[ignore] // Takes around 202s for the 12'972 words in the combined list!
+    #[test]
+    fn test_word_dividing_search_space_most_evenly_for_full_word_list() {
+        let words: Vec<Word> = COMBINED.lines().map(|word| word.to_word()).collect();
+        let word = WordDividingSearchSpaceMostEvenly.pick(&words, &[0, 1, 2, 3, 4]);
+
+        // Worst/highest variance:
+        // - 260640.7 jugum
+        // - 261668.0 yukky
+        // - 262751.1 bubby
+        // - 265548.4 cocco
+        // - 266296.7 fuzzy
+        // - 276147.6 immix
+        // - 276519.6 hyphy
+        // - 284332.9 gyppy
+        // - 284978.8 xylyl
+        // - 285207.7 fuffy
+
+        // Best/lowest variance:
+        // - 13973.0 serai
+        // - 13951.6 arles
+        // - 13771.3 rates
+        // - 13684.7 aeros
+        // - 13461.3 nares
+        // - 13419.3 reais
+        // - 13369.6 soare
+        // - 13298.1 tares
+        // - 12743.7 rales
+        // - 12563.9 lares
+
+        assert_eq!(word.unwrap().to_string(), "lares");
+    }
 
     #[test]
     fn test_pick_word_that_exactly_matches_most_others_in_at_least_one_open_position() {
