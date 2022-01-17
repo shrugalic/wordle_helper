@@ -38,6 +38,73 @@ impl Wordle {
             rng,
         }
     }
+    fn autoplay<S: PickBestWord>(&mut self, wanted: Word, strategy: S) -> usize {
+        println!("Wanted '{}':", wanted.to_string());
+        let mut round = 0;
+        while !self.is_game_over() {
+            round += 1;
+            if let Some(guess) = strategy.pick(&self.solutions, &self.open_positions()) {
+                let (hint, _) = get_hints(&guess, &wanted);
+                println!(
+                    "{}. guess '{}', hint '{}', {} words left",
+                    round,
+                    guess.to_string(),
+                    hint.to_string(),
+                    self.solutions.len()
+                );
+                for (i, feedback) in hint.hints.iter().enumerate() {
+                    let c = guess[i];
+                    // wanted   beret
+                    // 1. guess later -> hint ⬛⬛🟨🟩🟨 -> locked ___e_
+                    // 2. guess three -> hint 🟨⬛🟩🟩🟨 -> locked __re_ -> open th__e
+                    match feedback {
+                        Illegal => {}
+                        WrongPos => {
+                            // println!("Inserting '{}' as illegal @ {}", c, i);
+                            self.illegal_at_pos[i].insert(c);
+                            self.mandatory_chars.insert(c);
+                        }
+                        Correct => {
+                            // println!("Inserting '{}' as correct character @ {}", c, i);
+                            self.correct_chars[i] = Some(c.to_ascii_lowercase());
+                        }
+                    }
+                }
+                self.guessed_words.insert(guess.clone());
+                if self.is_game_over() {
+                    return round;
+                }
+                let open_positions = self.open_positions();
+                for (_, c) in guess
+                    .into_iter()
+                    .enumerate()
+                    .filter(|(_, c)| !self.mandatory_chars.contains(c))
+                    .filter(|&(i, c)| self.correct_chars[i] != Some(c))
+                {
+                    if !self.correct_chars.iter().any(|&o| o == Some(c)) {
+                        // println!("Inserting globally illegal char '{}'", c);
+                        self.illegal_chars.insert(c);
+                    } else {
+                        // println!("Inserting '{}' as illegal @ {:?}", c, open_positions);
+                        for i in &open_positions {
+                            self.illegal_at_pos[*i].insert(c);
+                        }
+                    }
+                }
+                self.update_words();
+            }
+        }
+        if self.solutions.len() == 1 {
+            println!(
+                "The only word left in the list is '{}'\n",
+                self.solutions[0].to_string()
+            );
+        } else {
+            let word: String = self.correct_chars.iter().map(|c| c.unwrap()).collect();
+            println!("\nThe word is '{}'\n", word);
+        }
+        round
+    }
     fn play(&mut self) {
         while !self.is_game_over() {
             self.print_remaining_word_count();
@@ -71,7 +138,6 @@ impl Wordle {
             return;
         }
         self.update_illegal_chars(guess);
-
         self.update_words();
     }
 
@@ -483,7 +549,7 @@ impl PickBestWord for MostFrequentGlobalCharacter {
         // Best overall with char_vec_at (with duplicate counts):
         // 4763 terse, 4795 tepee, 4833 easel, 4833 lease, 4843 tease,
         // 4893 elate, 4909 rarer, 5013 erase, 5073 eater, 5269 eerie
-        println!("Best overall:    {}", scores.to_string());
+        // println!("Best overall:    {}", scores.to_string());
         scores.highest()
     }
 }
@@ -509,8 +575,8 @@ impl PickBestWord for MostFrequentCharacterPerPos {
         if scores.is_empty() {
             return None;
         }
-        scores.sort_desc();
-        println!("Best individual: {}", scores.to_string());
+        // scores.sort_desc();
+        // println!("Best individual: {}", scores.to_string());
         scores.highest()
     }
 }
@@ -707,11 +773,21 @@ fn get_hints(word1: &Word, word2: &Word) -> (Hints, Hints) {
             word.iter()
                 .take(i + 1) // include current pos
                 .enumerate()
-                .filter(|(_, c)| c == &ch)
+                .filter(|(i, c)| c == &ch && open_positions.contains(i))
                 .count()
         };
         let char1 = &word1[i];
         let char2 = &word2[i];
+        // println!(
+        //     "considered_char_count('{}', {}) = {} | '{}'.total_char_count({:?}, {}) = {}",
+        //     word1.to_string(),
+        //     char1,
+        //     considered_char_count(word1, char1),
+        //     word2.to_string(),
+        //     open_positions,
+        //     char1,
+        //     word2.total_char_count(&open_positions, char1)
+        // );
         if considered_char_count(word1, char1) <= word2.total_char_count(&open_positions, char1) {
             hint1.set_wrong_pos(i);
         }
@@ -731,6 +807,67 @@ mod tests {
     use super::*;
 
     // #[ignore]
+    #[test]
+    // 62s normally, 6s parallel
+    // rounds: 1: 34, 2: 537, 3: 1145, 4: 467, 5: 114, 6: 9, 7: 8, 8: 1
+    // Average rounds 3.067; 9 (0.389%) failed games (> 6 rounds):
+    // 1: 34, 2: 537, 3: 1145, 4: 467, 5: 114, 6: 9, 7: 8, 8: 1
+    fn auto_play_most_frequent_global_characters() {
+        let words: Vec<_> = SOLUTIONS.trim().lines().map(|w| w.to_word()).collect();
+        let rounds: Vec<usize> = words
+            .into_par_iter()
+            .map(|word| Wordle::new(SOLUTIONS).autoplay(word, MostFrequentGlobalCharacter))
+            .collect();
+        print_stats(rounds);
+    }
+
+    // #[ignore]
+    #[test]
+    // 32s normally, 4s parallel
+    // Average rounds 3.098; 7 (0.302%) failed games (> 6 rounds):
+    // 1: 29, 2: 522, 3: 1133, 4: 498, 5: 98, 6: 28, 7: 6, 8: 1
+    fn auto_play_most_frequent_characters_per_pos() {
+        let words: Vec<_> = SOLUTIONS.trim().lines().map(|w| w.to_word()).collect();
+        let rounds: Vec<_> = words
+            .into_par_iter()
+            .map(|word| Wordle::new(SOLUTIONS).autoplay(word, MostFrequentCharacterPerPos))
+            .collect();
+        print_stats(rounds);
+    }
+
+    fn print_stats(rounds: Vec<usize>) {
+        let mut rounds_map: HashMap<usize, usize> = HashMap::new();
+        for round in rounds {
+            *rounds_map.entry(round).or_default() += 1;
+        }
+        let mut rounds: Vec<_> = rounds_map.into_iter().collect();
+        rounds.sort_unstable();
+        let total = rounds.iter().map(|&(_, cnt)| cnt).sum::<usize>() as f64;
+        let avg = rounds
+            .iter()
+            .map(|&(rnd, cnt)| rnd as f64 * cnt as f64)
+            .sum::<f64>()
+            / total;
+        let failed = rounds
+            .iter()
+            .filter(|&&(rnd, _)| rnd > 6)
+            .map(|&(_, cnt)| cnt)
+            .sum::<usize>();
+        let stats = rounds
+            .iter()
+            .map(|(rnd, cnt)| format!("{}: {}", rnd, cnt))
+            .collect::<Vec<_>>()
+            .join(", ");
+        println!(
+            "Average rounds = {:.3}; {} ({:.3}%) failed games (> 6 rounds):\n{}",
+            avg,
+            failed,
+            100.0 * failed as f64 / total,
+            stats
+        );
+    }
+
+    #[ignore]
     // Takes around 6s for the 2'315 solution words
     #[test]
     fn test_word_that_results_in_fewest_remaining_possible_words() {
@@ -738,28 +875,28 @@ mod tests {
         let word = WordThatResultsInFewestPossibleRemainingWords.pick(&words, &[0, 1, 2, 3, 4]);
 
         // Worst:
-        // - 701.8172786177106 jazzy
-        // - 723.4898488120951 fluff
-        // - 728.0306695464362 fizzy
-        // - 734.6820734341254 jiffy
-        // - 735.8388768898487 civic
-        // - 777.8172786177107 puppy
-        // - 781.710151187905 mamma
-        // - 815.412958963283 vivid
-        // - 820.7382289416845 mummy
-        // - 855.6807775377972 fuzzy
+        // - 701.8 jazzy
+        // - 723.5 fluff
+        // - 728.0 fizzy
+        // - 734.7 jiffy
+        // - 735.8 civic
+        // - 777.8 puppy
+        // - 781.7 mamma
+        // - 815.4 vivid
+        // - 820.7 mummy
+        // - 855.7 fuzzy
 
         // Best:
-        // - 71.57278617710573 slate
-        // - 71.29460043196535 stare
-        // - 71.09762419006474 snare
-        // - 70.22332613390911 later
-        // - 70.12570194384439 saner
-        // - 69.9917926565873 alter
-        // - 66.02116630669536 arose
-        // - 63.779265658747335 irate
-        // - 63.725701943844534 arise
-        // - 61.000863930885565 raise
+        // - 71.57 slate
+        // - 71.29 stare
+        // - 71.10 snare
+        // - 70.22 later
+        // - 70.13 saner
+        // - 69.99 alter
+        // - 66.02 arose
+        // - 63.78 irate
+        // - 63.73 arise
+        // - 61.00 raise
 
         assert_eq!(word.unwrap().to_string(), "raise");
     }
@@ -798,7 +935,7 @@ mod tests {
         assert_eq!(word.unwrap().to_string(), "lares");
     }
 
-    // #[ignore]
+    #[ignore]
     // Takes around 6s for the 2'315 solution words
     #[test]
     fn test_word_dividing_search_space_most_evenly() {
@@ -897,7 +1034,7 @@ mod tests {
         assert_eq!(value(0, 1, 2, 0, 0), Hints::from("⬛🟨🟩⬛⬛").value());
     }
     #[test]
-    fn test_get_hints_and_values() {
+    fn test_get_hints() {
         let (hint1, hint2) = get_hints(&"guest".to_word(), &"truss".to_word());
         assert_eq!("⬛🟨⬛🟩🟨", hint1.to_string());
         assert_eq!("🟨⬛🟨🟩⬛", hint2.to_string());
@@ -913,5 +1050,8 @@ mod tests {
         let (hint1, hint2) = get_hints(&"eject".to_word(), &"geese".to_word());
         assert_eq!("🟨⬛🟩⬛⬛", hint1.to_string());
         assert_eq!("⬛🟨🟩⬛⬛", hint2.to_string());
+
+        let (hint1, _) = get_hints(&"three".to_word(), &"beret".to_word());
+        assert_eq!("🟨⬛🟩🟩🟨", hint1.to_string());
     }
 }
