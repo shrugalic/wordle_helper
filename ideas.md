@@ -3,6 +3,9 @@ Wordle helper ideas:
 - Try more strategies with auto-play
 - Look at failures of certain strategies
   - Many are suboptimal when 4 characters are known, and there are multiple options for the remaining characters
+- MostFrequentUnusedCharacters:
+  - It seems pretty stable
+  - Switch to better strategy if very few words left
 - Allow specifying multiple strategies (fallback)
 - Combine "most unplayed characters" with other strategies, such as "least possible words left after guess"
 - Store results of some calculations to not repeat them every time
