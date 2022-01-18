@@ -70,12 +70,18 @@ impl Wordle {
     #[cfg(test)]
     fn autoplay<S: PickBestWord>(&mut self, wanted: Word, strategy: S) -> usize {
         let mut attempts = 0;
-        while !self.is_game_over() && attempts < 10 {
-            let guess = strategy.pick(self).unwrap_or_else(|| {
-                MostFrequentGlobalCharacter
+        while !self.is_game_over() && attempts < 6 {
+            let guess = if self.solutions.len() <= 6_usize.saturating_sub(attempts) {
+                None
+            } else if self.has_1_or_2_open_positions() {
+                self.suggest_word_covering_chars_in_open_positions()
+            } else {
+                strategy
                     .pick(self)
-                    .unwrap_or_else(|| self.random_suggestion())
-            });
+                    .or_else(|| MostFrequentGlobalCharacter.pick(self))
+            }
+            .unwrap_or_else(|| self.random_suggestion());
+
             attempts += 1;
             let (hint, _) = get_hints(&guess, &wanted);
             println!(
@@ -131,12 +137,45 @@ impl Wordle {
                 attempts,
                 self.solutions[0].to_string()
             );
-        } else {
+        } else if self.correct_chars.iter().all(|o| o.is_some()) {
             let word: String = self.correct_chars.iter().map(|c| c.unwrap()).collect();
             println!("After {} guesses: The word is '{}'\n", attempts, word);
+        } else {
+            panic!(
+                "After {} guesses: No solutions for '{}'",
+                attempts,
+                wanted.to_string()
+            );
         }
         attempts
     }
+
+    fn has_1_or_2_open_positions(&self) -> bool {
+        self.correct_chars.iter().filter(|o| o.is_some()).count() >= 3
+    }
+
+    fn suggest_word_covering_chars_in_open_positions(&self) -> Option<Word> {
+        let pos = self.open_positions();
+        let candidates: Vec<char> = self
+            .solutions
+            .iter()
+            .flat_map(|w| pos.iter().map(|&pos| w[pos]))
+            .collect();
+        let scores: Vec<(usize, &Word)> = COMBINED_WORDS
+            .iter()
+            .filter(|&word| !self.guessed_words.contains(word))
+            .map(|word| {
+                let cnt = word
+                    .unique_chars_in(&ALL_POS)
+                    .into_iter()
+                    .filter(|c| candidates.contains(c))
+                    .count();
+                (cnt, word)
+            })
+            .collect();
+        scores.highest()
+    }
+
     fn play(&mut self) {
         while !self.is_game_over() {
             self.print_remaining_word_count();
@@ -163,7 +202,8 @@ impl Wordle {
         }
     }
     fn single_round(&mut self) {
-        let guess = self.ask_for_guess();
+        let suggestion = self.suggest_a_word();
+        let guess = self.ask_for_guess(suggestion);
         self.guessed_words.insert(guess.clone());
         self.ask_for_feedback(&guess);
         if self.is_game_over() {
@@ -173,8 +213,7 @@ impl Wordle {
         self.update_words();
     }
 
-    fn ask_for_guess(&mut self) -> Word {
-        let suggestion = self.suggest_a_word();
+    fn ask_for_guess(&mut self, suggestion: Word) -> Word {
         let mut input;
         println!(
             "Enter the word you guessed, or use suggestion '{}':",
@@ -213,6 +252,9 @@ impl Wordle {
     }
 
     fn optimized_suggestion(&mut self) -> Option<Word> {
+        if self.has_1_or_2_open_positions() {
+            return self.suggest_word_covering_chars_in_open_positions();
+        }
         // Called just to print the top words
         MostFrequentGlobalCharacter.pick(self);
         MostFrequentCharacterPerPos.pick(self);
@@ -1221,17 +1263,15 @@ mod tests {
         print_stats(attempts);
     }
 
-    // #[ignore]
+    #[ignore]
     #[test]
     // Estimated ~10min normally, 59s parallel
-    // Average attempts = 3.151; 8 (0.346%) failed games (> 6 attempts):
-    // 1: 22, 2: 509, 3: 1097, 4: 522, 5: 122, 6: 35, 7: 8
+    // Average attempts = 3.123; 0 (0.000%) failed games (> 6 attempts):
+    // 1: 22, 2: 510, 3: 1100, 4: 537, 5: 137, 6: 9
     fn auto_play_most_frequent_unused_characters() {
         let words: Vec<_> = SOLUTIONS.trim().lines().map(|w| w.to_word()).collect();
         let attempts: Vec<usize> = words
             .into_par_iter()
-            // .skip(1588)
-            // .take(1)
             .map(|word| Wordle::new(SOLUTIONS).autoplay(word, MostFrequentUnusedCharacters))
             .collect();
         print_stats(attempts);
