@@ -4,16 +4,36 @@ use std::cmp::{Ordering, Reverse};
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Display, Formatter};
 use std::io;
+use Hint::*;
 
-const ALLOWED: &str = include_str!("../data/wordlists/allowed.txt");
+#[macro_use]
+extern crate lazy_static;
+
 const COMBINED: &str = include_str!("../data/wordlists/combined.txt");
 const SOLUTIONS: &str = include_str!("../data/wordlists/solutions.txt");
+const ALL_POS: [usize; 5] = [0, 1, 2, 3, 4];
+
+lazy_static! {
+    static ref COMBINED_WORDS: Vec<Word> = COMBINED.lines().map(|w| w.to_word()).collect();
+    static ref UNIQUE_COMBINED_WORDS: Vec<Word> = COMBINED
+        .lines()
+        .map(|w| w.to_word())
+        .filter(|w| w.unique_chars_in(&ALL_POS).len() == 5)
+        .collect();
+    static ref COMBINED_GLOBAL_CHAR_COUNTS: HashMap<char, usize> = COMBINED
+        .lines()
+        .map(|w| w.to_word())
+        .collect::<Vec<Word>>()
+        .as_slice()
+        .global_character_counts_in(&ALL_POS);
+}
 
 type Word = Vec<char>;
 
 // Helper for https://www.powerlanguage.co.uk/wordle/
 struct Wordle {
     solutions: Vec<Word>,
+    words: Vec<Word>,
     illegal_chars: HashSet<char>,
     correct_chars: [Option<char>; 5],
     illegal_at_pos: [HashSet<char>; 5],
@@ -24,12 +44,14 @@ struct Wordle {
 impl Wordle {
     fn new(wordlist: &str) -> Self {
         let solutions: Vec<Word> = wordlist.lines().map(|word| word.to_word()).collect();
+        let words = solutions.clone();
         let empty = HashSet::new;
         let illegal_position_for_char: [HashSet<char>; 5] =
             [empty(), empty(), empty(), empty(), empty()];
         let rng = thread_rng();
         Wordle {
             solutions,
+            words,
             illegal_chars: HashSet::new(),
             correct_chars: [None; 5],
             illegal_at_pos: illegal_position_for_char,
@@ -38,70 +60,72 @@ impl Wordle {
             rng,
         }
     }
+    #[cfg(test)]
     fn autoplay<S: PickBestWord>(&mut self, wanted: Word, strategy: S) -> usize {
-        println!("Wanted '{}':", wanted.to_string());
         let mut round = 0;
         while !self.is_game_over() {
             round += 1;
-            if let Some(guess) = strategy.pick(&self.solutions, &self.open_positions()) {
-                let (hint, _) = get_hints(&guess, &wanted);
-                println!(
-                    "{}. guess '{}', hint '{}', {} words left",
-                    round,
-                    guess.to_string(),
-                    hint.to_string(),
-                    self.solutions.len()
-                );
-                for (i, feedback) in hint.hints.iter().enumerate() {
-                    let c = guess[i];
-                    // wanted   beret
-                    // 1. guess later -> hint ⬛⬛🟨🟩🟨 -> locked ___e_
-                    // 2. guess three -> hint 🟨⬛🟩🟩🟨 -> locked __re_ -> open th__e
-                    match feedback {
-                        Illegal => {}
-                        WrongPos => {
-                            // println!("Inserting '{}' as illegal @ {}", c, i);
-                            self.illegal_at_pos[i].insert(c);
-                            self.mandatory_chars.insert(c);
-                        }
-                        Correct => {
-                            // println!("Inserting '{}' as correct character @ {}", c, i);
-                            self.correct_chars[i] = Some(c.to_ascii_lowercase());
-                        }
+            let guess = strategy.pick(self).unwrap_or_else(|| {
+                MostFrequentGlobalCharacter
+                    .pick(self)
+                    .unwrap_or_else(|| self.random_suggestion())
+            });
+            let (hint, _) = get_hints(&guess, &wanted);
+            println!(
+                "{} solutions left, {}. guess '{}', hint '{}', wanted '{}'",
+                self.solutions.len(),
+                round,
+                guess.to_string(),
+                hint.to_string(),
+                wanted.to_string(),
+            );
+            for (i, feedback) in hint.hints.iter().enumerate() {
+                let c = guess[i];
+                match feedback {
+                    Illegal => {}
+                    WrongPos => {
+                        // println!("Inserting '{}' as illegal @ {}", c, i);
+                        self.illegal_at_pos[i].insert(c);
+                        self.mandatory_chars.insert(c);
+                    }
+                    Correct => {
+                        // println!("Inserting '{}' as correct character @ {}", c, i);
+                        self.correct_chars[i] = Some(c.to_ascii_lowercase());
                     }
                 }
-                self.guessed_words.insert(guess.clone());
-                if self.is_game_over() {
-                    return round;
-                }
-                let open_positions = self.open_positions();
-                for (_, c) in guess
-                    .into_iter()
-                    .enumerate()
-                    .filter(|(_, c)| !self.mandatory_chars.contains(c))
-                    .filter(|&(i, c)| self.correct_chars[i] != Some(c))
-                {
-                    if !self.correct_chars.iter().any(|&o| o == Some(c)) {
-                        // println!("Inserting globally illegal char '{}'", c);
-                        self.illegal_chars.insert(c);
-                    } else {
-                        // println!("Inserting '{}' as illegal @ {:?}", c, open_positions);
-                        for i in &open_positions {
-                            self.illegal_at_pos[*i].insert(c);
-                        }
-                    }
-                }
-                self.update_words();
             }
+            self.guessed_words.insert(guess.clone());
+            if self.is_game_over() {
+                break;
+            }
+            let open_positions = self.open_positions();
+            for (_, c) in guess
+                .into_iter()
+                .enumerate()
+                .filter(|(_, c)| !self.mandatory_chars.contains(c))
+                .filter(|&(i, c)| self.correct_chars[i] != Some(c))
+            {
+                if !self.correct_chars.iter().any(|&o| o == Some(c)) {
+                    // println!("Inserting globally illegal char '{}'", c);
+                    self.illegal_chars.insert(c);
+                } else {
+                    // println!("Inserting '{}' as illegal @ {:?}", c, open_positions);
+                    for i in &open_positions {
+                        self.illegal_at_pos[*i].insert(c);
+                    }
+                }
+            }
+            self.update_words();
         }
         if self.solutions.len() == 1 {
             println!(
-                "The only word left in the list is '{}'\n",
+                "{}: The only word left in the list is '{}'\n",
+                round,
                 self.solutions[0].to_string()
             );
         } else {
             let word: String = self.correct_chars.iter().map(|c| c.unwrap()).collect();
-            println!("\nThe word is '{}'\n", word);
+            println!("{}: The word is '{}'\n", round, word);
         }
         round
     }
@@ -181,36 +205,38 @@ impl Wordle {
     }
 
     fn optimized_suggestion(&mut self) -> Option<Word> {
-        let positions = self.open_positions();
-        // println!("open positions {:?}", positions);
-
         // Called just to print the top words
-        MostFrequentGlobalCharacter.pick(&self.solutions, &positions);
-        MostFrequentCharacterPerPos.pick(&self.solutions, &positions);
-        MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&self.solutions, &positions);
-
-        let high_variety_words = self.high_variety_words(&positions);
-        println!(
-            "{}/{} are 'high-variety' words with different characters in all open positions",
-            high_variety_words.len(),
-            self.solutions.len()
-        );
+        MostFrequentGlobalCharacter.pick(self);
+        MostFrequentCharacterPerPos.pick(self);
+        MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(self);
 
         // Called just to print the top high variety words
-        MostFrequentGlobalCharacter.pick(&high_variety_words, &positions);
-        MostFrequentCharacterPerPos.pick(&high_variety_words, &positions);
-        MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&high_variety_words, &positions);
+        MostFrequentGlobalCharacterHighVarietyWord.pick(self);
+        MostFrequentCharacterPerPosHighVarietyWord.pick(self);
+        MatchingMostOtherWordsInAtLeastOneOpenPositionHighVarietyWord.pick(self);
+
+        // MostFrequentRemainingUnusedCharacters.pick(self)
+        MostFrequentUnusedCharacters.pick(self)
+
+        // TubesFlingChampWordyEveryTime.pick(self)
 
         // Slow
-        WordThatResultsInFewestPossibleRemainingWords.pick(&self.solutions, &positions)
+        // WordThatResultsInFewestPossibleRemainingWords.pick(self)
     }
 
     fn high_variety_words(&self, open_positions: &[usize]) -> Vec<Word> {
-        self.solutions
+        let high_variety_words: Vec<Word> = self
+            .solutions
             .iter()
             .filter(|&word| word.unique_chars_in(open_positions).len() == open_positions.len())
             .cloned()
-            .collect()
+            .collect();
+        // println!(
+        //     "{}/{} are 'high-variety' words with different characters in all open positions",
+        //     high_variety_words.len(),
+        //     self.solutions.len()
+        // );
+        high_variety_words
     }
 
     fn random_suggestion(&mut self) -> Word {
@@ -251,7 +277,9 @@ impl Wordle {
             .filter(|(_, c)| c.is_ascii_alphabetic())
         {
             let c = guess[i];
-            if feedback.is_ascii_uppercase() {
+            if !guess.contains(&feedback.to_ascii_lowercase()) {
+                panic!("Char '{}' at pos {} is not part of the guess", feedback, i,);
+            } else if feedback.is_ascii_uppercase() {
                 println!("Inserting '{}' as correct character @ {}", c, i);
                 self.correct_chars[i] = Some(c.to_ascii_lowercase());
             } else {
@@ -324,9 +352,11 @@ impl Wordle {
                 "\nThe only word left in the list is '{}'",
                 self.solutions[0].to_string()
             );
-        } else {
+        } else if self.correct_chars.iter().all(|o| o.is_some()) {
             let word: String = self.correct_chars.iter().map(|c| c.unwrap()).collect();
             println!("\nThe word is '{}'", word);
+        } else {
+            println!("No matching word in the solutions!");
         }
     }
 }
@@ -379,24 +409,29 @@ trait CharacterCounts {
 }
 impl CharacterCounts for &[Word] {
     fn global_character_counts_in(&self, positions: &[usize]) -> HashMap<char, usize> {
-        let mut freq: HashMap<char, usize> = HashMap::new();
+        let mut counts: HashMap<char, usize> = HashMap::new();
         for word in self.iter() {
             for i in positions {
-                *freq.entry(word[*i]).or_default() += 1;
+                *counts.entry(word[*i]).or_default() += 1;
             }
         }
-        freq
+        // for (c, i) in counts.iter() {
+        //     println!("{} * '{}'", i, c);
+        // }
+        counts
     }
     fn character_counts_per_position_in(&self, positions: &[usize]) -> [HashMap<char, usize>; 5] {
         let empty = || ('a'..='z').into_iter().map(|c| (c, 0)).collect();
-        let mut frequencies: [HashMap<char, usize>; 5] =
-            [empty(), empty(), empty(), empty(), empty()];
+        let mut counts: [HashMap<char, usize>; 5] = [empty(), empty(), empty(), empty(), empty()];
         for word in self.iter() {
             for i in positions {
-                *frequencies[*i].get_mut(&word[*i]).unwrap() += 1;
+                *counts[*i].get_mut(&word[*i]).unwrap() += 1;
             }
         }
-        frequencies
+        // for (i, count) in counts.iter().enumerate() {
+        //     println!("Position[{}] character counts: {}", i, count.to_string());
+        // }
+        counts
     }
 }
 
@@ -426,7 +461,7 @@ impl<T: PartialOrd + Display> ScoreTrait for Vec<(T, &Word)> {
     }
     fn to_string(&self) -> String {
         self.iter()
-            .skip(self.len().saturating_sub(10))
+            .skip(self.len().saturating_sub(100))
             .map(|(count, word)| format!("{} {}", count, word.to_string()))
             .collect::<Vec<_>>()
             .join(", ")
@@ -454,13 +489,14 @@ impl<T: PartialOrd + Display> ScoreTrait for Vec<(T, &Word)> {
 }
 
 trait PickBestWord {
-    fn pick(&self, words: &[Word], positions: &[usize]) -> Option<Word>;
+    fn pick(&self, game: &Wordle) -> Option<Word>;
 }
 
 struct WordThatResultsInFewestPossibleRemainingWords;
 impl PickBestWord for WordThatResultsInFewestPossibleRemainingWords {
-    fn pick(&self, words: &[Word], _positions: &[usize]) -> Option<Word> {
-        let all_buckets = try_out_all_words_with_each_other(words, &[0, 1, 2, 3, 4]);
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        let words = &game.solutions;
+        let all_buckets = try_out_all_words_with_each_other(words, &ALL_POS);
         let word_count = words.len() as f64;
         let mut scores: Vec<(f64, &Word)> = all_buckets
             .iter()
@@ -479,6 +515,7 @@ impl PickBestWord for WordThatResultsInFewestPossibleRemainingWords {
 
         scores.sort_desc();
         println!("Remaining worst: {}", scores.to_string());
+
         scores.sort_asc();
         println!("Remaining best:  {}", scores.to_string());
 
@@ -488,8 +525,9 @@ impl PickBestWord for WordThatResultsInFewestPossibleRemainingWords {
 
 struct WordDividingSearchSpaceMostEvenly;
 impl PickBestWord for WordDividingSearchSpaceMostEvenly {
-    fn pick(&self, words: &[Word], _positions: &[usize]) -> Option<Word> {
-        let all_buckets = try_out_all_words_with_each_other(words, &[0, 1, 2, 3, 4]);
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        let words = &game.solutions;
+        let all_buckets = try_out_all_words_with_each_other(words, &ALL_POS);
         let averages: Vec<_> = all_buckets
             .iter()
             .map(|bucket| bucket.iter().sum::<usize>() as f64 / bucket.len() as f64)
@@ -522,8 +560,38 @@ impl PickBestWord for WordDividingSearchSpaceMostEvenly {
 
 struct MostFrequentGlobalCharacter;
 impl PickBestWord for MostFrequentGlobalCharacter {
-    fn pick(&self, words: &[Word], positions: &[usize]) -> Option<Word> {
-        let freq = words.global_character_counts_in(positions);
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        let words = &game.solutions;
+        let positions = &game.open_positions();
+        let freq = words.as_slice().global_character_counts_in(positions);
+        // println!("Overall character counts: {}", freq.to_string());
+
+        let scores: Vec<_> = words
+            .iter()
+            .map(|word| {
+                let count = word
+                    .unique_chars_in(positions)
+                    .iter()
+                    .map(|c| freq[c])
+                    .sum::<usize>();
+                (count, word)
+            })
+            .collect();
+        if scores.is_empty() {
+            return None;
+        }
+        scores.highest()
+    }
+}
+struct MostFrequentGlobalCharacterHighVarietyWord;
+impl PickBestWord for MostFrequentGlobalCharacterHighVarietyWord {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        let positions = &game.open_positions();
+        let mut words = &game.high_variety_words(positions);
+        if words.is_empty() {
+            words = &game.solutions;
+        }
+        let freq = words.as_slice().global_character_counts_in(positions);
         // println!("Overall character counts: {}", freq.to_string());
 
         let mut scores: Vec<_> = words
@@ -540,29 +608,111 @@ impl PickBestWord for MostFrequentGlobalCharacter {
         if scores.is_empty() {
             return None;
         }
-        scores.sort_desc();
+        scores.highest()
+    }
+}
 
-        // Best overall with char_set_at (no duplicate counts):
-        // 4405 renal, 4405 learn, 4451 raise, 4451 arise, 4509 stare,
-        // 4511 irate, 4534 arose, 4559 alter, 4559 alert, 4559 later
+struct TubesFlingChampWordyEveryTime;
+impl PickBestWord for TubesFlingChampWordyEveryTime {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        ["tubes", "fling", "champ", "wordy"]
+            .get(game.guessed_words.len())
+            .map(|w| w.to_word())
+    }
+}
 
-        // Best overall with char_vec_at (with duplicate counts):
-        // 4763 terse, 4795 tepee, 4833 easel, 4833 lease, 4843 tease,
-        // 4893 elate, 4909 rarer, 5013 erase, 5073 eater, 5269 eerie
-        // println!("Best overall:    {}", scores.to_string());
+struct QuickBrownFoxedJumpsGlazyVetchEveryTime;
+impl PickBestWord for QuickBrownFoxedJumpsGlazyVetchEveryTime {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        ["quick", "brown", "foxed", "jumps", "glazy", "vetch"]
+            .get(game.guessed_words.len())
+            .map(|w| w.to_word())
+    }
+}
+
+struct SoareUntilPygmyWhackEveryTime;
+impl PickBestWord for SoareUntilPygmyWhackEveryTime {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        ["soare", "until", "pygmy", "whack"]
+            .get(game.guessed_words.len())
+            .map(|w| w.to_word())
+    }
+}
+
+struct MostFrequentCharactersOfRemainingWords;
+impl PickBestWord for MostFrequentCharactersOfRemainingWords {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        let played_chars: HashSet<char> = game.guessed_words.iter().flatten().cloned().collect();
+        let remaining_words_with_unique_unplayed_chars: Vec<_> = game
+            .words
+            .iter()
+            .filter(|&word| {
+                word.unique_chars_in(&ALL_POS).len() == 5
+                    && !word.iter().any(|c| played_chars.contains(c))
+            })
+            .cloned()
+            .collect();
+
+        let positions = &ALL_POS;
+        let freq = remaining_words_with_unique_unplayed_chars
+            .as_slice()
+            .global_character_counts_in(positions);
+        let scores: Vec<_> = remaining_words_with_unique_unplayed_chars
+            .iter()
+            .map(|word| {
+                let count = word
+                    .unique_chars_in(positions)
+                    .iter()
+                    .map(|c| freq[c])
+                    .sum::<usize>();
+                (count, word)
+            })
+            .collect();
+        scores.highest()
+    }
+}
+
+struct MostFrequentUnusedCharacters;
+impl PickBestWord for MostFrequentUnusedCharacters {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        let used_chars: HashSet<char> = game.guessed_words.iter().flatten().cloned().collect();
+        let words_with_most_new_chars: Vec<Word> =
+            words_with_most_new_chars(&used_chars, COMBINED_WORDS.clone())
+                .into_iter()
+                .map(|(_, word)| word)
+                .collect();
+
+        let mut scores: Vec<_> = words_with_most_new_chars
+            .iter()
+            .map(|word| {
+                let count = word
+                    .unique_chars_in(&ALL_POS)
+                    .iter()
+                    .map(|c| COMBINED_GLOBAL_CHAR_COUNTS[c])
+                    .sum::<usize>();
+                (count, word)
+            })
+            .collect();
+        if scores.len() > 10 {
+            println!("{} unplayed words", scores.len());
+        } else if scores.is_empty() {
+            println!("no more unplayed words");
+        } else {
+            scores.sort_asc();
+            println!("best unplayed words {}", scores.to_string());
+        }
         scores.highest()
     }
 }
 
 struct MostFrequentCharacterPerPos;
 impl PickBestWord for MostFrequentCharacterPerPos {
-    fn pick(&self, words: &[Word], positions: &[usize]) -> Option<Word> {
-        let counts = words.character_counts_per_position_in(positions);
-        // for (i, count) in counts.iter().enumerate() {
-        //     println!("Position[{}] character counts: {}", i, count.to_string());
-        // }
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        let words = &game.solutions;
+        let positions = &game.open_positions();
+        let counts = words.as_slice().character_counts_per_position_in(positions);
 
-        let mut scores: Vec<_> = words
+        let scores: Vec<_> = words
             .iter()
             .map(|word| {
                 let count = positions
@@ -572,18 +722,42 @@ impl PickBestWord for MostFrequentCharacterPerPos {
                 (count, word)
             })
             .collect();
-        if scores.is_empty() {
-            return None;
+        scores.highest()
+    }
+}
+
+struct MostFrequentCharacterPerPosHighVarietyWord;
+impl PickBestWord for MostFrequentCharacterPerPosHighVarietyWord {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        let positions = &game.open_positions();
+        let mut words = &game.high_variety_words(positions);
+        if words.is_empty() {
+            words = &game.solutions;
         }
-        // scores.sort_desc();
-        // println!("Best individual: {}", scores.to_string());
+        let counts = words.as_slice().character_counts_per_position_in(positions);
+        // for (i, count) in counts.iter().enumerate() {
+        //     println!("Position[{}] character counts: {}", i, count.to_string());
+        // }
+
+        let scores: Vec<_> = words
+            .iter()
+            .map(|word| {
+                let count = positions
+                    .iter()
+                    .map(|&i| counts[i][&word[i]])
+                    .sum::<usize>();
+                (count, word)
+            })
+            .collect();
         scores.highest()
     }
 }
 
 struct MatchingMostOtherWordsInAtLeastOneOpenPosition;
 impl PickBestWord for MatchingMostOtherWordsInAtLeastOneOpenPosition {
-    fn pick(&self, words: &[Word], positions: &[usize]) -> Option<Word> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        let words = &game.solutions;
+        let positions = &game.open_positions();
         // for each word, find out how many other words it matches in any open position
         let mut scores: Vec<(usize, &Word)> = words.iter().map(|word| (0, word)).collect();
         let open_chars: Vec<_> = words.iter().map(|word| word.chars_in(positions)).collect();
@@ -600,11 +774,11 @@ impl PickBestWord for MatchingMostOtherWordsInAtLeastOneOpenPosition {
             }
         }
 
-        scores.sort_asc();
-        println!("Matching fewest words: {}", scores.to_string());
-
-        scores.sort_desc();
-        println!("Matching most words:   {}", scores.to_string());
+        // scores.sort_asc();
+        // println!("Matching fewest words: {}", scores.to_string());
+        //
+        // scores.sort_desc();
+        // println!("Matching most words:   {}", scores.to_string());
 
         // Worst 10
         // 320 lymph, 314 igloo, 313 umbra, 310 unzip, 308 affix,
@@ -614,6 +788,32 @@ impl PickBestWord for MatchingMostOtherWordsInAtLeastOneOpenPosition {
         // 1077 slate, 1095 sooty, 1097 scree, 1098 gooey, 1099 spree,
         // 1100 sense, 1104 saute, 1114 soapy, 1115 saucy, 1122 sauce
 
+        scores.highest()
+    }
+}
+struct MatchingMostOtherWordsInAtLeastOneOpenPositionHighVarietyWord;
+impl PickBestWord for MatchingMostOtherWordsInAtLeastOneOpenPositionHighVarietyWord {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
+        let positions = &game.open_positions();
+        let mut words = &game.high_variety_words(positions);
+        if words.is_empty() {
+            words = &game.solutions;
+        }
+        // for each word, find out how many other words it matches in any open position
+        let mut scores: Vec<(usize, &Word)> = words.iter().map(|word| (0, word)).collect();
+        let open_chars: Vec<_> = words.iter().map(|word| word.chars_in(positions)).collect();
+        for (i, chars_a) in open_chars.iter().enumerate().take(open_chars.len() - 1) {
+            for (j, chars_b) in open_chars.iter().enumerate().skip(i + 1) {
+                assert_ne!(i, j);
+                assert_ne!(chars_a, chars_b);
+                let any_open_position_matches_exactly =
+                    chars_a.iter().zip(chars_b.iter()).any(|(a, b)| a == b);
+                if any_open_position_matches_exactly {
+                    scores[i].0 += 1;
+                    scores[j].0 += 1;
+                }
+            }
+        }
         scores.highest()
     }
 }
@@ -631,7 +831,6 @@ trait HintValue {
     fn value(&self) -> usize;
 }
 
-use Hint::*;
 #[derive(Copy, Clone)]
 enum Hint {
     Illegal,  // Not in the word at all
@@ -799,7 +998,89 @@ fn get_hints(word1: &Word, word2: &Word) -> (Hints, Hints) {
 }
 
 fn main() {
+    // print_word_combinations();
     Wordle::new(SOLUTIONS).play()
+}
+
+// TODO find 5 good starting words
+fn print_word_combinations() {
+    // let words: Vec<Word> = ["tubes", "fling", "champ", "wordy"]
+    // let words: Vec<Word> = ["quick", "brown", "foxed", "jumps", "glazy", "vetch"]
+    let words: Vec<Word> = ["soare", "until"]
+        .into_iter()
+        .map(|w| w.to_word())
+        .collect();
+
+    let used_chars: HashSet<char> = words.iter().flatten().cloned().collect();
+    let words_by_new_unused_chars = words_with_most_unused_chars(&used_chars);
+    for (chars, words) in &words_by_new_unused_chars {
+        println!("{}: {:?}", chars.to_string(), words);
+    }
+    println!();
+    for (chars, _) in words_by_new_unused_chars {
+        println!(" {}:", chars.to_string());
+        let mut used_chars = used_chars.clone();
+        chars.into_iter().for_each(|c| {
+            used_chars.insert(c);
+        });
+        let words_by_new_unused_chars = words_with_most_unused_chars(&used_chars);
+        for (chars, words) in &words_by_new_unused_chars {
+            println!("  {}: {:?}", chars.to_string(), words);
+
+            for (chars, _) in &words_by_new_unused_chars {
+                // println!("   {}:", chars.to_string());
+                let mut used_chars = used_chars.clone();
+                chars.into_iter().for_each(|c| {
+                    used_chars.insert(*c);
+                });
+                let words_by_new_unused_chars = words_with_most_unused_chars(&used_chars);
+                for (chars, words) in &words_by_new_unused_chars {
+                    if words.len() > 10 {
+                        continue;
+                    }
+                    println!("   {}: {:?}", chars.to_string(), words);
+                }
+            }
+        }
+        // break;
+    }
+}
+
+fn words_with_most_unused_chars(used_chars: &HashSet<char>) -> Vec<(Vec<char>, Vec<String>)> {
+    let words: Vec<Word> = COMBINED.lines().map(|word| word.to_word()).collect();
+    let best_words = words_with_most_new_chars(used_chars, words);
+    let mut words_by_new_unused_chars: HashMap<Vec<char>, Vec<String>> = HashMap::new();
+    for (new_chars, word) in best_words {
+        words_by_new_unused_chars
+            .entry(new_chars)
+            .or_default()
+            .push(word.to_string());
+    }
+    let mut words_by_new_unused_chars: Vec<(Vec<char>, Vec<String>)> =
+        words_by_new_unused_chars.into_iter().collect();
+    words_by_new_unused_chars.sort_unstable();
+    words_by_new_unused_chars
+}
+
+fn words_with_most_new_chars(
+    used_chars: &HashSet<char>,
+    words: Vec<Word>,
+) -> Vec<(Vec<char>, Word)> {
+    let new: Vec<(Vec<char>, Word)> = words
+        .into_iter()
+        .map(|word| {
+            let mut unique_unused_chars: Vec<char> = word
+                .unique_chars_in(&ALL_POS)
+                .into_iter()
+                .filter(|c| !used_chars.contains(c))
+                .collect();
+            unique_unused_chars.sort_unstable();
+            (unique_unused_chars, word)
+        })
+        .collect();
+    let len = new.iter().map(|(uc, _)| uc.len()).max().unwrap();
+    println!("most new chars = {}", len);
+    new.into_iter().filter(|(ch, _)| ch.len() == len).collect()
 }
 
 #[cfg(test)]
@@ -808,8 +1089,55 @@ mod tests {
 
     // #[ignore]
     #[test]
+    // 16s normally, 3.5s parallel
+    // Average rounds = 3.335; 0 (0.000%) failed games (> 6 rounds):
+    // 1: 29, 2: 322, 3: 963, 4: 853, 5: 142, 6: 6
+    fn auto_play_tubes_fling_champ_wordy_every_time() {
+        let words: Vec<_> = SOLUTIONS.trim().lines().map(|w| w.to_word()).collect();
+        let rounds: Vec<usize> = words
+            .into_iter()
+            .map(|word| Wordle::new(SOLUTIONS).autoplay(word, TubesFlingChampWordyEveryTime))
+            .collect();
+        print_stats(rounds);
+    }
+
+    #[ignore]
+    #[test]
+    // 16s normally, 2s parallel
+    // Without "whack":
+    // Average rounds = 3.349; 9 (0.389%) failed games (> 6 rounds):
+    // 1: 22, 2: 481, 3: 714, 4: 907, 5: 156, 6: 26, 7: 8, 8: 1
+    // With "whack":
+    // Average rounds = 3.479; 4 (0.173%) failed games (> 6 rounds):
+    // 1: 22, 2: 481, 3: 714, 4: 610, 5: 444, 6: 40, 7: 4
+    fn auto_play_soare_until_pygmy_whack_every_time() {
+        let words: Vec<_> = SOLUTIONS.trim().lines().map(|w| w.to_word()).collect();
+        let rounds: Vec<usize> = words
+            .into_iter()
+            .map(|word| Wordle::new(SOLUTIONS).autoplay(word, SoareUntilPygmyWhackEveryTime))
+            .collect();
+        print_stats(rounds);
+    }
+
+    #[ignore]
+    #[test]
+    // 21s normally, 3s parallel
+    // Average rounds = 3.349; 9 (0.389%) failed games (> 6 rounds):
+    // 1: 22, 2: 481, 3: 714, 4: 907, 5: 156, 6: 26, 7: 8, 8: 1
+    fn auto_play_quick_brown_foxed_jumps_glazy_vetch_every_time() {
+        let words: Vec<_> = SOLUTIONS.trim().lines().map(|w| w.to_word()).collect();
+        let rounds: Vec<usize> = words
+            .into_par_iter()
+            .map(|word| {
+                Wordle::new(SOLUTIONS).autoplay(word, QuickBrownFoxedJumpsGlazyVetchEveryTime)
+            })
+            .collect();
+        print_stats(rounds);
+    }
+
+    #[ignore]
+    #[test]
     // 62s normally, 6s parallel
-    // rounds: 1: 34, 2: 537, 3: 1145, 4: 467, 5: 114, 6: 9, 7: 8, 8: 1
     // Average rounds 3.067; 9 (0.389%) failed games (> 6 rounds):
     // 1: 34, 2: 537, 3: 1145, 4: 467, 5: 114, 6: 9, 7: 8, 8: 1
     fn auto_play_most_frequent_global_characters() {
@@ -821,7 +1149,23 @@ mod tests {
         print_stats(rounds);
     }
 
-    // #[ignore]
+    #[ignore]
+    #[test]
+    // 60s normally, 9s parallel
+    // Average rounds = 3.073; 12 (0.518%) failed games (> 6 rounds):
+    // 1: 14, 2: 598, 3: 1121, 4: 423, 5: 120, 6: 27, 7: 9, 8: 2, 9: 1
+    fn auto_play_most_frequent_global_characters_high_variety_word() {
+        let words: Vec<_> = SOLUTIONS.trim().lines().map(|w| w.to_word()).collect();
+        let rounds: Vec<usize> = words
+            .into_par_iter()
+            .map(|word| {
+                Wordle::new(SOLUTIONS).autoplay(word, MostFrequentGlobalCharacterHighVarietyWord)
+            })
+            .collect();
+        print_stats(rounds);
+    }
+
+    #[ignore]
     #[test]
     // 32s normally, 4s parallel
     // Average rounds 3.098; 7 (0.302%) failed games (> 6 rounds):
@@ -831,6 +1175,88 @@ mod tests {
         let rounds: Vec<_> = words
             .into_par_iter()
             .map(|word| Wordle::new(SOLUTIONS).autoplay(word, MostFrequentCharacterPerPos))
+            .collect();
+        print_stats(rounds);
+    }
+
+    #[ignore]
+    #[test]
+    // 45s normally, 7s parallel
+    // Average rounds = 2.998; 6 (0.259%) failed games (> 6 rounds):
+    // 1: 29, 2: 599, 3: 1183, 4: 390, 5: 86, 6: 22, 7: 5, 8: 1
+    fn auto_play_most_frequent_characters_per_pos_high_variety_word() {
+        let words: Vec<_> = SOLUTIONS.trim().lines().map(|w| w.to_word()).collect();
+        let rounds: Vec<_> = words
+            .into_par_iter()
+            .map(|word| {
+                Wordle::new(SOLUTIONS).autoplay(word, MostFrequentCharacterPerPosHighVarietyWord)
+            })
+            .collect();
+        print_stats(rounds);
+    }
+
+    #[ignore]
+    #[test]
+    // 107s normally, 20s parallel
+    // Average rounds = 3.223; 12 (0.518%) failed games (> 6 rounds):
+    // 1: 14, 2: 394, 3: 1194, 4: 542, 5: 129, 6: 30, 7: 11, 8: 1
+    fn auto_play_most_frequent_characters_of_words() {
+        let words: Vec<_> = SOLUTIONS.trim().lines().map(|w| w.to_word()).collect();
+        let rounds: Vec<usize> = words
+            .into_par_iter()
+            .map(|word| {
+                Wordle::new(SOLUTIONS).autoplay(word, MostFrequentCharactersOfRemainingWords)
+            })
+            .collect();
+        print_stats(rounds);
+    }
+
+    #[ignore]
+    #[test]
+    // 7min13s normally, 67s parallel
+    // Average rounds = 3.349; 9 (0.389%) failed games (> 6 rounds):
+    // 1: 22, 2: 481, 3: 714, 4: 907, 5: 156, 6: 26, 7: 8, 8: 1
+    fn auto_play_most_frequent_unused_characters() {
+        let words: Vec<_> = SOLUTIONS.trim().lines().map(|w| w.to_word()).collect();
+        let rounds: Vec<usize> = words
+            .into_par_iter()
+            .map(|word| Wordle::new(SOLUTIONS).autoplay(word, MostFrequentUnusedCharacters))
+            .collect();
+        print_stats(rounds);
+    }
+
+    #[ignore]
+    #[test]
+    // 48min29s normally, 4min45s parallel
+    // Average rounds = 3.357; 16 (0.691%) failed games (> 6 rounds):
+    // 1: 27, 2: 397, 3: 957, 4: 672, 5: 201, 6: 45, 7: 11, 8: 5
+    fn auto_play_most_other_words_in_at_least_one_open_position() {
+        let words: Vec<_> = SOLUTIONS.trim().lines().map(|w| w.to_word()).collect();
+        let rounds: Vec<_> = words
+            .into_iter()
+            .map(|word| {
+                Wordle::new(SOLUTIONS)
+                    .autoplay(word, MatchingMostOtherWordsInAtLeastOneOpenPosition)
+            })
+            .collect();
+        print_stats(rounds);
+    }
+
+    #[ignore]
+    #[test]
+    // 17min51s normally, 136s parallel
+    // Average rounds = 3.144; 12 (0.518%) failed games (> 6 rounds):
+    // 1: 20, 2: 540, 3: 1072, 4: 512, 5: 124, 6: 35, 7: 12
+    fn auto_play_most_other_words_in_at_least_one_open_position_high_variety_word() {
+        let words: Vec<_> = SOLUTIONS.trim().lines().map(|w| w.to_word()).collect();
+        let rounds: Vec<_> = words
+            .into_iter()
+            .map(|word| {
+                Wordle::new(SOLUTIONS).autoplay(
+                    word,
+                    MatchingMostOtherWordsInAtLeastOneOpenPositionHighVarietyWord,
+                )
+            })
             .collect();
         print_stats(rounds);
     }
@@ -871,8 +1297,8 @@ mod tests {
     // Takes around 6s for the 2'315 solution words
     #[test]
     fn test_word_that_results_in_fewest_remaining_possible_words() {
-        let words: Vec<Word> = SOLUTIONS.lines().map(|word| word.to_word()).collect();
-        let word = WordThatResultsInFewestPossibleRemainingWords.pick(&words, &[0, 1, 2, 3, 4]);
+        let game = Wordle::new(SOLUTIONS);
+        let word = WordThatResultsInFewestPossibleRemainingWords.pick(&game);
 
         // Worst:
         // - 701.8 jazzy
@@ -905,8 +1331,8 @@ mod tests {
     // Takes around 207s for the 12'972 words in the combined list!
     #[test]
     fn test_word_that_results_in_fewest_remaining_possible_words_for_full_word_list() {
-        let words: Vec<Word> = COMBINED.lines().map(|word| word.to_word()).collect();
-        let word = WordThatResultsInFewestPossibleRemainingWords.pick(&words, &[0, 1, 2, 3, 4]);
+        let game = Wordle::new(SOLUTIONS);
+        let word = WordThatResultsInFewestPossibleRemainingWords.pick(&game);
 
         // Worst:
         // - 4935.9 jugum
@@ -939,8 +1365,8 @@ mod tests {
     // Takes around 6s for the 2'315 solution words
     #[test]
     fn test_word_dividing_search_space_most_evenly() {
-        let words: Vec<Word> = SOLUTIONS.lines().map(|word| word.to_word()).collect();
-        let word = WordDividingSearchSpaceMostEvenly.pick(&words, &[0, 1, 2, 3, 4]);
+        let game = Wordle::new(SOLUTIONS);
+        let word = WordDividingSearchSpaceMostEvenly.pick(&game);
 
         // Worst/highest variance:
         // - 6595.3 jazzy
@@ -971,8 +1397,9 @@ mod tests {
     #[ignore] // Takes around 202s for the 12'972 words in the combined list!
     #[test]
     fn test_word_dividing_search_space_most_evenly_for_full_word_list() {
-        let words: Vec<Word> = COMBINED.lines().map(|word| word.to_word()).collect();
-        let word = WordDividingSearchSpaceMostEvenly.pick(&words, &[0, 1, 2, 3, 4]);
+        let game = Wordle::new(SOLUTIONS);
+
+        let word = WordDividingSearchSpaceMostEvenly.pick(&game);
 
         // Worst/highest variance:
         // - 260640.7 jugum
@@ -1001,10 +1428,11 @@ mod tests {
         assert_eq!(word.unwrap().to_string(), "lares");
     }
 
+    #[ignore]
     #[test]
     fn test_pick_word_that_exactly_matches_most_others_in_at_least_one_open_position() {
-        let words: Vec<Word> = SOLUTIONS.lines().map(|word| word.to_word()).collect();
-        let word = MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&words, &[0, 1, 2, 3, 4]);
+        let game = Wordle::new(SOLUTIONS);
+        let word = MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&game);
         assert_eq!(word.unwrap().to_string(), "sauce");
     }
 

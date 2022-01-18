@@ -1,10 +1,22 @@
 Wordle helper ideas:
 --------------------
 - Try more strategies with auto-play
+- Look at failures of certain strategies
+  - Many are suboptimal when 4 characters are known, and there are multiple options for the remaining characters
+- Allow specifying multiple strategies (fallback)
+- Combine "most unplayed characters" with other strategies, such as "least possible words left after guess"
 - Store results of some calculations to not repeat them every time
-- Implement strategy that starts with a few good words almost regardless of outcome, such as: TUBES, FLING, CHAMP, WORDY from [Why I ALWAYS Guess the Same Four Words](https://youtu.be/l92g6Yy8t5g)
-  - What other word combinations are good?
-  - Don't lock the know positions right away, use them to evaluate new characters, to make them must-have or illegal.
+- What other word combinations are good?
+  - Combined
+     1. SOARE
+     1. UNTIL
+     2. GYPPY, HYPPY or PYGMY
+    - Solutions
+      1. AROSE
+      2. UNTIL
+      3. PYGMY
+      4. WHACK
+- Don't lock the know positions right away, use them to evaluate new characters, to make them must-have or illegal.
 - Implement strategy that minimizes number of total guesses?
 - Possibly use larger wordlist when guessing
 - Re-evaluate strategies:
@@ -14,6 +26,19 @@ Wordle helper ideas:
 
 Done:
 -----
+- Implement strategy that starts with a few good words almost regardless of outcome, such as: TUBES, FLING, CHAMP, WORDY from [Why I ALWAYS Guess the Same Four Words](https://youtu.be/l92g6Yy8t5g)
+  - What are possible next words?
+    - Frequencies over all combined:
+      - 1505 * 'k'
+      - 694 * 'v'
+      - 434 * 'z'
+      - 291 * 'j'
+      - 288 * 'x'
+      - 112 * 'q'
+    - VODKA covers the next most frequent 'k' and 'v'
+      - JAZZY covers the next most frequent 'z' and 'j', no follow-up
+      - ZAXES instead covers 'z' and 'x', would leave QAJAQ
+      - SQUIZ instead covers 'z' and 'q', would leave JAXIE
 - Play the game automatically to report statistics on various strategies
   - Global most frequent chars: Average rounds 3.067; 9 (0.389%) failed games (> 6 rounds)
   - Most frequent per position: Average rounds 3.098; 7 (0.302%) failed games (> 6 rounds)

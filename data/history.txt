@@ -210,3 +210,5 @@ abbey
 tangy
 panic
 solar
+shire
+proxy
