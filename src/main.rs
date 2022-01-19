@@ -14,6 +14,7 @@ const SOLUTIONS: &str = include_str!("../data/wordlists/solutions.txt");
 const ALL_POS: [usize; 5] = [0, 1, 2, 3, 4];
 
 lazy_static! {
+    static ref SOLUTION_WORDS: Vec<Word> = SOLUTIONS.lines().map(|w| w.to_word()).collect();
     static ref COMBINED_WORDS: Vec<Word> = COMBINED.lines().map(|w| w.to_word()).collect();
     static ref COMBINED_GLOBAL_CHAR_COUNTS_BY_CHAR: HashMap<char, usize> = COMBINED
         .lines()
@@ -30,6 +31,23 @@ lazy_static! {
                 .map(|c| COMBINED_GLOBAL_CHAR_COUNTS_BY_CHAR[c])
                 .sum::<usize>();
             (word.to_vec(), count)
+        })
+        .collect();
+    static ref SCORES: Vec<(f64, &'static Word)> = get_hints(&COMBINED_WORDS, &SOLUTION_WORDS)
+        .into_par_iter()
+        .zip(COMBINED_WORDS.par_iter())
+        .map(|(hint_buckets, guess)| {
+            let solutions_len = SOLUTION_WORDS.len() as f64;
+            let expected_remaining_word_count = hint_buckets
+                .into_iter()
+                .enumerate()
+                .map(|(_bucket_no, solution_indices)| {
+                    let solutions_in_bucket: f64 = solution_indices.len() as f64;
+                    let bucket_probability = solutions_in_bucket / solutions_len;
+                    bucket_probability * solutions_in_bucket
+                })
+                .sum();
+            (expected_remaining_word_count, guess)
         })
         .collect();
 }
@@ -51,7 +69,7 @@ struct Wordle {
 impl Wordle {
     fn new(wordlist: &str) -> Self {
         let solutions: Vec<Word> = wordlist.lines().map(|word| word.to_word()).collect();
-        let words = solutions.clone();
+        let words = COMBINED_WORDS.clone();
         let empty = HashSet::new;
         let illegal_position_for_char: [HashSet<char>; 5] =
             [empty(), empty(), empty(), empty(), empty()];
@@ -67,13 +85,22 @@ impl Wordle {
             rng,
         }
     }
+    fn play(&mut self) {
+        while !self.is_game_over() {
+            self.print_remaining_word_count();
+            self.single_round();
+        }
+        self.print_result();
+    }
     #[cfg(test)]
     fn autoplay<S: PickBestWord>(&mut self, wanted: Word, strategy: S) -> usize {
         let mut attempts = 0;
-        while !self.is_game_over() && attempts < 6 {
-            let guess = if self.solutions.len() <= 6_usize.saturating_sub(attempts) {
-                None
-            } else if self.has_1_or_2_open_positions() {
+        while !self.is_game_over() && attempts < 12 {
+            let guess =
+            // if self.solutions.len() <= 6_usize.saturating_sub(attempts) {
+            //     None
+            // } else
+            if self.has_max_open_positions(1) {
                 self.suggest_word_covering_chars_in_open_positions()
             } else {
                 strategy
@@ -83,7 +110,7 @@ impl Wordle {
             .unwrap_or_else(|| self.random_suggestion());
 
             attempts += 1;
-            let (hint, _) = get_hints(&guess, &wanted);
+            let hint = get_hint(&guess, &wanted);
             println!(
                 "{:4} solutions left, {}. guess '{}', hint '{}', wanted '{}'",
                 self.solutions.len(),
@@ -109,6 +136,10 @@ impl Wordle {
                 }
             }
             self.guessed_words.insert(guess.clone());
+            if let Some(pos) = self.words.iter().position(|word| word == &guess) {
+                let removed = self.words.remove(pos).to_string();
+                // println!("Removed guess '{}'", removed);
+            }
             if self.is_game_over() {
                 break;
             }
@@ -150,8 +181,9 @@ impl Wordle {
         attempts
     }
 
-    fn has_1_or_2_open_positions(&self) -> bool {
-        self.correct_chars.iter().filter(|o| o.is_some()).count() >= 3
+    fn has_max_open_positions(&self, open_count: usize) -> bool {
+        let known_count = 5 - open_count;
+        self.correct_chars.iter().filter(|o| o.is_some()).count() >= known_count
     }
 
     fn suggest_word_covering_chars_in_open_positions(&self) -> Option<Word> {
@@ -176,13 +208,6 @@ impl Wordle {
         scores.highest()
     }
 
-    fn play(&mut self) {
-        while !self.is_game_over() {
-            self.print_remaining_word_count();
-            self.single_round();
-        }
-        self.print_result();
-    }
     fn is_game_over(&self) -> bool {
         self.correct_chars.iter().all(|o| o.is_some()) || self.solutions.len() <= 1
     }
@@ -205,6 +230,10 @@ impl Wordle {
         let suggestion = self.suggest_a_word();
         let guess = self.ask_for_guess(suggestion);
         self.guessed_words.insert(guess.clone());
+        if let Some(pos) = self.words.iter().position(|word| word == &guess) {
+            let removed = self.words.remove(pos).to_string();
+            // println!("Removed guess '{}'", removed);
+        }
         self.ask_for_feedback(&guess);
         if self.is_game_over() {
             return;
@@ -247,12 +276,15 @@ impl Wordle {
     }
 
     fn suggest_a_word(&mut self) -> Word {
-        self.optimized_suggestion()
-            .unwrap_or_else(|| self.random_suggestion())
+        self.optimized_suggestion().unwrap_or_else(|| {
+            println!("falling back to random suggestion");
+            self.random_suggestion()
+        })
     }
 
     fn optimized_suggestion(&mut self) -> Option<Word> {
-        if self.has_1_or_2_open_positions() {
+        if self.has_max_open_positions(1) {
+            println!("Falling back to single position strategy");
             return self.suggest_word_covering_chars_in_open_positions();
         }
         // Called just to print the top words
@@ -266,12 +298,12 @@ impl Wordle {
         MatchingMostOtherWordsInAtLeastOneOpenPositionHighVarietyWord.pick(self);
 
         // MostFrequentRemainingUnusedCharacters.pick(self)
-        MostFrequentUnusedCharacters.pick(self)
+        // MostFrequentUnusedCharacters.pick(self)
 
         // TubesFlingChampWordyEveryTime.pick(self)
 
         // Slow
-        // WordThatResultsInFewestPossibleRemainingWords.pick(self)
+        WordThatResultsInFewestRemainingSolutions.pick(self)
     }
 
     fn high_variety_words(&self, open_positions: &[usize]) -> Vec<Word> {
@@ -511,8 +543,8 @@ impl<T: PartialOrd + Display> ScoreTrait for Vec<(T, &Word)> {
     }
     fn to_string(&self) -> String {
         self.iter()
-            .skip(self.len().saturating_sub(100))
-            .map(|(count, word)| format!("{} {}", count, word.to_string()))
+            .skip(self.len().saturating_sub(10))
+            .map(|(count, word)| format!("{:.2} {}", count, word.to_string()))
             .collect::<Vec<_>>()
             .join(", ")
     }
@@ -542,32 +574,46 @@ trait PickBestWord {
     fn pick(&self, game: &Wordle) -> Option<Word>;
 }
 
-struct WordThatResultsInFewestPossibleRemainingWords;
-impl PickBestWord for WordThatResultsInFewestPossibleRemainingWords {
+struct WordThatResultsInFewestRemainingSolutions;
+impl PickBestWord for WordThatResultsInFewestRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Word> {
-        let words = &game.solutions;
-        let all_buckets = try_out_all_words_with_each_other(words, &ALL_POS);
-        let word_count = words.len() as f64;
-        let mut scores: Vec<(f64, &Word)> = all_buckets
-            .iter()
-            .enumerate()
-            .map(|(i, buckets)| {
-                let expected_remaining_word_count = buckets
-                    .iter()
-                    .map(|&bucket_size| {
-                        let probability_of_bucket = bucket_size as f64 / word_count;
-                        probability_of_bucket * bucket_size as f64
+        let solutions = &game.solutions;
+        if solutions.len() == 2315 {
+            return SCORES.lowest();
+        }
+        let hints_for_guesses: Vec<[Vec<usize>; 243]> = get_hints(&game.words, solutions);
+        let total_solutions = solutions.len() as f64;
+
+        // TODO used precalculated SCORES for all combined words
+
+        let mut scores: Vec<(f64, &Word)> = hints_for_guesses
+            .into_par_iter()
+            .zip(game.words.par_iter())
+            .map(|(hint_buckets, guess)| {
+                let expected_remaining_word_count = hint_buckets
+                    .into_iter()
+                    .enumerate()
+                    .map(|(_bucket_no, solution_indices)| {
+                        let solutions_in_bucket = solution_indices.len() as f64;
+                        let bucket_probability = solutions_in_bucket / total_solutions;
+                        bucket_probability * solutions_in_bucket
                     })
                     .sum();
-                (expected_remaining_word_count, &words[i])
+                (expected_remaining_word_count, guess)
             })
             .collect();
+        while let Some(pos) = scores
+            .iter()
+            .position(|&(_, guess)| game.guessed_words.contains(guess))
+        {
+            println!("removed {}", scores.remove(pos).1.to_string());
+        }
 
-        scores.sort_desc();
-        println!("Remaining worst: {}", scores.to_string());
-
-        scores.sort_asc();
-        println!("Remaining best:  {}", scores.to_string());
+        // scores.sort_desc();
+        // println!("Remaining worst: {}", scores.to_string());
+        //
+        // scores.sort_asc();
+        // println!("Remaining best:  {}", scores.to_string());
 
         scores.lowest()
     }
@@ -576,28 +622,34 @@ impl PickBestWord for WordThatResultsInFewestPossibleRemainingWords {
 struct WordDividingSearchSpaceMostEvenly;
 impl PickBestWord for WordDividingSearchSpaceMostEvenly {
     fn pick(&self, game: &Wordle) -> Option<Word> {
-        let words = &game.solutions;
-        let all_buckets = try_out_all_words_with_each_other(words, &ALL_POS);
-        let averages: Vec<_> = all_buckets
-            .iter()
-            .map(|bucket| bucket.iter().sum::<usize>() as f64 / bucket.len() as f64)
-            .collect();
-        let variances: Vec<_> = all_buckets
-            .iter()
-            .enumerate()
-            .map(|(i, bucket)| {
-                bucket
+        let guesses = &COMBINED_WORDS;
+        let solutions = &game.solutions;
+        let hints_for_guesses: Vec<[Vec<usize>; 243]> = get_hints(guesses, solutions);
+        let averages: Vec<f64> = hints_for_guesses
+            .par_iter()
+            .map(|hint_buckets| {
+                let average_solutions_per_bucket = hint_buckets
                     .iter()
-                    .map(|&v| ((v as f64) - averages[i]).powf(2.0))
-                    .sum::<f64>() as f64
-                    / bucket.len() as f64
+                    .map(|solution_indices| solution_indices.len())
+                    .sum::<usize>() as f64
+                    / hint_buckets.len() as f64;
+                average_solutions_per_bucket
             })
             .collect();
-        let mut scores: Vec<(f64, &Word)> = words
-            .iter()
-            .enumerate()
-            .map(|(i, word)| (variances[i], word))
+        let variances: Vec<f64> = hints_for_guesses
+            .into_par_iter()
+            .zip(averages)
+            .map(|(hint_buckets, average)| {
+                let hint_bucket_len = hint_buckets.len() as f64;
+                hint_buckets
+                    .into_iter()
+                    .map(|solution_indices| ((solution_indices.len() as f64) - average).powf(2.0))
+                    .sum::<f64>() as f64
+                    / hint_bucket_len
+            })
             .collect();
+        let mut scores: Vec<(f64, &Word)> =
+            variances.into_par_iter().zip(guesses.par_iter()).collect();
 
         scores.sort_desc();
         println!("Worst/highest variance: {}", scores.to_string());
@@ -967,17 +1019,17 @@ impl From<&str> for Hints {
     }
 }
 
-fn try_out_all_words_with_each_other(words: &[Word], positions: &[usize]) -> Vec<[usize; 243]> {
-    let open_chars: Vec<_> = words.iter().map(|word| word.chars_in(positions)).collect();
-    open_chars
+fn get_hints(guesses: &[Word], solutions: &[Word]) -> Vec<[Vec<usize>; 243]> {
+    guesses
         .par_iter()
         .map(|guess| {
-            let mut bucket = [0; 243];
-            for solution in open_chars.iter() {
-                let (hint, _) = get_hints(guess, solution);
-                bucket[hint.value()] += 1;
+            const EMPTY_VEC: Vec<usize> = Vec::new();
+            let mut hint_buckets = [EMPTY_VEC; 243];
+            for (i, solution) in solutions.iter().enumerate() {
+                let hint = get_hint(guess, solution);
+                hint_buckets[hint.value()].push(i);
             }
-            bucket
+            hint_buckets
         })
         .collect()
 }
@@ -992,20 +1044,17 @@ fn try_out_all_words_with_each_other(words: &[Word], positions: &[usize]) -> Vec
 /// Let's assign a number to each one. We multiply the values 0, 1 or 2 with a multiplier 3 ^ i,
 /// which depends on its index `i` within the word (the first index being 0).
 ///
-/// This function returns two hints. The first with w1 as the guess and w2 as the solution,
-/// and the second with w2 as the guess and w1 as the solution
+/// This function returns a hints for the given guess and solution
 #[allow(clippy::ptr_arg)] // Because trait WordAsCharVec is implemented for Word not &[char]
-fn get_hints(word1: &Word, word2: &Word) -> (Hints, Hints) {
+fn get_hint(guess: &Word, solution: &Word) -> Hints {
     // Initialize as every position incorrect
-    let mut hint1 = Hints::default(); // Hint for guessed word1 with solution word2
-    let mut hint2 = Hints::default(); // Hint for guessed word2 with solution word1
+    let mut hint = Hints::default();
 
     // Fill in exact matches
     let mut open_positions = vec![];
     for i in 0..5 {
-        if word1[i] == word2[i] {
-            hint1.set_correct(i);
-            hint2.set_correct(i);
+        if guess[i] == solution[i] {
+            hint.set_correct(i);
         } else {
             open_positions.push(i);
         }
@@ -1013,9 +1062,9 @@ fn get_hints(word1: &Word, word2: &Word) -> (Hints, Hints) {
 
     // For characters at another position, consider only characters not previously matched
     // For example:
-    // "eject" and "geese" match exactly in the middle character, leaving open "ej_ct" and "ge_se".
-    // Both first 'e's in will have a match in the respective other word,
-    // but the last 'e' in "geese" is illegal, because all the 'e's in "ej_ct" were already matched.
+    // Guessing "geese" for solution "eject"  matches exactly in the middle 'e', which leaves
+    // "ge_se" and "ej_ct". The 'e' at pos 1 of "geese" will count as a present char, but the
+    // last 'e' in "geese" is illegal, because all the 'e's in "ej_ct" were already matched.
     for &i in &open_positions {
         let considered_char_count = |word: &[char], ch: &char| {
             word.iter()
@@ -1024,26 +1073,22 @@ fn get_hints(word1: &Word, word2: &Word) -> (Hints, Hints) {
                 .filter(|(i, c)| c == &ch && open_positions.contains(i))
                 .count()
         };
-        let char1 = &word1[i];
-        let char2 = &word2[i];
+        let char = &guess[i];
         // println!(
         //     "considered_char_count('{}', {}) = {} | '{}'.total_char_count({:?}, {}) = {}",
-        //     word1.to_string(),
-        //     char1,
-        //     considered_char_count(word1, char1),
-        //     word2.to_string(),
+        //     guess.to_string(),
+        //     char,
+        //     considered_char_count(guess, char),
+        //     solution.to_string(),
         //     open_positions,
-        //     char1,
-        //     word2.total_char_count(&open_positions, char1)
+        //     char,
+        //     solution.total_char_count(&open_positions, char)
         // );
-        if considered_char_count(word1, char1) <= word2.total_char_count(&open_positions, char1) {
-            hint1.set_wrong_pos(i);
-        }
-        if considered_char_count(word2, char2) <= word1.total_char_count(&open_positions, char2) {
-            hint2.set_wrong_pos(i);
+        if considered_char_count(guess, char) <= solution.total_char_count(&open_positions, char) {
+            hint.set_wrong_pos(i);
         }
     }
-    (hint1, hint2)
+    hint
 }
 
 fn main() {
@@ -1138,6 +1183,22 @@ fn words_with_most_new_chars<'w>(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // #[ignore]
+    #[test]
+    // s
+    //
+    fn auto_guess_combined_word_that_results_in_fewest_remaining_solutions() {
+        let attempts: Vec<_> = SOLUTIONS
+            .trim()
+            .lines()
+            .map(|w| w.to_word())
+            .map(|word| {
+                Wordle::new(SOLUTIONS).autoplay(word, WordThatResultsInFewestRemainingSolutions)
+            })
+            .collect();
+        print_stats(attempts);
+    }
 
     #[ignore]
     #[test]
@@ -1350,7 +1411,7 @@ mod tests {
     #[test]
     fn test_word_that_results_in_fewest_remaining_possible_words() {
         let game = Wordle::new(SOLUTIONS);
-        let word = WordThatResultsInFewestPossibleRemainingWords.pick(&game);
+        let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
         // Worst:
         // - 701.8 jazzy
@@ -1384,7 +1445,7 @@ mod tests {
     #[test]
     fn test_word_that_results_in_fewest_remaining_possible_words_for_full_word_list() {
         let game = Wordle::new(SOLUTIONS);
-        let word = WordThatResultsInFewestPossibleRemainingWords.pick(&game);
+        let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
         // Worst:
         // - 4935.9 jugum
@@ -1411,6 +1472,25 @@ mod tests {
         // - 288.74 lares
 
         assert_eq!(word.unwrap().to_string(), "lares");
+    }
+
+    #[ignore]
+    // Takes around 24s (parallel) guessing with 12'972 combined words in 2'315 solutions.
+    #[test]
+    fn test_word_from_combined_list_that_results_in_fewest_remaining_possible_solution_words() {
+        let game = Wordle::new(SOLUTIONS);
+        let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
+
+        // Using 12'972 combined words on 2'315 solutions
+        // Remaining worst:
+        // 862 zoppo, 870 kudzu, 871 susus, 878 yukky, 883 fuffy,
+        // 886 gyppy, 901 jugum, 903 jujus, 925 qajaq, 967 immix
+
+        // Remaining best:
+        // 67 raine, 66 arose, 65 ariel, 64 orate, 64 irate,
+        // 64 arise, 62 soare, 61 raile, 61 raise, 60 roate
+
+        assert_eq!(word.unwrap().to_string(), "roate");
     }
 
     #[ignore]
@@ -1446,6 +1526,7 @@ mod tests {
 
         assert_eq!(word.unwrap().to_string(), "raise");
     }
+
     #[ignore] // Takes around 202s for the 12'972 words in the combined list!
     #[test]
     fn test_word_dividing_search_space_most_evenly_for_full_word_list() {
@@ -1478,6 +1559,27 @@ mod tests {
         // - 12563.9 lares
 
         assert_eq!(word.unwrap().to_string(), "lares");
+    }
+
+    #[ignore]
+    // Takes around 24s (parallel) guessing with 12'972 combined words in 2'315 solutions.
+    #[test]
+    fn test_combined_word_dividing_solution_words_most_evenly() {
+        let game = Wordle::new(SOLUTIONS);
+        let word = WordDividingSearchSpaceMostEvenly.pick(&game);
+
+        // Using 12'972 combined words on 2'315 solutions
+
+        // Worst/highest variance:
+        // 8121.9 zoppo, 8200.6 kudzu, 8207.6 susus, 8273.1 yukky, 8318.0 fuffy,
+        // 8349.0 gyppy, 8489.2 jugum, 8514.8 jujus, 8722.5 qajaq, 9125.4 immix
+
+        // Best/lowest variance:
+        // 548.1 raine, 538.2 arose, 531.2 ariel, 517.9 orate, 516.9 irate,
+        // 516.3 arise, 502.8 soare, 493.5 raile, 490.4 raise, 484.9 roate
+
+        // Using 12'972 combined words on all of them:
+        assert_eq!(word.unwrap().to_string(), "roate");
     }
 
     #[ignore]
@@ -1515,23 +1617,19 @@ mod tests {
     }
     #[test]
     fn test_get_hints() {
-        let (hint1, hint2) = get_hints(&"guest".to_word(), &"truss".to_word());
-        assert_eq!("⬛🟨⬛🟩🟨", hint1.to_string());
-        assert_eq!("🟨⬛🟨🟩⬛", hint2.to_string());
+        let hint = get_hint(&"guest".to_word(), &"truss".to_word());
+        assert_eq!("⬛🟨⬛🟩🟨", hint.to_string());
 
-        let (hint1, hint2) = get_hints(&"briar".to_word(), &"error".to_word());
-        assert_eq!("⬛🟩⬛⬛🟩", hint1.to_string());
-        assert_eq!("⬛🟩⬛⬛🟩", hint2.to_string());
+        let hint = get_hint(&"briar".to_word(), &"error".to_word());
+        assert_eq!("⬛🟩⬛⬛🟩", hint.to_string());
 
-        let (hint1, hint2) = get_hints(&"sissy".to_word(), &"truss".to_word());
-        assert_eq!("🟨⬛⬛🟩⬛", hint1.to_string());
-        assert_eq!("⬛⬛⬛🟩🟨", hint2.to_string());
+        let hint = get_hint(&"sissy".to_word(), &"truss".to_word());
+        assert_eq!("🟨⬛⬛🟩⬛", hint.to_string());
 
-        let (hint1, hint2) = get_hints(&"eject".to_word(), &"geese".to_word());
-        assert_eq!("🟨⬛🟩⬛⬛", hint1.to_string());
-        assert_eq!("⬛🟨🟩⬛⬛", hint2.to_string());
+        let hint = get_hint(&"eject".to_word(), &"geese".to_word());
+        assert_eq!("🟨⬛🟩⬛⬛", hint.to_string());
 
-        let (hint1, _) = get_hints(&"three".to_word(), &"beret".to_word());
-        assert_eq!("🟨⬛🟩🟩🟨", hint1.to_string());
+        let hint = get_hint(&"three".to_word(), &"beret".to_word());
+        assert_eq!("🟨⬛🟩🟩🟨", hint.to_string());
     }
 }
