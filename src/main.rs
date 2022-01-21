@@ -11,8 +11,6 @@ extern crate lazy_static;
 
 const COMBINED: &str = include_str!("../data/wordlists/combined.txt");
 const SOLUTIONS: &str = include_str!("../data/wordlists/solutions.txt");
-const ALL_POS: [usize; 5] = [0, 1, 2, 3, 4];
-
 lazy_static! {
     static ref SOLUTION_WORDS: Vec<Word> = SOLUTIONS.lines().map(|w| w.to_word()).collect();
     static ref COMBINED_WORDS: Vec<Word> = COMBINED.lines().map(|w| w.to_word()).collect();
@@ -33,26 +31,57 @@ lazy_static! {
             (word.to_vec(), count)
         })
         .collect();
-    static ref SCORES: Vec<(f64, &'static Word)> = get_hints(&COMBINED_WORDS, &SOLUTION_WORDS)
-        .into_par_iter()
-        .zip(COMBINED_WORDS.par_iter())
-        .map(|(hint_buckets, guess)| {
-            let solutions_len = SOLUTION_WORDS.len() as f64;
-            let expected_remaining_word_count = hint_buckets
-                .into_iter()
-                .enumerate()
-                .map(|(_bucket_no, solution_indices)| {
-                    let solutions_in_bucket: f64 = solution_indices.len() as f64;
-                    let bucket_probability = solutions_in_bucket / solutions_len;
-                    bucket_probability * solutions_in_bucket
-                })
-                .sum();
-            (expected_remaining_word_count, guess)
-        })
-        .collect();
+    static ref REMAINING_WORDS_FOR_GUESS: Vec<(f64, &'static Word)> =
+        get_hints(&COMBINED_WORDS, &SOLUTION_WORDS)
+            .into_par_iter()
+            .zip(COMBINED_WORDS.par_iter())
+            .map(|(hint_buckets, guess)| {
+                let solutions_len = SOLUTION_WORDS.len() as f64;
+                let expected_remaining_word_count = hint_buckets
+                    .into_iter()
+                    .enumerate()
+                    .map(|(_bucket_no, solution_indices)| {
+                        let solutions_in_bucket: f64 = solution_indices.len() as f64;
+                        let bucket_probability = solutions_in_bucket / solutions_len;
+                        bucket_probability * solutions_in_bucket
+                    })
+                    .sum();
+                (expected_remaining_word_count, guess)
+            })
+            .collect();
+    static ref HINT_BY_SOLUTION_BY_GUESS: HashMap<&'static Guess, HashMap<&'static Solution, Hints>> =
+        COMBINED_WORDS
+            .par_iter()
+            .map(|guess| {
+                let hints_by_solution = SOLUTION_WORDS
+                    .iter()
+                    .map(|solution| (solution, get_hint(guess, solution)))
+                    .collect::<HashMap<&Solution, Hints>>();
+                (guess, hints_by_solution)
+            })
+            .collect();
+    static ref SOLUTIONS_BY_HINT_BY_GUESS: HashMap<&'static Guess, HashMap<HintValue, HashSet<&'static Solution>>> =
+        COMBINED_WORDS
+            .par_iter()
+            .map(|guess| {
+                let mut solution_by_value: HashMap<HintValue, HashSet<&Solution>> = HashMap::new();
+                for solution in SOLUTION_WORDS.iter() {
+                    solution_by_value
+                        .entry(get_hint(guess, solution).value())
+                        .or_default()
+                        .insert(solution);
+                }
+                (guess, solution_by_value)
+            })
+            .collect();
 }
 
+const ALL_POS: [usize; 5] = [0, 1, 2, 3, 4];
+
 type Word = Vec<char>;
+type Guess = Word;
+type Solution = Word;
+type HintValue = u8;
 
 // Helper for https://www.powerlanguage.co.uk/wordle/
 #[derive(Debug)]
@@ -95,7 +124,7 @@ impl Wordle {
     #[cfg(test)]
     fn autoplay<S: PickBestWord>(&mut self, wanted: Word, strategy: S) -> usize {
         let mut attempts = 0;
-        while !self.is_game_over() && attempts < 12 {
+        while !self.is_game_over() && attempts < 20 {
             let guess =
             // if self.solutions.len() <= 6_usize.saturating_sub(attempts) {
             //     None
@@ -137,8 +166,8 @@ impl Wordle {
             }
             self.guessed_words.insert(guess.clone());
             if let Some(pos) = self.words.iter().position(|word| word == &guess) {
-                let removed = self.words.remove(pos).to_string();
-                // println!("Removed guess '{}'", removed);
+                let _removed = self.words.remove(pos).to_string();
+                // println!("Removed guess '{}'", _removed);
             }
             if self.is_game_over() {
                 break;
@@ -579,7 +608,7 @@ impl PickBestWord for WordThatResultsInFewestRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Word> {
         let solutions = &game.solutions;
         if solutions.len() == 2315 {
-            return SCORES.lowest();
+            return REMAINING_WORDS_FOR_GUESS.lowest();
         }
         let hints_for_guesses: Vec<[Vec<usize>; 243]> = get_hints(&game.words, solutions);
         let total_solutions = solutions.len() as f64;
@@ -612,8 +641,8 @@ impl PickBestWord for WordThatResultsInFewestRemainingSolutions {
         // scores.sort_desc();
         // println!("Remaining worst: {}", scores.to_string());
         //
-        // scores.sort_asc();
-        // println!("Remaining best:  {}", scores.to_string());
+        scores.sort_asc();
+        println!("Remaining best:  {}", scores.to_string());
 
         scores.lowest()
     }
@@ -928,8 +957,8 @@ impl ToWord for &str {
     }
 }
 
-trait HintValue {
-    fn value(&self) -> usize;
+trait CalcHintValue {
+    fn value(&self) -> HintValue;
 }
 
 #[derive(Copy, Clone)]
@@ -938,8 +967,8 @@ enum Hint {
     WrongPos, // In word but at other position
     Correct,  // Correct at this position
 }
-impl HintValue for Hint {
-    fn value(&self) -> usize {
+impl CalcHintValue for Hint {
+    fn value(&self) -> HintValue {
         match self {
             Illegal => 0,
             WrongPos => 1,
@@ -954,6 +983,16 @@ impl From<char> for Hint {
             '🟨' => WrongPos,
             '🟩' => Correct,
             _ => unreachable!("Illegal hint {}", c),
+        }
+    }
+}
+impl From<HintValue> for Hint {
+    fn from(v: u8) -> Self {
+        match v {
+            0 => Illegal,
+            1 => WrongPos,
+            2 => Correct,
+            _ => unreachable!("Illegal hint value {}", v),
         }
     }
 }
@@ -989,14 +1028,14 @@ impl Hints {
         self.hints[i] = WrongPos;
     }
 }
-impl HintValue for Hints {
-    fn value(&self) -> usize {
-        const MULTIPLIERS: [usize; 5] = [1, 3, 9, 27, 81];
+impl CalcHintValue for Hints {
+    fn value(&self) -> HintValue {
+        const MULTIPLIERS: [HintValue; 5] = [81, 27, 9, 3, 1];
         self.hints
             .iter()
             .enumerate()
             .map(|(i, h)| MULTIPLIERS[i] * h.value())
-            .sum()
+            .sum::<HintValue>()
     }
 }
 impl Display for Hints {
@@ -1018,6 +1057,21 @@ impl From<&str> for Hints {
         }
     }
 }
+impl From<u8> for Hints {
+    fn from(mut hint_value: u8) -> Self {
+        const MULTIPLIERS: [HintValue; 5] = [81, 27, 9, 3, 1];
+        let mut hints = vec![];
+        for multi in MULTIPLIERS.into_iter() {
+            let hint = hint_value / multi;
+            hint_value %= multi;
+            hints.push(Hint::from(hint));
+        }
+        let hint = Hints {
+            hints: hints.clone(),
+        };
+        Hints { hints }
+    }
+}
 
 fn get_hints(guesses: &[Word], solutions: &[Word]) -> Vec<[Vec<usize>; 243]> {
     guesses
@@ -1027,7 +1081,7 @@ fn get_hints(guesses: &[Word], solutions: &[Word]) -> Vec<[Vec<usize>; 243]> {
             let mut hint_buckets = [EMPTY_VEC; 243];
             for (i, solution) in solutions.iter().enumerate() {
                 let hint = get_hint(guess, solution);
-                hint_buckets[hint.value()].push(i);
+                hint_buckets[hint.value() as usize].push(i);
             }
             hint_buckets
         })
@@ -1184,7 +1238,225 @@ fn words_with_most_new_chars<'w>(
 mod tests {
     use super::*;
 
-    // #[ignore]
+    #[ignore]
+    #[test]
+    fn test_hint_from_value_and_back() {
+        for value in 0..243 {
+            let hint = Hints::from(value);
+            println!("{} = {}", hint, value);
+            assert_eq!(value, Hints::from(value).value());
+        }
+    }
+
+    // -3s with --release
+    #[ignore]
+    #[test]
+    fn hint_by_solution_by_guess() {
+        let hint_by_solution_by_guess: HashMap<&'static Guess, HashMap<&'static Solution, Hints>> =
+            COMBINED_WORDS
+                .par_iter()
+                .map(|guess| {
+                    let hints_by_solution = SOLUTION_WORDS
+                        .iter()
+                        .map(|solution| (solution, get_hint(guess, solution)))
+                        .collect::<HashMap<&Solution, Hints>>();
+                    (guess, hints_by_solution)
+                })
+                .collect();
+        println!(
+            "hint_by_solution_by_guess.len() = {}",
+            hint_by_solution_by_guess.len()
+        );
+        // let mut rng = thread_rng();
+        // let (guess, hint_by_solution) = hint_by_solution_by_guess.iter().choose(&mut rng).unwrap();
+        // for (sol, hint) in hint_by_solution.iter() {
+        //     println!("{} + {} = {}", guess.to_string(), sol.to_string(), hint);
+        // }
+    }
+
+    // ~2s with --release
+    #[ignore]
+    #[test]
+    fn solutions_by_hint_by_guess() {
+        let solutions_by_hint_by_guess: HashMap<
+            &'static Guess,
+            HashMap<HintValue, HashSet<&'static Solution>>,
+        > = COMBINED_WORDS
+            .par_iter()
+            .map(|guess| {
+                let mut solution_by_value: HashMap<HintValue, HashSet<&Solution>> = HashMap::new();
+                for solution in SOLUTION_WORDS.iter() {
+                    solution_by_value
+                        .entry(get_hint(guess, solution).value())
+                        .or_default()
+                        .insert(solution);
+                }
+                (guess, solution_by_value)
+            })
+            .collect();
+        println!(
+            "solutions_by_hint_by_guess.len() = {}",
+            solutions_by_hint_by_guess.len()
+        );
+        // let mut rng = thread_rng();
+        // let (guess, solutions_by_hint) =
+        //     solutions_by_hint_by_guess.iter().choose(&mut rng).unwrap();
+        // println!("Guess '{}'", guess.to_string());
+        // for (hint, solutions) in solutions_by_hint.iter() {
+        //     println!("value {:3}: {:3} solutions", hint, solutions.len());
+        // }
+    }
+
+    #[ignore]
+    #[test]
+    // Second word after 'roate' with lowest total remaining words in round 3:
+    // 13021 cling, 12977 lysin, 12951 lings, 12753 sclim, 12667 slink,
+    // 12337 blins, 12237 limns, 12033 clips, 11947 sling, 11847 linds
+    fn find_optimal_second_word() {
+        // one of 12'972 guesses + one of 2'135 solutions = ~27.7m hints, in one of 243 buckets
+        let mut guesses = vec!["roate".to_word()];
+
+        let guess = guesses.last().unwrap();
+        let guess_and_remaining_words_count: Vec<(&Guess, usize)> = SOLUTION_WORDS
+            .par_iter()
+            .map(|secret| {
+                let hint = get_hint(guess, secret);
+                // let hint = &HINT_BY_SOLUTION_BY_GUESS[&guess][&secret];
+                let solutions: &HashSet<&Solution> =
+                    &SOLUTIONS_BY_HINT_BY_GUESS[&guess][&hint.value()];
+                println!(
+                    "1. guess '{}' + secret '{}' = hint '{}'. {} remaining",
+                    guess.to_string(),
+                    secret.to_string(),
+                    hint.to_string(),
+                    solutions.len()
+                );
+
+                // for (i, solution) in solutions_1.iter().enumerate() {
+                //     println!("{:2}. solution 1 =  {}", i, solution.to_string());
+                // }
+
+                // 80 words:
+                // 10s calc   both hint1 + hint2 directly
+                // 18s lookup both hint1 + hint2
+                // 18s calc hint1 + lookup hint2
+                // 18s lookup hint1 + calc hint2
+                COMBINED_WORDS
+                    .iter()
+                    .filter(|&word| word != guess)
+                    .map(|guess| {
+                        let hint = get_hint(guess, secret);
+                        // let hint = &HINT_BY_SOLUTION_BY_GUESS[guess][secret];
+                        let next_solutions = &SOLUTIONS_BY_HINT_BY_GUESS[guess][&hint.value()];
+                        // for (i, solution) in solutions_2.iter().enumerate() {
+                        //     println!("{:2}. solution 2 =  {}", i, solution.to_string());
+                        // }
+
+                        // for (i, solution) in solutions_1
+                        //     .intersection(solutions_2)
+                        //     .into_iter()
+                        //     .enumerate()
+                        // {
+                        //     println!("{:2}. intersection =  {}", i, solution.to_string());
+                        // }
+                        let count = solutions.intersection(next_solutions).count();
+                        // println!(
+                        //     "2. guess '{}' + secret '{}' = hint '{}'. {} remaining ({} in new set)",
+                        //     guess2.to_string(),
+                        //     secret.to_string(),
+                        //     hint2.to_string(),
+                        //     count,
+                        //     solutions_2.len()
+                        // );
+                        (guess, count)
+                    })
+                    .collect::<Vec<(&Guess, usize)>>()
+            })
+            .flatten()
+            .collect();
+
+        let mut count_by_next_guess: HashMap<&Guess, usize> = HashMap::new();
+        for (next_guess, count) in guess_and_remaining_words_count {
+            *count_by_next_guess.entry(next_guess).or_default() += count;
+        }
+        let mut scores: Vec<(usize, &Guess)> = count_by_next_guess
+            .into_iter()
+            .map(|(g, c)| (c, g))
+            .collect();
+        scores.sort_asc();
+        println!("Best 2nd guesses: {}", scores.to_string());
+        let optimal_next_guess = scores.lowest().unwrap();
+        println!("Best 2nd guess: '{}'", optimal_next_guess.to_string());
+    }
+    #[ignore]
+    #[test]
+    fn precalculate_all_guesses_with_all_hints() {
+        // one of 12'972 guesses + one of 2'135 solutions = ~27.7m hints, in one of 243 buckets
+        // (guess 1 + hint 1) -> possible solutions
+        // (guess 2 + hint 2) -> possible solutions
+
+        let guesses_hint_values_and_solutions: Vec<(&Guess, Vec<(HintValue, &Solution)>)> =
+            COMBINED_WORDS
+                .par_iter()
+                .map(|guess| {
+                    let value_and_solutions: Vec<(HintValue, &Solution)> = SOLUTION_WORDS
+                        .iter()
+                        .map(|solution| {
+                            let hint_value = get_hint(guess, solution).value();
+                            (hint_value, solution)
+                        })
+                        .collect();
+                    (guess, value_and_solutions)
+                })
+                .collect();
+        let mut solutions_by_guess_and_value: HashMap<(&Guess, HintValue), HashSet<&Solution>> =
+            HashMap::new();
+        for (guess, value_and_solutions) in guesses_hint_values_and_solutions {
+            for (value, solutions) in value_and_solutions {
+                solutions_by_guess_and_value
+                    .entry((guess, value))
+                    .or_default()
+                    .insert(solutions);
+            }
+        }
+        println!(
+            "solutions_by_guess_and_value count = {}",
+            solutions_by_guess_and_value.len()
+        );
+        let secret = "robot".to_word();
+        let guess1 = "roate".to_word();
+        let solutions_1: &HashSet<&Solution> = solutions_by_guess_and_value
+            .get(&(&guess1, get_hint(&guess1, &secret).value()))
+            .unwrap();
+
+        let guess2 = "until".to_word();
+        let solutions_2: &HashSet<&Solution> = solutions_by_guess_and_value
+            .get(&(&guess2, get_hint(&guess2, &secret).value()))
+            .unwrap();
+        println!("solutions_1.len() = {}", solutions_1.len());
+        println!("solutions_2.len() = {}", solutions_2.len());
+        println!(
+            "intersection.len() = {}",
+            solutions_1.intersection(solutions_2).count()
+        );
+        for (i, solution) in solutions_1.iter().enumerate() {
+            println!("{:2}. solution 1 =  {}", i, solution.to_string());
+        }
+        println!();
+        for (i, solution) in solutions_2.iter().enumerate() {
+            println!("{:2}. solution 2 =  {}", i, solution.to_string());
+        }
+        println!();
+        for (i, solution) in solutions_1
+            .intersection(solutions_2)
+            .into_iter()
+            .enumerate()
+        {
+            println!("{:2}. intersection =  {}", i, solution.to_string());
+        }
+    }
+
+    #[ignore]
     #[test]
     // s
     //
@@ -1600,9 +1872,8 @@ mod tests {
     #[test]
     #[allow(clippy::identity_op)] // For the 1_usize * a
     fn test_word_hint_values() {
-        let value = |a, b, c, d, e| -> usize {
-            1_usize * a + 3_usize * b + 9_usize * c + 27_usize * d + 81_usize * e
-        };
+        let value =
+            |a, b, c, d, e| -> HintValue { 81_u8 * a + 27_u8 * b + 9_u8 * c + 3_u8 * d + 1_u8 * e };
         assert_eq!(value(0, 0, 0, 0, 0), Hints::from("⬛⬛⬛⬛⬛").value());
         assert_eq!(value(1, 1, 1, 1, 1), Hints::from("🟨🟨🟨🟨🟨").value());
         assert_eq!(value(2, 2, 2, 2, 2), Hints::from("🟩🟩🟩🟩🟩").value());
