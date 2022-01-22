@@ -9,8 +9,8 @@ use Hint::*;
 #[macro_use]
 extern crate lazy_static;
 
-const COMBINED: &str = include_str!("../data/wordlists/combined.txt");
-const SOLUTIONS: &str = include_str!("../data/wordlists/solutions.txt");
+const COMBINED: &str = include_str!("../data/wordlists/original/combined.txt");
+const SOLUTIONS: &str = include_str!("../data/wordlists/original/solutions.txt");
 lazy_static! {
     static ref SOLUTION_WORDS: Vec<Word> = SOLUTIONS.lines().map(|w| w.to_word()).collect();
     static ref COMBINED_WORDS: Vec<Word> = COMBINED.lines().map(|w| w.to_word()).collect();
