@@ -75,8 +75,8 @@ After 6 guesses: The word is 'taunt'
   16 solutions left, 2. guess 'linds', hint '🟨⬛🟩⬛⬛', secret 'zonal'
 After 2 guesses: The only word left in the list is 'zonal'
 
-Average attempts = 3.066; 0 (0.000%) failed games (> 6 attempts):
-1: 23, 2: 518, 3: 1156, 4: 522, 5: 93, 6: 3
+Average attempts = 3.074; 7 (0.302%) failed games (> 6 attempts):
+1: 23, 2: 517, 3: 1164, 4: 507, 5: 92, 6: 5, 7: 7
 ```
 
 [Full example](data/simulation_example.txt)

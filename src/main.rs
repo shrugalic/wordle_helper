@@ -81,6 +81,7 @@ lazy_static! {
 const ALL_POS: [usize; 5] = [0, 1, 2, 3, 4];
 #[cfg(test)]
 const AUTOPLAY_MAX_ATTEMPTS: usize = 10;
+const MAX_ATTEMPTS: usize = 6;
 
 type Word = Vec<char>;
 type Guess = Word;
@@ -165,6 +166,10 @@ impl Wordle {
                 attempts,
                 self.solutions[0].to_string()
             );
+            if attempts == MAX_ATTEMPTS {
+                // In this case it's still a failure because we cannot enter it
+                attempts += 1;
+            }
         } else if self.correct_chars.iter().all(|o| o.is_some()) {
             let word: String = self.correct_chars.iter().map(|c| c.unwrap()).collect();
             println!("After {} guesses: The word is '{}'", attempts, word);
@@ -174,6 +179,8 @@ impl Wordle {
                 attempts,
                 secret.to_string()
             );
+            // Who knows how many more attempts it would take,
+            // let's return this known quantity as a signal
             attempts = 2 * AUTOPLAY_MAX_ATTEMPTS;
         }
         attempts
@@ -1661,8 +1668,8 @@ mod tests {
 
     #[ignore]
     #[test]
-    // Average attempts = 3.067; 2 (0.086%) failed games (> 6 attempts):
-    // 1: 23, 2: 521, 3: 1162, 4: 509, 5: 88, 6: 10, 7: 2
+    // Average attempts = 3.074; 7 (0.302%) failed games (> 6 attempts):
+    // 1: 23, 2: 517, 3: 1164, 4: 507, 5: 92, 6: 5, 7: 7
     fn auto_play_roate_linds_chump_gawky_befit() {
         let strategy = FixedGuessList::new(vec!["roate", "linds", "chump", "gawky", "befit"]);
         autoplay_and_print_stats(strategy);
@@ -1670,8 +1677,8 @@ mod tests {
 
     #[ignore] // ~4s
     #[test]
-    // Average attempts = 3.060; 0 (0.000%) failed games (> 6 attempts):
-    // 1: 23, 2: 515, 3: 1179, 4: 498, 5: 97, 6: 3
+    // Average attempts = 3.067; 2 (0.086%) failed games (> 6 attempts):
+    // 1: 23, 2: 521, 3: 1158, 4: 510, 5: 100, 6: 1, 7: 2
     fn auto_play_roate_linds_chump_gawky() {
         let strategy = FixedGuessList::new(vec!["roate", "linds", "chump", "gawky"]);
         autoplay_and_print_stats(strategy);
