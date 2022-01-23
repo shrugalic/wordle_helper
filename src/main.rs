@@ -1444,14 +1444,18 @@ mod tests {
     // English: "roate -> "linds"
     // Deutsch: "tarne" -> "helis"
     #[test]
-    // English
-    // Second word after 'roate' with lowest total remaining words in round 3:
-    // 11847 linds, 11947 sling, 12033 clips, 12237 limns, 12337 blins,
-    // 12667 slink, 12753 sclim, 12951 lings, 12977 lysin, 13021 cling
     //
     // Deutsch: 1. Wort "tarne, 2. Wort:
     // 7273 helis, 7451 heils, 7641 holis, 7925 selig, 8073 kilos,
     // 8221 gusli, 8281 bilds, 8313 beils, 8315 keils, 8381 solid
+    //
+    // Best 5. guesses after 1. 'tarne' and 2. 'helis' and 3. 'gudok' and 4. 'zamba':
+    // 1731 fiept, 1737 fiepe, 1741 fieps, 1743 wippt, 1743 luepf
+    //
+    // English
+    // Second word after 'roate' with lowest total remaining words in round 3:
+    // 11847 linds, 11947 sling, 12033 clips, 12237 limns, 12337 blins,
+    // 12667 slink, 12753 sclim, 12951 lings, 12977 lysin, 13021 cling
     //
     // Best 5-combo in 84s:
     // Best 5. guesses after 1. 'roate' and 2. 'linds' and 3. 'chump' and 4. 'gawky':
@@ -1670,6 +1674,28 @@ mod tests {
     // 1: 23, 2: 515, 3: 1179, 4: 498, 5: 97, 6: 3
     fn auto_play_roate_linds_chump_gawky() {
         let strategy = FixedGuessList::new(vec!["roate", "linds", "chump", "gawky"]);
+        autoplay_and_print_stats(strategy);
+    }
+
+    // #[ignore] // ~4s
+    #[test]
+    // Average attempts = 3.055; 6 (0.364%) failed games (> 6 attempts):
+    // 1: 32, 2: 451, 3: 708, 4: 331, 5: 112, 6: 9, 7: 6
+    fn auto_play_german_tarne_helis_gudok_zamba_fiept() {
+        // Best 5. guesses after 1. 'tarne' and 2. 'helis' and 3. 'gudok' and 4. 'zamba':
+        // 1731 fiept, 1737 fiepe, 1741 fieps, 1743 wippt, 1743 luepf
+        let strategy = FixedGuessList::new(vec!["tarne", "helis", "gudok", "zamba", "fiept"]);
+        autoplay_and_print_stats(strategy);
+    }
+
+    // #[ignore] // ~4s
+    #[test]
+    // Average attempts = 3.047; 2 (0.121%) failed games (> 6 attempts):
+    // 1: 32, 2: 466, 3: 684, 4: 341, 5: 114, 6: 10, 7: 2
+    fn auto_play_german_tarne_helis_gudok_zamba() {
+        // Best 5. guesses after 1. 'tarne' and 2. 'helis' and 3. 'gudok' and 4. 'zamba':
+        // 1731 fiept, 1737 fiepe, 1741 fieps, 1743 wippt, 1743 luepf
+        let strategy = FixedGuessList::new(vec!["tarne", "helis", "gudok", "zamba"]);
         autoplay_and_print_stats(strategy);
     }
 
