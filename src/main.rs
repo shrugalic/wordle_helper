@@ -656,7 +656,7 @@ fn lowest_total_number_of_remaining_solutions<'g>(
     assert!(SOLUTIONS_BY_HINT_BY_GUESS.len() > 0);
 
     let mut scores: Vec<_> = guesses
-        .iter()
+        .par_iter()
         .map(|guess| {
             let count: usize = solutions
                 .iter()
