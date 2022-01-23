@@ -102,20 +102,16 @@ struct Wordle {
 }
 impl Wordle {
     fn new(solutions: &[Solution]) -> Self {
-        let words = GUESSES.clone();
         let empty = HashSet::new;
-        let illegal_position_for_char: [HashSet<char>; 5] =
-            [empty(), empty(), empty(), empty(), empty()];
-        let rng = thread_rng();
         Wordle {
             solutions: solutions.to_vec(),
-            allowed: words,
+            allowed: GUESSES.clone(),
             illegal_chars: HashSet::new(),
             correct_chars: [None; 5],
-            illegal_at_pos: illegal_position_for_char,
+            illegal_at_pos: [empty(), empty(), empty(), empty(), empty()],
             mandatory_chars: HashSet::new(),
             guessed: Vec::new(),
-            rng,
+            rng: thread_rng(),
             print_output: true,
         }
     }
@@ -729,7 +725,7 @@ struct FixedGuessList<'a> {
 impl<'a> FixedGuessList<'a> {
     #[cfg(test)]
     fn new(guesses: Vec<&'a str>) -> Self {
-        println!("Fixed guesses {:?}", guesses);
+        println!("Fixed guesses {:?}\n", guesses);
         FixedGuessList { guesses }
     }
 }
@@ -1851,7 +1847,7 @@ mod tests {
             .collect::<Vec<_>>()
             .join(", ");
         println!(
-            "Average attempts = {:.3}; {} ({:.3}%) failed games (> 6 attempts):\n{}\n",
+            "\nAverage attempts = {:.3}; {} ({:.3}%) failed games (> 6 attempts):\n{}\n",
             avg,
             failed,
             100.0 * failed as f64 / total,
