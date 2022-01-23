@@ -1677,7 +1677,7 @@ mod tests {
         autoplay_and_print_stats(strategy);
     }
 
-    // #[ignore] // ~4s
+    #[ignore] // ~4s
     #[test]
     // Average attempts = 3.055; 6 (0.364%) failed games (> 6 attempts):
     // 1: 32, 2: 451, 3: 708, 4: 331, 5: 112, 6: 9, 7: 6
@@ -1688,7 +1688,7 @@ mod tests {
         autoplay_and_print_stats(strategy);
     }
 
-    // #[ignore] // ~4s
+    #[ignore] // ~4s
     #[test]
     // Average attempts = 3.047; 2 (0.121%) failed games (> 6 attempts):
     // 1: 32, 2: 466, 3: 684, 4: 341, 5: 114, 6: 10, 7: 2
