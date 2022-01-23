@@ -57,7 +57,7 @@ Fixed guesses ["roate", "linds", "chump", "gawky"]
 2315 solutions left, 1. guess 'roate', hint '⬛⬛🟩⬛⬛', secret 'aback'
   71 solutions left, 2. guess 'linds', hint '⬛⬛⬛⬛⬛', secret 'aback'
    6 solutions left, 3. guess 'chump', hint '🟨⬛⬛⬛⬛', secret 'aback'
-After 3 guesses: The only word left in the list is 'aback'
+After 3 guesses (4. turn): The only word left in the list is 'aback'
 
 …
 
@@ -67,16 +67,16 @@ After 3 guesses: The only word left in the list is 'aback'
    4 solutions left, 4. guess 'gawky', hint '⬛🟩⬛⬛⬛', secret 'taunt'
    3 solutions left, 5. guess 'vaunt', hint '⬛🟩🟩🟩🟩', secret 'taunt'
    2 solutions left, 6. guess 'taunt', hint '🟩🟩🟩🟩🟩', secret 'taunt'
-After 6 guesses: The word is 'taunt'
+With 6 guesses: The word is 'taunt'
 
 …
 
 2315 solutions left, 1. guess 'roate', hint '⬛🟩🟨⬛⬛', secret 'zonal'
   16 solutions left, 2. guess 'linds', hint '🟨⬛🟩⬛⬛', secret 'zonal'
-After 2 guesses: The only word left in the list is 'zonal'
+After 2 guesses (3. turn): The only word left in the list is 'zonal'
 
-Average attempts = 3.074; 7 (0.302%) failed games (> 6 attempts):
-1: 23, 2: 517, 3: 1164, 4: 507, 5: 92, 6: 5, 7: 7
+Average attempts = 3.806; 2 (0.086%) failed games (> 6 attempts):
+2: 54, 3: 797, 4: 1062, 5: 351, 6: 49, 7: 2
 ```
 
 [Full example](data/simulation_example.txt)
