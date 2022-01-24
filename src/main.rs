@@ -1684,6 +1684,8 @@ mod tests {
 
     #[ignore]
     #[test]
+    // Average attempts = 3.749; 9 (0.546%) failed games (> 6 attempts):
+    // 2: 82, 3: 649, 4: 610, 5: 229, 6: 70, 7: 6, 8: 3
     fn auto_play_german_tarne_helis_gudok_zamba_fiept() {
         // Best 5. guesses after 1. 'tarne' and 2. 'helis' and 3. 'gudok' and 4. 'zamba':
         // 1731 fiept, 1737 fiepe, 1741 fieps, 1743 wippt, 1743 luepf
@@ -1693,6 +1695,8 @@ mod tests {
 
     #[ignore]
     #[test]
+    // Average attempts = 3.763; 7 (0.424%) failed games (> 6 attempts):
+    // 2: 79, 3: 623, 4: 631, 5: 249, 6: 60, 7: 6, 8: 1
     fn auto_play_german_tarne_helis_gudok_zamba() {
         // Best 5. guesses after 1. 'tarne' and 2. 'helis' and 3. 'gudok' and 4. 'zamba':
         // 1731 fiept, 1737 fiepe, 1741 fieps, 1743 wippt, 1743 luepf
@@ -1702,6 +1706,8 @@ mod tests {
 
     #[ignore]
     #[test]
+    // Average attempts = 3.994; 21 (0.907%) failed games (> 6 attempts):
+    // 2: 53, 3: 738, 4: 873, 5: 496, 6: 134, 7: 19, 8: 2
     fn auto_play_soare_until_pygmy_whack_every_time() {
         let strategy = FixedGuessList::new(vec!["soare", "until", "pygmy", "whack"]);
         autoplay_and_print_stats(strategy);
@@ -1709,6 +1715,8 @@ mod tests {
 
     #[ignore]
     #[test]
+    // Average attempts = 4.879; 219 (9.460%) failed games (> 6 attempts):
+    // 1: 1, 2: 18, 3: 317, 4: 592, 5: 622, 6: 546, 7: 200, 8: 18, 9: 1
     fn auto_play_quick_brown_foxed_jumps_glazy_vetch_every_time() {
         let strategy =
             FixedGuessList::new(vec!["quick", "brown", "foxed", "jumps", "glazy", "vetch"]);
@@ -1717,6 +1725,8 @@ mod tests {
 
     #[ignore]
     #[test]
+    // Average attempts = 4.024; 2 (0.086%) failed games (> 6 attempts):
+    // 1: 1, 2: 51, 3: 500, 4: 1177, 5: 513, 6: 71, 7: 2
     fn auto_play_fixed_guess_list_1() {
         let strategy = FixedGuessList::new(vec!["brake", "dying", "clots", "whump"]);
         autoplay_and_print_stats(strategy);
@@ -1724,6 +1734,8 @@ mod tests {
 
     #[ignore]
     #[test]
+    // Average attempts = 3.910; 1 (0.043%) failed games (> 6 attempts):
+    // 1: 1, 2: 64, 3: 636, 4: 1114, 5: 443, 6: 56, 7: 1
     fn auto_play_fixed_guess_list_2() {
         let strategy = FixedGuessList::new(vec!["maple", "sight", "frown", "ducky"]);
         autoplay_and_print_stats(strategy);
@@ -1731,6 +1743,8 @@ mod tests {
 
     #[ignore]
     #[test]
+    // Average attempts = 4.034; 5 (0.216%) failed games (> 6 attempts):
+    // 1: 1, 2: 49, 3: 550, 4: 1081, 5: 544, 6: 85, 7: 5
     fn auto_play_fixed_guess_list_3() {
         let strategy = FixedGuessList::new(vec!["fiend", "paths", "crumb", "glows"]);
         autoplay_and_print_stats(strategy);
@@ -1738,6 +1752,8 @@ mod tests {
 
     #[ignore]
     #[test]
+    // Average attempts = 3.785; 11 (0.475%) failed games (> 6 attempts):
+    // 2: 67, 3: 854, 4: 974, 5: 364, 6: 45, 7: 7, 8: 4
     fn auto_play_fixed_guess_list_4() {
         let strategy = FixedGuessList::new(vec!["reals", "point", "ducky"]);
         autoplay_and_print_stats(strategy);
@@ -1745,6 +1761,8 @@ mod tests {
 
     #[ignore]
     #[test]
+    // Average attempts = 3.831; 8 (0.346%) failed games (> 6 attempts):
+    // 2: 72, 3: 725, 4: 1113, 5: 344, 6: 53, 7: 6, 8: 1, 9: 1
     fn auto_play_fixed_guess_list_5() {
         let strategy = FixedGuessList::new(vec!["laser", "pitch", "mound"]);
         autoplay_and_print_stats(strategy);

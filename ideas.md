@@ -9,16 +9,6 @@ Wordle helper ideas:
 - Allow specifying multiple strategies (fallback)
 - Combine "most unplayed characters" with other strategies, such as "least possible words left after guess"
 - Store results of some calculations to not repeat them every time
-- What other word combinations are good?
-  - Combined
-     1. SOARE
-     1. UNTIL
-     2. GYPPY, HYPPY or PYGMY
-    - Solutions
-      1. AROSE
-      2. UNTIL
-      3. PYGMY
-      4. WHACK
 - Don't lock the know positions right away, use them to evaluate new characters, to make them must-have or illegal.
 - Implement strategy that minimizes number of total guesses?
 - Possibly use larger wordlist when guessing
@@ -29,6 +19,7 @@ Wordle helper ideas:
 
 Done:
 -----
+- Tried many other word combinations
 - Implement strategy that starts with a few good words almost regardless of outcome, such as: TUBES, FLING, CHAMP, WORDY from [Why I ALWAYS Guess the Same Four Words](https://youtu.be/l92g6Yy8t5g)
   - What are possible next words?
     - Frequencies over all combined:
