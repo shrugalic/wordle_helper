@@ -2,6 +2,7 @@ use rand::prelude::*;
 use rayon::prelude::*;
 use std::cmp::{Ordering, Reverse};
 use std::collections::{HashMap, HashSet};
+use std::env::args;
 use std::fmt::{Display, Formatter};
 use std::io;
 use Hint::*;
@@ -9,21 +10,37 @@ use Hint::*;
 #[macro_use]
 extern crate lazy_static;
 
-const ENGLISH: bool = true;
+const LANGUAGE: Language = Language::English;
+#[derive(Copy, Clone)]
+enum Language {
+    English,
+    German,
+}
+impl TryFrom<&str> for Language {
+    type Error = String;
 
-const GUESSES_LIST: &str = if ENGLISH {
-    include_str!("../data/wordlists/original/combined.txt")
-} else {
-    include_str!("../data/wordlists/german/combined.txt")
-};
-const SOLUTIONS_LIST: &str = if ENGLISH {
-    include_str!("../data/wordlists/original/solutions.txt")
-} else {
-    include_str!("../data/wordlists/german/solutions.txt")
-};
+    fn try_from(lang: &str) -> Result<Self, Self::Error> {
+        match lang.to_ascii_lowercase().as_str() {
+            "english" => Ok(Language::English),
+            "german" | "deutsch" => Ok(Language::German),
+            _ => Err(format!("Unknown language '{}'", lang)),
+        }
+    }
+}
+const GUESSES_LISTS: [&str; 2] = [
+    include_str!("../data/wordlists/original/combined.txt"),
+    include_str!("../data/wordlists/german/combined.txt"),
+];
+const SOLUTIONS_LISTS: [&str; 2] = [
+    include_str!("../data/wordlists/original/solutions.txt"),
+    include_str!("../data/wordlists/german/solutions.txt"),
+];
+fn to_words(txt: &str) -> Vec<Word> {
+    txt.lines().map(|w| w.to_word()).collect()
+}
 lazy_static! {
-    static ref SOLUTIONS: Vec<Word> = SOLUTIONS_LIST.lines().map(|w| w.to_word()).collect();
-    static ref GUESSES: Vec<Word> = GUESSES_LIST.lines().map(|w| w.to_word()).collect();
+    static ref SOLUTIONS: Vec<Word> = to_words(SOLUTIONS_LISTS[LANGUAGE as usize]);
+    static ref GUESSES: Vec<Word> = to_words(GUESSES_LISTS[LANGUAGE as usize]);
     static ref COMBINED_GLOBAL_CHAR_COUNTS_BY_CHAR: HashMap<char, usize> =
         GUESSES.as_slice().global_character_counts_in(&ALL_POS);
     static ref COMBINED_GLOBAL_CHAR_COUNT_SUMS_BY_WORD: HashMap<Word, usize> = GUESSES
@@ -92,8 +109,8 @@ type HintValue = u8;
 // Helper for https://www.powerlanguage.co.uk/wordle/
 #[derive(Debug)]
 struct Wordle {
-    solutions: Vec<Word>,
-    allowed: Vec<Word>,
+    solutions: Vec<Solution>,
+    allowed: Vec<Guess>,
     illegal_chars: HashSet<char>,
     correct_chars: [Option<char>; 5],
     illegal_at_pos: [HashSet<char>; 5],
@@ -103,11 +120,11 @@ struct Wordle {
     print_output: bool,
 }
 impl Wordle {
-    fn new(solutions: &[Solution]) -> Self {
+    fn new(language: Language) -> Self {
         let empty = HashSet::new;
         Wordle {
-            solutions: solutions.to_vec(),
-            allowed: GUESSES.clone(),
+            solutions: to_words(SOLUTIONS_LISTS[language as usize]),
+            allowed: to_words(GUESSES_LISTS[language as usize]),
             illegal_chars: HashSet::new(),
             correct_chars: [None; 5],
             illegal_at_pos: [empty(), empty(), empty(), empty(), empty()],
@@ -676,11 +693,14 @@ fn lowest_total_number_of_remaining_solutions<'g>(
 struct MostFrequentGlobalCharacter;
 impl PickBestWord for MostFrequentGlobalCharacter {
     fn pick(&self, game: &Wordle) -> Option<Word> {
-        let words = &game.solutions;
         let positions = &game.open_positions();
-        let freq = words.as_slice().global_character_counts_in(positions);
+        let freq = game
+            .solutions
+            .as_slice()
+            .global_character_counts_in(positions);
 
-        let scores: Vec<_> = words
+        let scores: Vec<_> = game
+            .solutions
             .iter()
             .map(|word| {
                 let count = word
@@ -785,7 +805,7 @@ impl PickBestWord for MostFrequentUnusedCharacters {
         };
         let used_chars: HashSet<char> = game.guessed.iter().flatten().cloned().collect();
         let words_with_most_new_chars: Vec<&Word> =
-            words_with_most_new_chars(&used_chars, &GUESSES)
+            words_with_most_new_chars(&used_chars, &game.allowed)
                 .into_iter()
                 .map(|(_, word)| word)
                 .collect();
@@ -809,7 +829,8 @@ struct WordsWithMostCharsFromRemainingSolutions;
 impl PickBestWord for WordsWithMostCharsFromRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Word> {
         let wanted_chars: HashSet<char> = game.wanted_chars();
-        let scores: Vec<(&Word, usize)> = words_with_most_wanted_chars(&wanted_chars, &GUESSES);
+        let scores: Vec<(&Word, usize)> =
+            words_with_most_wanted_chars(&wanted_chars, &game.allowed);
         if game.print_output {
             println!(
                 "Words with most of wanted chars {:?} are:\n  {}",
@@ -872,11 +893,11 @@ impl PickBestWord for MostFrequentCharacterPerPosHighVarietyWord {
 struct MatchingMostOtherWordsInAtLeastOneOpenPosition;
 impl PickBestWord for MatchingMostOtherWordsInAtLeastOneOpenPosition {
     fn pick(&self, game: &Wordle) -> Option<Word> {
-        let solutions = &game.solutions;
         let positions = &game.open_positions();
         // for each word, find out how many other words it matches in any open position
-        let mut scores: Vec<_> = solutions.iter().map(|word| (word, 0_usize)).collect();
-        let open_chars: Vec<_> = solutions
+        let mut scores: Vec<_> = game.solutions.iter().map(|word| (word, 0_usize)).collect();
+        let open_chars: Vec<_> = game
+            .solutions
             .iter()
             .map(|word| word.chars_in(positions))
             .collect();
@@ -1120,8 +1141,14 @@ fn determine_hint(guess: &Guess, solution: &Solution) -> Hints {
 }
 
 fn main() {
+    let args: Vec<String> = args().collect();
+    let language = if args.len() > 1 {
+        Language::try_from(args[1].as_str()).unwrap_or(Language::English)
+    } else {
+        Language::English
+    };
     // print_word_combinations();
-    Wordle::new(&SOLUTIONS).play()
+    Wordle::new(language).play()
 }
 
 // TODO find 5 good starting words
@@ -1209,9 +1236,9 @@ fn words_with_most_new_chars<'w>(
 
 fn words_with_most_wanted_chars<'w>(
     wanted_chars: &HashSet<char>,
-    words: &'w [Word],
+    guesses: &'w [Word],
 ) -> Vec<(&'w Word, usize)> {
-    let mut scores: Vec<_> = words
+    let mut scores: Vec<_> = guesses
         .iter()
         .map(|word| {
             let unique_wanted_char_count = word
@@ -1441,6 +1468,7 @@ mod tests {
     // 60.42 roate, 61.00 raise, 61.33 raile, 62.30 soare, 63.73 arise,
     // 63.78 irate, 63.89 orate, 65.29 ariel, 66.02 arose, 67.06 raine
     fn find_optimal_first_word() {
+        let lang = Language::English;
         let scores = lowest_total_number_of_remaining_solutions(&SOLUTIONS, &GUESSES);
         let optimal = scores.lowest().unwrap();
         assert_eq!("roate".to_word(), optimal);
@@ -1506,6 +1534,7 @@ mod tests {
     // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gompa': 2401 wakfs, 2409 wheft, 2409 fewer, 2413 tweak, 2413 fetwa
     // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gramp': 2407 wakfs, 2413 fewer, 2415 wheft, 2415 fetwa, 2417 swift
     fn find_optimal_word_combos() {
+        let lang = Language::English;
         let guesses = &GUESSES;
         let solutions = &SOLUTIONS;
 
@@ -1673,7 +1702,7 @@ mod tests {
         autoplay_and_print_stats(strategy);
     }
 
-    #[ignore]
+    // #[ignore]
     #[test]
     // Average attempts = 3.806; 2 (0.086%) failed games (> 6 attempts):
     // 2: 54, 3: 797, 4: 1062, 5: 351, 6: 49, 7: 2
@@ -1682,7 +1711,7 @@ mod tests {
         autoplay_and_print_stats(strategy);
     }
 
-    #[ignore]
+    // #[ignore]
     #[test]
     // Average attempts = 3.749; 9 (0.546%) failed games (> 6 attempts):
     // 2: 82, 3: 649, 4: 610, 5: 229, 6: 70, 7: 6, 8: 3
@@ -1690,7 +1719,7 @@ mod tests {
         // Best 5. guesses after 1. 'tarne' and 2. 'helis' and 3. 'gudok' and 4. 'zamba':
         // 1731 fiept, 1737 fiepe, 1741 fieps, 1743 wippt, 1743 luepf
         let strategy = FixedGuessList::new(vec!["tarne", "helis", "gudok", "zamba", "fiept"]);
-        autoplay_and_print_stats(strategy);
+        autoplay_and_print_stats_with_language(strategy, Language::German);
     }
 
     #[ignore]
@@ -1701,7 +1730,7 @@ mod tests {
         // Best 5. guesses after 1. 'tarne' and 2. 'helis' and 3. 'gudok' and 4. 'zamba':
         // 1731 fiept, 1737 fiepe, 1741 fieps, 1743 wippt, 1743 luepf
         let strategy = FixedGuessList::new(vec!["tarne", "helis", "gudok", "zamba"]);
-        autoplay_and_print_stats(strategy);
+        autoplay_and_print_stats_with_language(strategy, Language::German);
     }
 
     #[ignore]
@@ -1817,9 +1846,15 @@ mod tests {
     }
 
     fn autoplay_and_print_stats<S: PickBestWord + Sync>(strategy: S) {
+        autoplay_and_print_stats_with_language(strategy, Language::English);
+    }
+    fn autoplay_and_print_stats_with_language<S: PickBestWord + Sync>(
+        strategy: S,
+        language: Language,
+    ) {
         let attempts: Vec<usize> = SOLUTIONS
             .iter()
-            .map(|secret| Wordle::new(&SOLUTIONS).autoplay(secret, &strategy))
+            .map(|secret| Wordle::new(language).autoplay(secret, &strategy))
             .collect();
         print_stats(attempts);
     }
@@ -1860,7 +1895,7 @@ mod tests {
     // Takes around 6s for the 2'315 solution words
     #[test]
     fn test_word_that_results_in_fewest_remaining_possible_words() {
-        let game = Wordle::new(&SOLUTIONS);
+        let game = Wordle::new(Language::English);
         let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
         // Worst:
@@ -1894,7 +1929,7 @@ mod tests {
     // Takes around a minute for the 12'972 words in the combined list
     #[test]
     fn test_word_that_results_in_fewest_remaining_possible_words_for_full_word_list() {
-        let game = Wordle::new(&GUESSES);
+        let game = Wordle::new(Language::English);
         let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
         // Worst:
@@ -1928,7 +1963,7 @@ mod tests {
     // Takes around 24s (parallel) guessing with 12'972 combined words in 2'315 solutions.
     #[test]
     fn test_word_from_combined_list_that_results_in_fewest_remaining_possible_solution_words() {
-        let game = Wordle::new(&SOLUTIONS);
+        let game = Wordle::new(Language::English);
         let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
         // Using 12'972 combined words on 2'315 solutions
@@ -1946,7 +1981,7 @@ mod tests {
     #[ignore]
     #[test]
     fn test_pick_word_that_exactly_matches_most_others_in_at_least_one_open_position() {
-        let game = Wordle::new(&SOLUTIONS);
+        let game = Wordle::new(Language::English);
         let word = MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&game);
         assert_eq!(word.unwrap().to_string(), "sauce");
     }
