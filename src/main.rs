@@ -437,6 +437,10 @@ impl Wordle {
     fn guessed_chars(&self) -> HashSet<char> {
         self.guessed.iter().flatten().cloned().collect()
     }
+
+    fn attempts(&self) -> usize {
+        self.guessed.len()
+    }
 }
 
 trait WordAsCharVec {
@@ -612,8 +616,7 @@ trait TryToPickWord {
 struct PickRandomSolutionIfEnoughAttemptsLeft;
 impl TryToPickWord for PickRandomSolutionIfEnoughAttemptsLeft {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
-        let attempts_left = MAX_ATTEMPTS.saturating_sub(game.guessed.len());
-        if game.solutions.len() <= attempts_left {
+        if game.attempts() + game.solutions.len() <= MAX_ATTEMPTS {
             game.solutions
                 .iter()
                 .choose(&mut ThreadRng::default())
@@ -1601,8 +1604,6 @@ mod tests {
                     }
                 }
             }
-            // let optimal_next_guess = scores.lowest().unwrap();
-            // println!("Best 2nd guess: '{}'", optimal_next_guess.to_string());
         }
     }
 
@@ -1685,16 +1686,14 @@ mod tests {
             "hint_by_solution_by_guess.len() = {}",
             hint_by_solution_by_guess.len()
         );
-        // let mut rng = thread_rng();
-        // let (guess, hint_by_solution) = hint_by_solution_by_guess.iter().choose(&mut rng).unwrap();
-        // for (sol, hint) in hint_by_solution.iter() {
-        //     println!("{} + {} = {}", guess.to_string(), sol.to_string(), hint);
-        // }
     }
 
-    #[ignore]
+    #[ignore] // ~63min
     #[test]
+    // Average attempts = 3.545; 0 (0.000%) failed games (> 6 attempts):
+    // 2: 64, 3: 1088, 4: 1007, 5: 149, 6: 7
     fn auto_play_word_that_results_in_fewest_remaining_solutions() {
+        assert!(SOLUTIONS_BY_HINT_BY_GUESS.len() > 0);
         autoplay_and_print_stats(WordThatResultsInFewestRemainingSolutions);
     }
 
@@ -1716,7 +1715,7 @@ mod tests {
         autoplay_and_print_stats(strategy);
     }
 
-    // #[ignore]
+    #[ignore]
     #[test]
     // Average attempts = 3.816; 2 (0.086%) failed games (> 6 attempts):
     // 2: 47, 3: 796, 4: 1065, 5: 353, 6: 52, 7: 2
@@ -1827,48 +1826,64 @@ mod tests {
 
     #[ignore]
     #[test]
+    // Average attempts = 3.743; 23 (0.994%) failed games (> 6 attempts):
+    // 1: 1, 2: 135, 3: 853, 4: 924, 5: 304, 6: 75, 7: 16, 8: 5, 9: 2
     fn auto_play_most_frequent_global_characters() {
         autoplay_and_print_stats(MostFrequentGlobalCharacter);
     }
 
     #[ignore]
     #[test]
+    // Average attempts = 3.715; 26 (1.123%) failed games (> 6 attempts):
+    // 1: 1, 2: 130, 3: 919, 4: 888, 5: 268, 6: 83, 7: 18, 8: 7, 10: 1
     fn auto_play_most_frequent_global_characters_high_variety_word() {
         autoplay_and_print_stats(MostFrequentGlobalCharacterHighVarietyWord);
     }
 
     #[ignore]
     #[test]
+    // Average attempts = 3.778; 22 (0.950%) failed games (> 6 attempts):
+    // 1: 1, 2: 148, 3: 773, 4: 955, 5: 343, 6: 73, 7: 19, 8: 2, 9: 1
     fn auto_play_most_frequent_characters_per_pos() {
         autoplay_and_print_stats(MostFrequentCharacterPerPos);
     }
 
     #[ignore]
     #[test]
+    // Average attempts = 3.667; 19 (0.821%) failed games (> 6 attempts):
+    // 1: 1, 2: 148, 3: 903, 4: 929, 5: 263, 6: 52, 7: 15, 8: 2, 9: 2
     fn auto_play_most_frequent_characters_per_pos_high_variety_word() {
         autoplay_and_print_stats(MostFrequentCharacterPerPosHighVarietyWord);
     }
 
     #[ignore]
     #[test]
+    // Average attempts = 3.951; 54 (2.333%) failed games (> 6 attempts):
+    // 2: 50, 3: 829, 4: 873, 5: 390, 6: 119, 7: 34, 8: 15, 9: 5
     fn auto_play_most_frequent_characters_of_words() {
         autoplay_and_print_stats(MostFrequentCharactersOfRemainingWords);
     }
 
     #[ignore]
     #[test]
+    // Average attempts = 3.861; 32 (1.382%) failed games (> 6 attempts):
+    // 2: 78, 3: 813, 4: 932, 5: 380, 6: 80, 7: 22, 8: 8, 9: 2
     fn auto_play_most_frequent_unused_characters() {
         autoplay_and_print_stats(MostFrequentUnusedCharacters);
     }
 
     #[ignore]
     #[test]
+    // Average attempts = 4.004; 40 (1.728%) failed games (> 6 attempts):
+    // 1: 1, 2: 126, 3: 632, 4: 887, 5: 495, 6: 134, 7: 29, 8: 8, 9: 3
     fn auto_play_most_other_words_in_at_least_one_open_position() {
         autoplay_and_print_stats(MatchingMostOtherWordsInAtLeastOneOpenPosition);
     }
 
     #[ignore]
     #[test]
+    // Average attempts = 3.794; 29 (1.253%) failed games (> 6 attempts):
+    // 1: 1, 2: 114, 3: 856, 4: 886, 5: 341, 6: 88, 7: 23, 8: 6
     fn auto_play_most_other_words_in_at_least_one_open_position_high_variety_word() {
         autoplay_and_print_stats(MatchingMostOtherWordsInAtLeastOneOpenPositionHighVarietyWord);
     }
@@ -1880,16 +1895,16 @@ mod tests {
         strategy: S,
         language: Language,
     ) {
-        let mut strategy = ChainedStrategies::new(
-            vec![&PickRandomSolutionIfEnoughAttemptsLeft, &strategy],
-            PickRandomWord,
-        );
         let attempts: Vec<usize> = SOLUTIONS
-            .iter()
+            .par_iter()
             .map(|secret| {
                 let mut game = Wordle::new(language);
+                let mut strategy = ChainedStrategies::new(
+                    vec![&PickRandomSolutionIfEnoughAttemptsLeft, &strategy],
+                    PickRandomWord,
+                );
                 game.autoplay(secret, &mut strategy);
-                game.guessed.len() // attempts
+                game.attempts()
             })
             .collect();
         print_stats(attempts);
