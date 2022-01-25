@@ -602,7 +602,7 @@ trait ScoreTrait {
 impl<T: PartialOrd + Display> ScoreTrait for Vec<(&Word, T)> {
     fn sort_asc(&mut self) {
         self.sort_unstable_by(|(a_word, a_value), (b_word, b_value)| {
-            match b_value.partial_cmp(a_value) {
+            match a_value.partial_cmp(b_value) {
                 Some(Ordering::Equal) | None => a_word.cmp(b_word),
                 Some(by_value) => by_value,
             }
@@ -610,7 +610,7 @@ impl<T: PartialOrd + Display> ScoreTrait for Vec<(&Word, T)> {
     }
     fn sort_desc(&mut self) {
         self.sort_unstable_by(|(a_word, a_value), (b_word, b_value)| {
-            match a_value.partial_cmp(b_value) {
+            match b_value.partial_cmp(a_value) {
                 Some(Ordering::Equal) | None => a_word.cmp(b_word),
                 Some(by_value) => by_value,
             }
@@ -618,7 +618,6 @@ impl<T: PartialOrd + Display> ScoreTrait for Vec<(&Word, T)> {
     }
     fn to_string(&self, count: usize) -> String {
         self.iter()
-            .rev()
             .take(count)
             .map(|(word, value)| format!("{:.2} {}", value, word.to_string()))
             .collect::<Vec<_>>()
@@ -1702,7 +1701,7 @@ mod tests {
         autoplay_and_print_stats(strategy);
     }
 
-    // #[ignore]
+    #[ignore]
     #[test]
     // Average attempts = 3.806; 2 (0.086%) failed games (> 6 attempts):
     // 2: 54, 3: 797, 4: 1062, 5: 351, 6: 49, 7: 2
@@ -1711,7 +1710,7 @@ mod tests {
         autoplay_and_print_stats(strategy);
     }
 
-    // #[ignore]
+    #[ignore]
     #[test]
     // Average attempts = 3.749; 9 (0.546%) failed games (> 6 attempts):
     // 2: 82, 3: 649, 4: 610, 5: 229, 6: 70, 7: 6, 8: 3
