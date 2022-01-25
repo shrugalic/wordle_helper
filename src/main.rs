@@ -670,6 +670,8 @@ fn lowest_total_number_of_remaining_solutions<'g>(
 ) -> Vec<(&'g Guess, usize)> {
     // Access lazy_static here to initialize it before the parallel part below
     assert!(SOLUTIONS_BY_HINT_BY_GUESS.len() > 0);
+    let solution_set: HashSet<_> = solutions.iter().collect();
+    let all_solutions_possible = solutions.len() == SOLUTIONS.len();
 
     let mut scores: Vec<_> = guesses
         .par_iter()
@@ -677,9 +679,14 @@ fn lowest_total_number_of_remaining_solutions<'g>(
             let count: usize = solutions
                 .iter()
                 .map(|secret| {
-                    let solutions_by_hint = &SOLUTIONS_BY_HINT_BY_GUESS[guess];
                     let hint = determine_hint(guess, secret);
-                    solutions_by_hint[&hint.value()].len()
+                    if all_solutions_possible {
+                        SOLUTIONS_BY_HINT_BY_GUESS[guess][&hint.value()].len()
+                    } else {
+                        SOLUTIONS_BY_HINT_BY_GUESS[guess][&hint.value()]
+                            .intersection(&solution_set)
+                            .count()
+                    }
                 })
                 .sum();
             (guess, count)
@@ -1290,8 +1297,8 @@ mod tests {
         // panic!(); // ~5s
 
         // Solutions only:
-        //
-        // Guesses:
+        // 139883 roate, 141217 raise, 141981 raile, 144227 soare, 147525 arise
+        // All guesses:
         // Best (lowest) average remaining solution count:
         // 3745512 lares, 3789200 rales, 3923922 tares, 3941294 soare, 3953360 reais
         // 3963578 nares, 4017862 aeros, 4038902 rates, 4082728 arles, 4087910 serai
@@ -1467,7 +1474,6 @@ mod tests {
     // 60.42 roate, 61.00 raise, 61.33 raile, 62.30 soare, 63.73 arise,
     // 63.78 irate, 63.89 orate, 65.29 ariel, 66.02 arose, 67.06 raine
     fn find_optimal_first_word() {
-        let lang = Language::English;
         let scores = lowest_total_number_of_remaining_solutions(&SOLUTIONS, &GUESSES);
         let optimal = scores.lowest().unwrap();
         assert_eq!("roate".to_word(), optimal);
@@ -1533,15 +1539,14 @@ mod tests {
     // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gompa': 2401 wakfs, 2409 wheft, 2409 fewer, 2413 tweak, 2413 fetwa
     // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gramp': 2407 wakfs, 2413 fewer, 2415 wheft, 2415 fetwa, 2417 swift
     fn find_optimal_word_combos() {
-        let lang = Language::English;
         let guesses = &GUESSES;
         let solutions = &SOLUTIONS;
 
         let mut scores = lowest_total_number_of_remaining_solutions(solutions, guesses);
         scores.sort_asc();
 
-        let number_of_top_pickes_to_try = 1;
-        for (guess1, _) in scores.into_iter().rev().take(number_of_top_pickes_to_try) {
+        let top_pick_count = 1;
+        for (guess1, _) in scores.into_iter().take(top_pick_count) {
             let guessed = [guess1];
             let scores = find_best_next_guesses(guesses, solutions, &guessed);
 
@@ -1551,7 +1556,7 @@ mod tests {
                 scores.to_string(5)
             );
 
-            for (guess2, _) in scores.into_iter().rev().take(number_of_top_pickes_to_try) {
+            for (guess2, _) in scores.into_iter().take(top_pick_count) {
                 let guessed = [guess1, guess2];
                 let scores = find_best_next_guesses(guesses, solutions, &guessed);
                 println!(
@@ -1561,7 +1566,7 @@ mod tests {
                     scores.to_string(5)
                 );
 
-                for (guess3, _) in scores.into_iter().rev().take(number_of_top_pickes_to_try) {
+                for (guess3, _) in scores.into_iter().take(top_pick_count) {
                     let guessed = [guess1, guess2, guess3];
                     let scores = find_best_next_guesses(guesses, solutions, &guessed);
                     println!(
@@ -1572,7 +1577,7 @@ mod tests {
                         scores.to_string(5)
                     );
 
-                    for (guess4, _) in scores.into_iter().rev().take(number_of_top_pickes_to_try) {
+                    for (guess4, _) in scores.into_iter().take(top_pick_count) {
                         let guessed = [guess1, guess2, guess3, guess4];
                         let scores = find_best_next_guesses(guesses, solutions, &guessed);
                         println!(
@@ -2029,5 +2034,26 @@ mod tests {
 
         let hint = determine_hint(&"three".to_word(), &"beret".to_word());
         assert_eq!("🟨⬛🟩🟩🟨", hint.to_string());
+    }
+
+    #[ignore]
+    #[test]
+    fn lowest_total_number_of_remaining_solutions_only_counts_remaining_viable_solutions() {
+        let solutions: Vec<Solution> = ["augur", "briar", "friar", "lunar", "sugar"]
+            .iter()
+            .map(|w| w.to_word())
+            .collect();
+        let guesses: Vec<Guess> = ["fubar", "rural", "aurar", "goier", "urial"]
+            .iter()
+            .map(|w| w.to_word())
+            .collect();
+        let mut scores = lowest_total_number_of_remaining_solutions(&solutions, &guesses);
+        scores.sort_asc();
+        // println!("scores {}", scores.to_string(5));
+        assert_eq!(scores[0], (&guesses[0], 7));
+        assert_eq!(scores[1], (&guesses[1], 7));
+        assert_eq!(scores[2], (&guesses[4], 7));
+        assert_eq!(scores[3], (&guesses[2], 9));
+        assert_eq!(scores[4], (&guesses[3], 9));
     }
 }
