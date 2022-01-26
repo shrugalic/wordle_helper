@@ -562,7 +562,7 @@ impl<T: PartialOrd + Display> ScoreTrait for Vec<(&Word, T)> {
         self.iter()
             .max_by(
                 |(a_word, a_value), (b_word, b_value)| match a_value.partial_cmp(b_value) {
-                    Some(Ordering::Equal) | None => a_word.cmp(b_word),
+                    Some(Ordering::Equal) | None => b_word.cmp(a_word),
                     Some(by_value) => by_value,
                 },
             )
