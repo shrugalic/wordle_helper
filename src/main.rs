@@ -6,11 +6,12 @@ use std::env::args;
 use std::fmt::{Display, Formatter};
 use std::io;
 use Hint::*;
+use Language::*;
 
 #[macro_use]
 extern crate lazy_static;
 
-const LANGUAGE: Language = Language::English;
+const LANGUAGE: Language = English;
 #[derive(Copy, Clone)]
 enum Language {
     English,
@@ -21,8 +22,8 @@ impl TryFrom<&str> for Language {
 
     fn try_from(lang: &str) -> Result<Self, Self::Error> {
         match lang.to_ascii_lowercase().as_str() {
-            "english" => Ok(Language::English),
-            "german" | "deutsch" => Ok(Language::German),
+            "english" => Ok(English),
+            "german" | "deutsch" => Ok(German),
             _ => Err(format!("Unknown language '{}'", lang)),
         }
     }
@@ -54,39 +55,27 @@ lazy_static! {
             (word.to_vec(), count)
         })
         .collect();
-    static ref HINT_BY_SOLUTION_BY_GUESS: HashMap<&'static Guess, HashMap<&'static Solution, Hints>> =
+    static ref SOLUTIONS_BY_HINT_BY_GUESS: HashMap<&'static Guess, HashMap<HintValue, HashSet<&'static Secret>>> =
         GUESSES
             .par_iter()
             .map(|guess| {
-                let hints_by_solution = SOLUTIONS
-                    .iter()
-                    .map(|solution| (solution, determine_hints(guess, solution)))
-                    .collect::<HashMap<&Solution, Hints>>();
-                (guess, hints_by_solution)
-            })
-            .collect();
-    static ref SOLUTIONS_BY_HINT_BY_GUESS: HashMap<&'static Guess, HashMap<HintValue, HashSet<&'static Solution>>> =
-        GUESSES
-            .par_iter()
-            .map(|guess| {
-                let mut solution_by_value: HashMap<HintValue, HashSet<&Solution>> = HashMap::new();
+                let mut solution_by_value: HashMap<HintValue, HashSet<&Secret>> = HashMap::new();
                 for solution in SOLUTIONS.iter() {
                     solution_by_value
-                        .entry(determine_hints(guess, solution).value())
+                        .entry(guess.get_hint(solution).value())
                         .or_default()
                         .insert(solution);
                 }
                 (guess, solution_by_value)
             })
             .collect();
-    static ref SOLUTIONS_BY_SECRET_BY_GUESS: HashMap<&'static Guess, HashMap<&'static Solution, &'static HashSet<&'static Solution>>> =
+    static ref SOLUTIONS_BY_SECRET_BY_GUESS: HashMap<&'static Guess, HashMap<&'static Secret, &'static HashSet<&'static Secret>>> =
         GUESSES
             .par_iter()
             .map(|guess| {
-                let mut solutions_by_secret: HashMap<&Solution, &HashSet<&Solution>> =
-                    HashMap::new();
+                let mut solutions_by_secret: HashMap<&Secret, &HashSet<&Secret>> = HashMap::new();
                 for secret in SOLUTIONS.iter() {
-                    let hint = determine_hints(guess, secret).value();
+                    let hint = guess.get_hint(secret).value();
                     let solutions = &SOLUTIONS_BY_HINT_BY_GUESS[guess][&hint];
                     solutions_by_secret.insert(secret, solutions);
                 }
@@ -103,13 +92,13 @@ const MAX_ATTEMPTS: usize = 6;
 
 type Word = Vec<char>;
 type Guess = Word;
-type Solution = Word;
+type Secret = Word;
 type HintValue = u8;
 
 // Helper for https://www.powerlanguage.co.uk/wordle/
 #[derive(Debug)]
 struct Wordle {
-    solutions: Vec<Solution>,
+    solutions: Vec<Secret>,
     allowed: Vec<Guess>,
     illegal_chars: HashSet<char>,
     correct_chars: [Option<char>; 5],
@@ -149,14 +138,14 @@ impl Wordle {
     }
     #[cfg(test)]
     #[allow(clippy::ptr_arg)] // to_string is implemented for Word but not &[char]
-    fn autoplay(&mut self, secret: &Solution, strategy: &mut dyn PickWord) {
+    fn autoplay(&mut self, secret: &Secret, strategy: &mut dyn PickWord) {
         self.print_output = false;
 
         while !self.are_all_chars_known() && self.guessed.len() < AUTOPLAY_MAX_ATTEMPTS {
             let guess: Guess = strategy.pick(self);
             self.move_from_allowed_to_guessed(&guess);
 
-            let hints = determine_hints(&guess, secret);
+            let hints = guess.get_hint(secret);
             println!(
                 "{:4} solutions left, {}. guess '{}', hint '{}', secret '{}'",
                 self.solutions.len(),
@@ -642,7 +631,7 @@ impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
 }
 
 fn lowest_total_number_of_remaining_solutions<'g>(
-    solutions: &[Solution],
+    solutions: &[Secret],
     guesses: &'g [Guess],
 ) -> Vec<(&'g Guess, usize)> {
     // Access lazy_static here to initialize it before the parallel part below
@@ -656,7 +645,7 @@ fn lowest_total_number_of_remaining_solutions<'g>(
             let count: usize = solutions
                 .iter()
                 .map(|secret| {
-                    let hint = determine_hints(guess, secret);
+                    let hint = guess.get_hint(secret);
                     if all_solutions_possible {
                         SOLUTIONS_BY_HINT_BY_GUESS[guess][&hint.value()].len()
                     } else {
@@ -1109,69 +1098,65 @@ impl From<u8> for Hints {
     }
 }
 
-/// Each guessed word results in a hint that depends on the secret word.
-/// For each character in a guess there are 3 options:
-/// - The solution contains it in exactly this position: 🟩, given value 2
-/// - The solution contains it, but a different position: 🟨, given value 1
-/// - The solution does not contain this character anywhere: ⬛️, given value 0
-///
-/// As each of the 5 positions can result in one of 3 states, there are 3^5 = 243 possible hints.
-/// Let's assign a number to each one. We multiply the values 0, 1 or 2 with a multiplier 3 ^ i,
-/// which depends on its index `i` within the word (the first index being 0).
-///
-/// This function returns a hints for the given guess and solution
-#[allow(clippy::ptr_arg)] // Because trait WordAsCharVec is implemented for Word not &[char]
-fn determine_hints(guess: &Guess, solution: &Solution) -> Hints {
-    // Initialize as every position incorrect
-    let mut hint = Hints::default();
+trait GetHint {
+    /// Each guessed word results in a hint that depends on the secret word.
+    /// For each character in a guess there are 3 options:
+    /// - The solution contains it in exactly this position: 🟩, given value 2
+    /// - The solution contains it, but a different position: 🟨, given value 1
+    /// - The solution does not contain this character anywhere: ⬛️, given value 0
+    ///
+    /// As each of the 5 positions can result in one of 3 states, there are 3^5 = 243 possible hints.
+    /// Let's assign a number to each one. We multiply the values 0, 1 or 2 with a multiplier 3 ^ i,
+    /// which depends on its index `i` within the word (the first index being 0).
+    ///
+    /// Returns a hints for the given guess and solution
+    fn get_hint(&self, secret: &Word) -> Hints;
+}
+impl GetHint for Word {
+    fn get_hint(&self, secret: &Word) -> Hints {
+        // Initialize as every position incorrect
+        let mut hint = Hints::default();
 
-    // Fill in exact matches
-    let mut open_positions = vec![];
-    for i in 0..5 {
-        if guess[i] == solution[i] {
-            hint.set_correct(i);
-        } else {
-            open_positions.push(i);
+        // Fill in exact matches
+        let mut open_positions = vec![];
+        for i in 0..5 {
+            if self[i] == secret[i] {
+                hint.set_correct(i);
+            } else {
+                open_positions.push(i);
+            }
         }
-    }
 
-    // For characters at another position, consider only characters not previously matched
-    // For example:
-    // Guessing "geese" for solution "eject"  matches exactly in the middle 'e', which leaves
-    // "ge_se" and "ej_ct". The 'e' at pos 1 of "geese" will count as a present char, but the
-    // last 'e' in "geese" is illegal, because all the 'e's in "ej_ct" were already matched.
-    for &i in &open_positions {
-        let considered_char_count = |word: &[char], ch: &char| {
-            word.iter()
-                .take(i + 1) // include current pos
-                .enumerate()
-                .filter(|(i, c)| c == &ch && open_positions.contains(i))
-                .count()
-        };
-        let char = &guess[i];
-        // println!(
-        //     "considered_char_count('{}', {}) = {} | '{}'.total_char_count({:?}, {}) = {}",
-        //     guess.to_string(),
-        //     char,
-        //     considered_char_count(guess, char),
-        //     solution.to_string(),
-        //     open_positions,
-        //     char,
-        //     solution.total_char_count(&open_positions, char)
-        // );
-        if considered_char_count(guess, char) <= solution.total_char_count(&open_positions, char) {
-            hint.set_wrong_pos(i);
+        // For characters at another position, consider only characters not previously matched
+        // For example:
+        // Guessing "geese" for solution "eject"  matches exactly in the middle 'e', which leaves
+        // "ge_se" and "ej_ct". The 'e' at pos 1 of "ge_se" will count as a present char, but the
+        // last 'e' in "ge_se" is illegal, because all the 'e's in "ej_ct" were already matched.
+        for &i in &open_positions {
+            let considered_char_count = |guess: &[char], ch: &char| {
+                guess
+                    .iter()
+                    .take(i + 1) // include current pos
+                    .enumerate()
+                    .filter(|(i, g)| g == &ch && open_positions.contains(i))
+                    .count()
+            };
+            let char = &self[i];
+            if considered_char_count(&self, char) <= secret.total_char_count(&open_positions, char)
+            {
+                hint.set_wrong_pos(i);
+            }
         }
+        hint
     }
-    hint
 }
 
 fn main() {
     let args: Vec<String> = args().collect();
     let language = if args.len() > 1 {
-        Language::try_from(args[1].as_str()).unwrap_or(Language::English)
+        Language::try_from(args[1].as_str()).unwrap_or(English)
     } else {
-        Language::English
+        English
     };
     // print_word_combinations();
     Wordle::new(language).play()
@@ -1458,7 +1443,7 @@ mod tests {
         const EMPTY_VEC: Vec<usize> = Vec::new();
         let mut hint_buckets = [EMPTY_VEC; 243];
         for (i, solution) in solutions.iter().enumerate() {
-            let hint = determine_hints(guess, solution);
+            let hint = guess.get_hint(solution);
             hint_buckets[hint.value() as usize].push(i);
         }
         hint_buckets
@@ -1609,7 +1594,7 @@ mod tests {
 
     fn find_best_next_guesses<'g>(
         guesses: &'g [Guess],
-        solutions: &[Solution],
+        solutions: &[Secret],
         guessed: &[&Guess],
     ) -> Vec<(&'g Guess, usize)> {
         let first = *guessed.iter().next().unwrap();
@@ -1631,9 +1616,9 @@ mod tests {
                             let solutions2 = SOLUTIONS_BY_SECRET_BY_GUESS[next][secret];
                             (solutions1, solutions2)
                         } else {
-                            let hint1 = determine_hints(first, secret);
+                            let hint1 = first.get_hint(secret);
                             let solutions1 = &SOLUTIONS_BY_HINT_BY_GUESS[first][&hint1.value()];
-                            let hint2 = determine_hints(next, secret);
+                            let hint2 = next.get_hint(secret);
                             let solutions2 = &SOLUTIONS_BY_HINT_BY_GUESS[next][&hint2.value()];
                             (solutions1, solutions2)
                         };
@@ -1671,14 +1656,14 @@ mod tests {
     #[test]
     fn hint_by_solution_by_guess() {
         // -3s with --release
-        let hint_by_solution_by_guess: HashMap<&'static Guess, HashMap<&'static Solution, Hints>> =
+        let hint_by_solution_by_guess: HashMap<&'static Guess, HashMap<&'static Secret, Hints>> =
             GUESSES
                 .par_iter()
                 .map(|guess| {
                     let hints_by_solution = SOLUTIONS
                         .iter()
-                        .map(|solution| (solution, determine_hints(guess, solution)))
-                        .collect::<HashMap<&Solution, Hints>>();
+                        .map(|solution| (solution, guess.get_hint(solution)))
+                        .collect::<HashMap<&Secret, Hints>>();
                     (guess, hints_by_solution)
                 })
                 .collect();
@@ -1748,7 +1733,7 @@ mod tests {
     // 2: 82, 3: 649, 4: 610, 5: 229, 6: 70, 7: 6, 8: 3
     fn auto_play_german_tarne_helis_gudok_zamba_fiept() {
         let strategy = FixedGuessList::new(vec!["tarne", "helis", "gudok", "zamba", "fiept"]);
-        autoplay_and_print_stats_with_language(strategy, Language::German);
+        autoplay_and_print_stats_with_language(strategy, German);
     }
 
     #[ignore]
@@ -1757,7 +1742,7 @@ mod tests {
     // 2: 79, 3: 623, 4: 631, 5: 249, 6: 60, 7: 6, 8: 1
     fn auto_play_german_tarne_helis_gudok_zamba() {
         let strategy = FixedGuessList::new(vec!["tarne", "helis", "gudok", "zamba"]);
-        autoplay_and_print_stats_with_language(strategy, Language::German);
+        autoplay_and_print_stats_with_language(strategy, German);
     }
 
     #[ignore]
@@ -1889,7 +1874,7 @@ mod tests {
     }
 
     fn autoplay_and_print_stats<S: TryToPickWord + Sync>(strategy: S) {
-        autoplay_and_print_stats_with_language(strategy, Language::English);
+        autoplay_and_print_stats_with_language(strategy, English);
     }
     fn autoplay_and_print_stats_with_language<S: TryToPickWord + Sync>(
         strategy: S,
@@ -1946,7 +1931,7 @@ mod tests {
     // Takes around 6s for the 2'315 solution words
     #[test]
     fn test_word_that_results_in_fewest_remaining_possible_words() {
-        let game = Wordle::new(Language::English);
+        let game = Wordle::new(English);
         let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
         // Worst:
@@ -1980,7 +1965,7 @@ mod tests {
     // Takes around a minute for the 12'972 words in the combined list
     #[test]
     fn test_word_that_results_in_fewest_remaining_possible_words_for_full_word_list() {
-        let game = Wordle::new(Language::English);
+        let game = Wordle::new(English);
         let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
         // Worst:
@@ -2014,7 +1999,7 @@ mod tests {
     // Takes around 24s (parallel) guessing with 12'972 combined words in 2'315 solutions.
     #[test]
     fn test_word_from_combined_list_that_results_in_fewest_remaining_possible_solution_words() {
-        let game = Wordle::new(Language::English);
+        let game = Wordle::new(English);
         let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
         // Using 12'972 combined words on 2'315 solutions
@@ -2032,7 +2017,7 @@ mod tests {
     #[ignore]
     #[test]
     fn test_pick_word_that_exactly_matches_most_others_in_at_least_one_open_position() {
-        let game = Wordle::new(Language::English);
+        let game = Wordle::new(English);
         let word = MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&game);
         assert_eq!(word.unwrap().to_string(), "sauce");
     }
@@ -2066,27 +2051,27 @@ mod tests {
 
     #[ignore]
     #[test]
-    fn test_determine_hints() {
-        let hint = determine_hints(&"guest".to_word(), &"truss".to_word());
+    fn test_get_hint() {
+        let hint = "guest".to_word().get_hint(&"truss".to_word());
         assert_eq!("⬛🟨⬛🟩🟨", hint.to_string());
 
-        let hint = determine_hints(&"briar".to_word(), &"error".to_word());
+        let hint = "briar".to_word().get_hint(&"error".to_word());
         assert_eq!("⬛🟩⬛⬛🟩", hint.to_string());
 
-        let hint = determine_hints(&"sissy".to_word(), &"truss".to_word());
+        let hint = "sissy".to_word().get_hint(&"truss".to_word());
         assert_eq!("🟨⬛⬛🟩⬛", hint.to_string());
 
-        let hint = determine_hints(&"eject".to_word(), &"geese".to_word());
+        let hint = "eject".to_word().get_hint(&"geese".to_word());
         assert_eq!("🟨⬛🟩⬛⬛", hint.to_string());
 
-        let hint = determine_hints(&"three".to_word(), &"beret".to_word());
+        let hint = "three".to_word().get_hint(&"beret".to_word());
         assert_eq!("🟨⬛🟩🟩🟨", hint.to_string());
     }
 
     #[ignore]
     #[test]
     fn lowest_total_number_of_remaining_solutions_only_counts_remaining_viable_solutions() {
-        let solutions: Vec<Solution> = ["augur", "briar", "friar", "lunar", "sugar"]
+        let solutions: Vec<Secret> = ["augur", "briar", "friar", "lunar", "sugar"]
             .iter()
             .map(|w| w.to_word())
             .collect();
