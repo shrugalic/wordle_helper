@@ -659,7 +659,6 @@ impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
 
 fn lowest_total_number_of_remaining_solutions(game: &Wordle) -> Vec<(&Guess, usize)> {
     let solution_set: HashSet<_> = game.solutions.iter().collect();
-    let all_solutions_possible = game.solutions.len() == SOLUTIONS.len();
 
     let solutions = SolutionsByHintByGuess::from(game);
     let mut scores: Vec<_> = game
@@ -671,13 +670,9 @@ fn lowest_total_number_of_remaining_solutions(game: &Wordle) -> Vec<(&Guess, usi
                 .iter()
                 .map(|secret| {
                     let hint = guess.get_hint(secret);
-                    if all_solutions_possible {
-                        solutions.by_hint_by_guess[guess][&hint.value()].len()
-                    } else {
-                        solutions.by_hint_by_guess[guess][&hint.value()]
-                            .intersection(&solution_set)
-                            .count()
-                    }
+                    solutions.by_hint_by_guess[guess][&hint.value()]
+                        .intersection(&solution_set)
+                        .count()
                 })
                 .sum();
             (guess, count)
@@ -1529,6 +1524,7 @@ mod tests {
     #[ignore]
     #[test]
     // Deutsch:
+    // Best 1. guesses : 71017 tarne, 72729 raine, 74391 trane, 75473 lernt, 75513 raete
     // Best 2. guesses after 1. 'tarne': 7273 helis, 7451 heils, 7641 holis, 7925 selig, 8073 kilos
     // Best 3. guesses after 1. 'tarne' and 2. 'helis': 2725 gudok, 2755 umbog, 2765 dumpf, 2855 kumpf, 2903 begum
     // Best 4. guesses after 1. 'tarne' and 2. 'helis' and 3. 'gudok': 1969 zamba, 1981 zumba, 1983 abzym, 1987 zambo, 1991 impft
@@ -1579,11 +1575,9 @@ mod tests {
     // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gompa': 2401 wakfs, 2409 wheft, 2409 fewer, 2413 tweak, 2413 fetwa
     // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gramp': 2407 wakfs, 2413 fewer, 2415 wheft, 2415 fetwa, 2417 swift
     fn find_optimal_word_combos() {
-        let guesses = &GUESSES;
-        let solutions = &SOLUTIONS;
-
         let game = Wordle::new(English);
         let mut scores = lowest_total_number_of_remaining_solutions(&game);
+        println!("Best 1. guesses : {}", scores.to_string(5));
         scores.sort_asc();
 
         let top_pick_count = 1;
