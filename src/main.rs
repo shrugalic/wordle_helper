@@ -1476,7 +1476,7 @@ mod tests {
         assert_eq!("roate".to_word(), optimal);
     }
 
-    #[ignore] // ~3s
+    #[ignore] // ~1s
     #[test]
     // Top 5: 71017 tarne, 72729 raine, 74391 trane, 75473 lernt, 75513 raete
     fn find_optimal_first_word_german() {
@@ -1484,19 +1484,19 @@ mod tests {
         let cache = SolutionsByHintByGuess::of(&words);
         let game = Wordle::with(&words, &cache);
         let scores = lowest_total_number_of_remaining_solutions(&game);
-        // println!("scores {}", scores.to_string(5));
+        println!("scores {}", scores.to_string(5));
         let optimal = scores.lowest().unwrap();
-        assert_eq!("tarne".to_word(), optimal);
+        assert_eq!("raine".to_word(), optimal);
     }
 
-    #[ignore]
+    #[ignore] // ~10s for 5 single German words, ~1min 51s for 5 single English words
     #[test]
     // Deutsch:
-    // Best 1. guesses : 71017 tarne, 72729 raine, 74391 trane, 75473 lernt, 75513 raete
-    // Best 2. guesses after 1. 'tarne': 7273 helis, 7451 heils, 7641 holis, 7925 selig, 8073 kilos
-    // Best 3. guesses after 1. 'tarne' and 2. 'helis': 2725 gudok, 2755 umbog, 2765 dumpf, 2855 kumpf, 2903 begum
-    // Best 4. guesses after 1. 'tarne' and 2. 'helis' and 3. 'gudok': 1969 zamba, 1981 zumba, 1983 abzym, 1987 zambo, 1991 impft
-    // Best 5. guesses after 1. 'tarne' and 2. 'helis' and 3. 'gudok' and 4. 'zamba': 1731 fiept, 1737 fiepe, 1741 fieps, 1743 luepf, 1743 wippt
+    // Best 1. guesses: 36655 raine, 41291 taler, 42405 raten, 42461 laser, 42897 reale
+    // Best 2. guesses after 1. 'raine': 3803 holst, 3893 kults, 3911 lotus, 3965 stuhl, 4117 buhlt
+    // Best 3. guesses after 1. 'raine' and 2. 'holst': 1635 dumpf, 1677 umgab, 1709 umweg, 1745 bekam, 1761 bezug
+    // Best 4. guesses after 1. 'raine' and 2. 'holst' and 3. 'dumpf': 1247 biwak, 1261 abweg, 1271 bezog, 1271 bezug, 1273 beeck
+    // Best 5. guesses after 1. 'raine' and 2. 'holst' and 3. 'dumpf' and 4. 'biwak': 1179 legen, 1179 leger, 1181 engen, 1181 enzen, 1181 genen
     //
     // English
     // Best 2. guesses after 1. 'roate': 11847 linds, 11947 sling, 12033 clips, 12237 limns, 12337 blins
@@ -1543,11 +1543,11 @@ mod tests {
     // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gompa': 2401 wakfs, 2409 wheft, 2409 fewer, 2413 tweak, 2413 fetwa
     // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gramp': 2407 wakfs, 2413 fewer, 2415 wheft, 2415 fetwa, 2417 swift
     fn find_optimal_word_combos() {
-        let words = Words::new(German);
+        let words = Words::new(English);
         let cache = SolutionsByHintByGuess::of(&words);
         let game = Wordle::with(&words, &cache);
         let mut scores = lowest_total_number_of_remaining_solutions(&game);
-        println!("Best 1. guesses : {}", scores.to_string(5));
+        println!("Best 1. guesses: {}", scores.to_string(5));
         scores.sort_asc();
 
         let top_pick_count = 1;
