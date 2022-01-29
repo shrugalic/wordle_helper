@@ -44,8 +44,9 @@ impl Words {
     }
 }
 
-struct Wordle {
-    words: Words,
+struct Wordle<'a> {
+    words: &'a Words,
+    cache: &'a SolutionsByHintByGuess<'a>,
     illegal_chars: HashSet<char>,
     correct_chars: [Option<char>; 5],
     illegal_at_pos: [HashSet<char>; 5],
@@ -53,14 +54,12 @@ struct Wordle {
     guessed: Vec<Guess>,
     print_output: bool,
 }
-impl Wordle {
-    fn new(lang: Language) -> Self {
-        Wordle::with(Words::new(lang))
-    }
-    fn with(words: Words) -> Self {
+impl<'a> Wordle<'a> {
+    fn with(words: &'a Words, cache: &'a SolutionsByHintByGuess<'a>) -> Self {
         let empty = HashSet::new;
         Wordle {
             words,
+            cache,
             illegal_chars: HashSet::new(),
             correct_chars: [None; 5],
             illegal_at_pos: [empty(), empty(), empty(), empty(), empty()],
@@ -608,8 +607,7 @@ impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
     }
 }
 
-fn lowest_total_number_of_remaining_solutions(game: &Wordle) -> Vec<(&Guess, usize)> {
-    let solutions = SolutionsByHintByGuess::of(&game.words);
+fn lowest_total_number_of_remaining_solutions<'a>(game: &'a Wordle) -> Vec<(&'a Guess, usize)> {
     let mut scores: Vec<_> = game
         .allowed()
         .into_par_iter()
@@ -619,7 +617,7 @@ fn lowest_total_number_of_remaining_solutions(game: &Wordle) -> Vec<(&Guess, usi
                 .iter()
                 .map(|secret| {
                     let hint = guess.get_hint(secret);
-                    solutions.by_hint_by_guess[guess][&hint.value()].len()
+                    game.cache.by_hint_by_guess[guess][&hint.value()].len()
                 })
                 .sum();
             (guess, count)
@@ -735,6 +733,7 @@ struct MostFrequentUnusedCharacters<'w> {
     combined_global_char_count_sums_by: HashMap<&'w Word, usize>,
 }
 impl<'w> MostFrequentUnusedCharacters<'w> {
+    #[allow(clippy::ptr_arg)] // for global_character_counts_in defined for Vec<Guess> not &[Guess]
     fn new(guesses: &'w Vec<Guess>) -> Self {
         let global_count_by_char: HashMap<char, usize> =
             guesses.global_character_counts_in(&ALL_POS);
@@ -1137,13 +1136,15 @@ impl GetHint for Word {
 
 fn main() {
     let args: Vec<String> = args().collect();
-    let language = if args.len() > 1 {
+    let lang = if args.len() > 1 {
         Language::try_from(args[1].as_str()).unwrap_or(English)
     } else {
         English
     };
     // print_word_combinations();
-    Wordle::new(language).play()
+    let words = Words::new(lang);
+    let cache = SolutionsByHintByGuess::of(&words);
+    Wordle::with(&words, &cache).play()
 }
 
 #[derive(Copy, Clone)]
@@ -1248,7 +1249,9 @@ mod tests {
         // Best (lowest) average remaining solution count:
         // 3745512 lares, 3789200 rales, 3923922 tares, 3941294 soare, 3953360 reais
         // 3963578 nares, 4017862 aeros, 4038902 rates, 4082728 arles, 4087910 serai
-        let game = Wordle::new(English);
+        let words = Words::new(English);
+        let cache = SolutionsByHintByGuess::of(&words);
+        let game = Wordle::with(&words, &cache);
         let totals = lowest_total_number_of_remaining_solutions(&game);
         println!(
             "Best (lowest) average remaining solution count:\n{}",
@@ -1422,7 +1425,7 @@ mod tests {
         }
     }
 
-    // #[ignore] // 3s for 1, 4.2s for 5, 6.1s for 10
+    #[ignore] // 3s for 1, 4.2s for 5, 6.1s for 10
     #[test]
     fn does_hint_cache_help_part_2() {
         let words = Words::new(English);
@@ -1464,7 +1467,9 @@ mod tests {
     #[test]
     // Top 5: 139883 roate, 141217 raise, 141981 raile, 144227 soare, 147525 arise
     fn find_optimal_first_word_english() {
-        let game = Wordle::new(English);
+        let words = Words::new(English);
+        let cache = SolutionsByHintByGuess::of(&words);
+        let game = Wordle::with(&words, &cache);
         let scores = lowest_total_number_of_remaining_solutions(&game);
         // println!("scores {}", scores.to_string(5));
         let optimal = scores.lowest().unwrap();
@@ -1475,7 +1480,9 @@ mod tests {
     #[test]
     // Top 5: 71017 tarne, 72729 raine, 74391 trane, 75473 lernt, 75513 raete
     fn find_optimal_first_word_german() {
-        let game = Wordle::new(German);
+        let words = Words::new(German);
+        let cache = SolutionsByHintByGuess::of(&words);
+        let game = Wordle::with(&words, &cache);
         let scores = lowest_total_number_of_remaining_solutions(&game);
         // println!("scores {}", scores.to_string(5));
         let optimal = scores.lowest().unwrap();
@@ -1536,7 +1543,9 @@ mod tests {
     // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gompa': 2401 wakfs, 2409 wheft, 2409 fewer, 2413 tweak, 2413 fetwa
     // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gramp': 2407 wakfs, 2413 fewer, 2415 wheft, 2415 fetwa, 2417 swift
     fn find_optimal_word_combos() {
-        let game = Wordle::new(German);
+        let words = Words::new(German);
+        let cache = SolutionsByHintByGuess::of(&words);
+        let game = Wordle::with(&words, &cache);
         let mut scores = lowest_total_number_of_remaining_solutions(&game);
         println!("Best 1. guesses : {}", scores.to_string(5));
         scores.sort_asc();
@@ -1872,11 +1881,12 @@ mod tests {
         language: Language,
     ) {
         let words = Words::new(language);
+        let cache = SolutionsByHintByGuess::of(&words);
         let attempts: Vec<usize> = words
             .secrets
-            .par_iter()
+            .iter()
             .map(|secret| {
-                let mut game = Wordle::with(words.clone());
+                let mut game = Wordle::with(&words, &cache);
                 let mut strategy = ChainedStrategies::new(
                     vec![&PickRandomSolutionIfEnoughAttemptsLeft, &strategy],
                     PickRandomWord,
@@ -1924,7 +1934,9 @@ mod tests {
     // Takes around 6s for the 2'315 solution words
     #[test]
     fn test_word_that_results_in_fewest_remaining_possible_words() {
-        let game = Wordle::new(English);
+        let words = Words::new(English);
+        let cache = SolutionsByHintByGuess::of(&words);
+        let game = Wordle::with(&words, &cache);
         let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
         // Worst:
@@ -1958,7 +1970,9 @@ mod tests {
     // Takes around a minute for the 12'972 words in the combined list
     #[test]
     fn test_word_that_results_in_fewest_remaining_possible_words_for_full_word_list() {
-        let game = Wordle::new(English);
+        let words = Words::new(English);
+        let cache = SolutionsByHintByGuess::of(&words);
+        let game = Wordle::with(&words, &cache);
         let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
         // Worst:
@@ -1992,7 +2006,9 @@ mod tests {
     // Takes around 24s (parallel) guessing with 12'972 combined words in 2'315 solutions.
     #[test]
     fn test_word_from_combined_list_that_results_in_fewest_remaining_possible_solution_words() {
-        let game = Wordle::new(English);
+        let words = Words::new(English);
+        let cache = SolutionsByHintByGuess::of(&words);
+        let game = Wordle::with(&words, &cache);
         let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
         // Using 12'972 combined words on 2'315 solutions
@@ -2010,7 +2026,9 @@ mod tests {
     #[ignore]
     #[test]
     fn test_pick_word_that_exactly_matches_most_others_in_at_least_one_open_position() {
-        let game = Wordle::new(English);
+        let words = Words::new(English);
+        let cache = SolutionsByHintByGuess::of(&words);
+        let game = Wordle::with(&words, &cache);
         let word = MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&game);
         assert_eq!(word.unwrap().to_string(), "sauce");
     }
@@ -2072,9 +2090,11 @@ mod tests {
             .iter()
             .map(|w| w.to_word())
             .collect();
-        let mut game = Wordle::new(English);
-        game.words.guesses = guesses;
-        game.words.secrets = solutions;
+        let mut words = Words::new(English);
+        words.guesses = guesses;
+        words.secrets = solutions;
+        let cache = SolutionsByHintByGuess::of(&words);
+        let game = Wordle::with(&words, &cache);
         let allowed = &game.words.guesses;
         let mut scores = lowest_total_number_of_remaining_solutions(&game);
         scores.sort_asc();
