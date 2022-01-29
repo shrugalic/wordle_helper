@@ -95,7 +95,7 @@ impl<'a> Wordle<'a> {
             println!(
                 "{:4} solutions left, {}. guess '{}', hint '{}', secret '{}'",
                 self.solutions().len(),
-                self.guessed.len(),
+                self.guessed.len() + 1,
                 guess.to_string(),
                 hints,
                 secret.to_string(),
@@ -1673,10 +1673,10 @@ mod tests {
             .all(|(_, hint_by_secret)| hint_by_secret.len() == 2315));
     }
 
-    #[ignore] // ~63min
+    #[ignore] // ~75 min
     #[test]
-    // Average attempts = 3.545; 0 (0.000%) failed games (> 6 attempts):
-    // 2: 64, 3: 1088, 4: 1007, 5: 149, 6: 7
+    // Average attempts = 3.564; 0 (0.000%) failed games (> 6 attempts):
+    // 2: 61, 3: 1081, 4: 1003, 5: 147, 6: 23
     fn auto_play_word_that_results_in_fewest_remaining_solutions() {
         autoplay_and_print_stats(WordThatResultsInFewestRemainingSolutions);
     }
