@@ -1499,6 +1499,36 @@ mod tests {
         );
     }
 
+    struct SolutionsBySecretByGuess<'a> {
+        by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, &'a HashSet<&'a Secret>>>,
+    }
+    impl<'a> SolutionsBySecretByGuess<'a> {
+        fn of(words: &'a Words, solutions: &'a SolutionsByHintByGuess) -> Self {
+            SolutionsBySecretByGuess::new(&words.guesses, &words.secrets, solutions)
+        }
+        fn new(
+            guesses: &'a [Guess],
+            secrets: &'a [Secret],
+            solutions: &'a SolutionsByHintByGuess,
+        ) -> Self {
+            SolutionsBySecretByGuess {
+                by_secret_by_guess: guesses
+                    .par_iter()
+                    .map(|guess| {
+                        let mut solutions_by_secret: HashMap<&Secret, &HashSet<&Secret>> =
+                            HashMap::new();
+                        for secret in secrets.iter() {
+                            let hint = guess.get_hint(secret).value();
+                            let solutions = &solutions.by_hint_by_guess[guess][&hint];
+                            solutions_by_secret.insert(secret, solutions);
+                        }
+                        (guess, solutions_by_secret)
+                    })
+                    .collect(),
+            }
+        }
+    }
+
     #[ignore] // ~3s
     #[test]
     // Top 5: 139883 roate, 141217 raise, 141981 raile, 144227 soare, 147525 arise
