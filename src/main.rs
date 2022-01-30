@@ -1,10 +1,12 @@
-use rand::prelude::*;
-use rayon::prelude::*;
 use std::cmp::{Ordering, Reverse};
 use std::collections::{HashMap, HashSet};
 use std::env::args;
 use std::fmt::{Display, Formatter};
 use std::io;
+
+use rand::prelude::*;
+use rayon::prelude::*;
+
 use Hint::*;
 use Language::*;
 
