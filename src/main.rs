@@ -1682,8 +1682,10 @@ mod tests {
         assert_eq!("raine".to_word(), optimal);
     }
 
-    #[ignore] // ~10s for 5 single German words, ~1min 51s for 5 single English words
+    #[ignore]
     #[test]
+    // ~10s (i9) or ~13s (M1) for 5 single German words
+    // ~1min 51s (i9) or ~2min 21s (M1) for 5 single English words
     // Deutsch:
     // Best 1. guesses: 36655 raine, 41291 taler, 42405 raten, 42461 laser, 42897 reale
     // Best 2. guesses after 1. 'raine': 3803 holst, 3893 kults, 3911 lotus, 3965 stuhl, 4117 buhlt
