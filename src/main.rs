@@ -3,6 +3,8 @@ use std::collections::{HashMap, HashSet};
 use std::env::args;
 use std::fmt::{Display, Formatter};
 use std::io;
+use std::iter::Map;
+use std::str::Lines;
 
 use rand::prelude::*;
 use rayon::prelude::*;
@@ -31,18 +33,18 @@ type HintValue = u8;
 
 #[derive(Clone)]
 struct Words {
-    secrets: Vec<Secret>,
     guesses: Vec<Guess>,
+    secrets: HashSet<Secret>,
 }
 impl Words {
     fn new(lang: Language) -> Self {
         Words {
-            secrets: Words::from_str(SOLUTIONS[lang as usize]),
-            guesses: Words::from_str(GUESSES[lang as usize]),
+            secrets: Words::from_str(SOLUTIONS[lang as usize]).collect(),
+            guesses: Words::from_str(GUESSES[lang as usize]).collect(),
         }
     }
-    fn from_str(txt: &str) -> Vec<Word> {
-        txt.lines().map(|w| w.to_word()).collect()
+    fn from_str(txt: &str) -> Map<Lines<'_>, fn(&'_ str) -> Word> {
+        txt.lines().map(|w| w.to_word())
     }
 }
 
@@ -95,7 +97,7 @@ impl<'a> Wordle<'a> {
 
             let hints = guess.get_hint(secret);
             println!(
-                "{:4} solutions left, {}. guess '{}', hint '{}', secret '{}'",
+                "{:4} solutions left, {}. guess {}, hint {}, secret {}",
                 self.solutions().len(),
                 self.guessed.len() + 1,
                 guess.to_string(),
@@ -110,7 +112,7 @@ impl<'a> Wordle<'a> {
         }
         if !self.are_all_chars_known() {
             println!(
-                "After {} guesses: No solutions for '{}'",
+                "After {} guesses: No solutions for {}",
                 self.guessed.len(),
                 secret.to_string()
             );
@@ -130,15 +132,7 @@ impl<'a> Wordle<'a> {
         if len > 10 {
             println!("\n{} words left", len);
         } else {
-            println!(
-                "\n{} words left: {}",
-                len,
-                self.solutions()
-                    .iter()
-                    .map(|word| word.to_string())
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            );
+            println!("\n{} words left: {}", len, self.solutions().to_string());
         }
     }
 
@@ -179,7 +173,7 @@ impl<'a> Wordle<'a> {
 
     fn ask_for_guess(&self, suggestion: Word) -> Word {
         println!(
-            "Enter your guess, or press enter to use the suggestion '{}':",
+            "Enter your guess, or press enter to use the suggestion {}:",
             suggestion.to_string()
         );
         loop {
@@ -337,12 +331,12 @@ impl<'a> Wordle<'a> {
         let solutions = self.solutions();
         if solutions.len() == 1 {
             println!(
-                "\nThe only word left in the list is '{}'",
+                "\nThe only word left in the list is {}",
                 solutions[0].to_string()
             );
         } else if self.correct_chars.iter().all(|o| o.is_some()) {
-            let word: String = self.correct_chars.iter().map(|c| c.unwrap()).collect();
-            println!("\nThe word is '{}'", word);
+            let word: Vec<char> = self.correct_chars.iter().filter_map(|&c| c).collect();
+            println!("\nThe word is {}", word.to_string());
         } else {
             println!("No matching word in the solutions!");
         }
@@ -377,7 +371,7 @@ impl<'a> HintsBySecretByGuess<'a> {
     fn of(words: &'a Words) -> Self {
         HintsBySecretByGuess::new(&words.guesses, &words.secrets)
     }
-    fn new(guesses: &'a [Guess], secrets: &'a [Secret]) -> Self {
+    fn new(guesses: &'a [Guess], secrets: &'a HashSet<Secret>) -> Self {
         HintsBySecretByGuess {
             by_secret_by_guess: guesses
                 .par_iter()
@@ -400,7 +394,7 @@ impl<'a> SolutionsByHintByGuess<'a> {
     fn of(words: &'a Words) -> Self {
         SolutionsByHintByGuess::new(&words.guesses, &words.secrets)
     }
-    fn new(guesses: &'a [Guess], secrets: &'a [Secret]) -> Self {
+    fn new(guesses: &'a [Guess], secrets: &'a HashSet<Secret>) -> Self {
         SolutionsByHintByGuess {
             by_hint_by_guess: guesses
                 .par_iter()
@@ -428,7 +422,7 @@ trait WordAsCharVec {
 }
 impl WordAsCharVec for Word {
     fn to_string(&self) -> String {
-        self.iter().collect::<String>()
+        format!("'{}'", self.iter().collect::<String>())
     }
     fn unique_chars_in(&self, positions: &[usize]) -> HashSet<char> {
         positions.iter().map(|&pos| self[pos]).collect()
@@ -455,6 +449,30 @@ impl CharFrequencyToString for HashMap<char, usize> {
             .map(|(c, i)| format!("{} {}", i, c))
             .collect::<Vec<_>>()
             .join(", ")
+    }
+}
+
+trait WordsToString {
+    fn to_string(&self) -> String;
+}
+fn to_sorted_string<W: AsRef<Word>>(words: impl Iterator<Item = W>) -> String {
+    let mut words: Vec<_> = words.map(|w| w.as_ref().to_string()).collect();
+    words.sort_unstable();
+    words.join(", ")
+}
+impl<W: AsRef<Word>> WordsToString for Vec<W> {
+    fn to_string(&self) -> String {
+        to_sorted_string(self.iter())
+    }
+}
+impl<W: AsRef<Word>> WordsToString for &[W] {
+    fn to_string(&self) -> String {
+        to_sorted_string(self.iter())
+    }
+}
+impl<W: AsRef<Word>> WordsToString for HashSet<W> {
+    fn to_string(&self) -> String {
+        to_sorted_string(self.iter())
     }
 }
 
@@ -599,7 +617,7 @@ impl TryToPickWord for PickRandomSolutionIfEnoughAttemptsLeft {
 struct WordThatResultsInFewestRemainingSolutions;
 impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
-        let mut scores = lowest_total_number_of_remaining_solutions(game);
+        let mut scores = fewest_remaining_solutions_for_game(game);
         if game.print_output {
             scores.sort_asc();
             println!("Best (fewest remaining solutions): {}", scores.to_string(5));
@@ -611,17 +629,37 @@ impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
     }
 }
 
-fn lowest_total_number_of_remaining_solutions<'a>(game: &'a Wordle) -> Vec<(&'a Guess, usize)> {
-    let mut scores: Vec<_> = game
-        .allowed()
-        .into_par_iter()
+fn fewest_remaining_solutions_for_game<'a>(game: &'a Wordle) -> Vec<(&'a Guess, usize)> {
+    let words = game.words;
+    let guessed: Vec<_> = game.guessed.iter().collect();
+    let secrets: HashSet<_> = game.solutions().into_iter().collect();
+    let solutions_hg = game.cache;
+    fewest_remaining_solutions(words, &secrets, &guessed, solutions_hg)
+}
+
+fn fewest_remaining_solutions<'a>(
+    words: &'a Words,
+    secrets: &HashSet<&Secret>,
+    guessed: &[&Guess],
+    solutions: &SolutionsByHintByGuess,
+) -> Vec<(&'a Guess, usize)> {
+    let is_first_turn = secrets.len() == words.secrets.len();
+    let mut scores: Vec<(&Guess, usize)> = words
+        .guesses
+        .par_iter()
+        .filter(|guess| !guessed.contains(guess))
         .map(|guess| {
-            let count: usize = game
-                .solutions()
+            let count: usize = secrets
                 .iter()
                 .map(|secret| {
                     let hint = guess.get_hint(secret);
-                    game.cache.by_hint_by_guess[guess][&hint.value()].len()
+                    if is_first_turn {
+                        solutions.by_hint_by_guess[guess][&hint.value()].len()
+                    } else {
+                        solutions.by_hint_by_guess[guess][&hint.value()]
+                            .intersection(secrets)
+                            .count()
+                    }
                 })
                 .sum();
             (guess, count)
@@ -1257,7 +1295,7 @@ mod tests {
         let words = Words::new(English);
         let cache = SolutionsByHintByGuess::of(&words);
         let game = Wordle::with(&words, &cache);
-        let totals = lowest_total_number_of_remaining_solutions(&game);
+        let totals = fewest_remaining_solutions_for_game(&game);
         println!(
             "Best (lowest) average remaining solution count:\n{}",
             totals.to_string(10)
@@ -1384,7 +1422,7 @@ mod tests {
     // Allow because determine_hints expects &Guess not &[char]
     fn hint_buckets(
         #[allow(clippy::ptr_arg)] guess: &Guess,
-        solutions: &[Word],
+        solutions: &HashSet<Secret>,
     ) -> [Vec<usize>; 243] {
         const EMPTY_VEC: Vec<usize> = Vec::new();
         let mut hint_buckets = [EMPTY_VEC; 243];
@@ -1393,6 +1431,95 @@ mod tests {
             hint_buckets[hint.value() as usize].push(i);
         }
         hint_buckets
+    }
+
+    // #[ignore] // ~13s
+    #[test]
+    fn test_print_full_guess_tree() {
+        print_full_guess_tree();
+    }
+    fn print_full_guess_tree() {
+        let words = Words::new(German);
+        let secrets: HashSet<_> = words.secrets.iter().collect();
+        let hg_solutions = SolutionsByHintByGuess::of(&words);
+        let guessed = [];
+        explore_tree(&words, &secrets, &guessed, &hg_solutions);
+    }
+    fn explore_tree(
+        words: &Words,
+        secrets: &HashSet<&Secret>,
+        guessed: &[&Word],
+        hg_solutions: &SolutionsByHintByGuess,
+    ) {
+        if guessed.len() == MAX_ATTEMPTS {
+            println!(
+                "            7. Still not found after 6 guesses {}. Secrets: {}",
+                guessed.to_string(),
+                secrets.to_string()
+            );
+            return;
+        } else if secrets.len() <= 2 {
+            // 1 and 2 already printed info on how to proceed
+            return;
+        }
+        let scores = fewest_remaining_solutions(words, secrets, guessed, hg_solutions);
+        let guess = scores.lowest().unwrap();
+        let guessed: Vec<_> = guessed
+            .iter()
+            .cloned()
+            .chain(std::iter::once(&guess))
+            .collect();
+
+        let mut pairs: Vec<_> = hg_solutions.by_hint_by_guess[&guess]
+            .iter()
+            .map(|(h, solutions)| {
+                (
+                    h,
+                    solutions
+                        .intersection(secrets)
+                        .into_iter()
+                        .cloned()
+                        .collect::<HashSet<_>>(),
+                )
+            })
+            .filter(|(_, solutions)| !solutions.is_empty())
+            .collect();
+        pairs.sort_unstable_by(|(v1, s1), (v2, s2)| match s1.len().cmp(&s2.len()) {
+            Ordering::Equal => v1.cmp(v2), // lower hint-value (more unknown) first
+            fewer_elements_first => fewer_elements_first,
+        });
+        for (hint, secrets) in pairs {
+            print_info(&guessed, *hint, &secrets);
+            explore_tree(words, &secrets, &guessed, hg_solutions)
+        }
+    }
+    fn print_info(guessed: &[&Guess], hint: HintValue, secrets: &HashSet<&Secret>) {
+        let turn = guessed.len();
+        let indent = "\t".repeat(turn - 1);
+        let guess = guessed.last().unwrap().to_string();
+        let first = secrets.iter().next().unwrap().to_string();
+        print!(
+            "{}{}. guess {} + hint {} matches ",
+            indent,
+            turn,
+            guess,
+            Hints::from(hint)
+        );
+        if secrets.len() == 1 {
+            println!("{}, use it as {}. guess.", first, turn + 1);
+        } else if secrets.len() == 2 {
+            let second = secrets.iter().nth(1).unwrap().to_string();
+            println!(
+                "{} and {}. Pick one at random to win by the {}. guess.",
+                first,
+                second,
+                turn + 2
+            );
+        } else if secrets.len() <= 5 {
+            println!("{} secrets {}.", secrets.len(), secrets.to_string());
+        } else {
+            println!("{} secrets, for example {}.", secrets.len(), first);
+        }
     }
 
     #[ignore] // < 2s
@@ -1508,7 +1635,7 @@ mod tests {
         }
         fn new(
             guesses: &'a [Guess],
-            secrets: &'a [Secret],
+            secrets: &'a HashSet<Secret>,
             solutions: &'a SolutionsByHintByGuess,
         ) -> Self {
             SolutionsBySecretByGuess {
@@ -1536,7 +1663,7 @@ mod tests {
         let words = Words::new(English);
         let cache = SolutionsByHintByGuess::of(&words);
         let game = Wordle::with(&words, &cache);
-        let scores = lowest_total_number_of_remaining_solutions(&game);
+        let scores = fewest_remaining_solutions_for_game(&game);
         // println!("scores {}", scores.to_string(5));
         let optimal = scores.lowest().unwrap();
         assert_eq!("roate".to_word(), optimal);
@@ -1549,7 +1676,7 @@ mod tests {
         let words = Words::new(German);
         let cache = SolutionsByHintByGuess::of(&words);
         let game = Wordle::with(&words, &cache);
-        let scores = lowest_total_number_of_remaining_solutions(&game);
+        let scores = fewest_remaining_solutions_for_game(&game);
         println!("scores {}", scores.to_string(5));
         let optimal = scores.lowest().unwrap();
         assert_eq!("raine".to_word(), optimal);
@@ -1612,7 +1739,7 @@ mod tests {
         let words = Words::new(English);
         let cache = SolutionsByHintByGuess::of(&words);
         let game = Wordle::with(&words, &cache);
-        let mut scores = lowest_total_number_of_remaining_solutions(&game);
+        let mut scores = fewest_remaining_solutions_for_game(&game);
         println!("Best 1. guesses: {}", scores.to_string(5));
         scores.sort_asc();
 
@@ -1622,7 +1749,7 @@ mod tests {
             let scores = find_best_next_guesses(&game, &guessed);
 
             println!(
-                "Best 2. guesses after 1. '{}': {}",
+                "Best 2. guesses after 1. {}: {}",
                 guess1.to_string(),
                 scores.to_string(5)
             );
@@ -1631,7 +1758,7 @@ mod tests {
                 let guessed = [guess1, guess2];
                 let scores = find_best_next_guesses(&game, &guessed);
                 println!(
-                    "Best 3. guesses after 1. '{}' and 2. '{}': {}",
+                    "Best 3. guesses after 1. {} and 2. {}: {}",
                     guess1.to_string(),
                     guess2.to_string(),
                     scores.to_string(5)
@@ -1641,7 +1768,7 @@ mod tests {
                     let guessed = [guess1, guess2, guess3];
                     let scores = find_best_next_guesses(&game, &guessed);
                     println!(
-                        "Best 4. guesses after 1. '{}' and 2. '{}' and 3. '{}': {}",
+                        "Best 4. guesses after 1. {} and 2. {} and 3. {}: {}",
                         guess1.to_string(),
                         guess2.to_string(),
                         guess3.to_string(),
@@ -1652,7 +1779,7 @@ mod tests {
                         let guessed = [guess1, guess2, guess3, guess4];
                         let scores = find_best_next_guesses(&game, &guessed);
                         println!(
-                            "Best 5. guesses after 1. '{}' and 2. '{}' and 3. '{}' and 4. '{}': {}",
+                            "Best 5. guesses after 1. {} and 2. {} and 3. {} and 4. {}: {}",
                             guess1.to_string(),
                             guess2.to_string(),
                             guess3.to_string(),
@@ -2136,7 +2263,7 @@ mod tests {
     #[ignore]
     #[test]
     fn lowest_total_number_of_remaining_solutions_only_counts_remaining_viable_solutions() {
-        let solutions: Vec<Secret> = ["augur", "briar", "friar", "lunar", "sugar"]
+        let secrets: HashSet<Secret> = ["augur", "briar", "friar", "lunar", "sugar"]
             .iter()
             .map(|w| w.to_word())
             .collect();
@@ -2146,11 +2273,11 @@ mod tests {
             .collect();
         let mut words = Words::new(English);
         words.guesses = guesses;
-        words.secrets = solutions;
+        words.secrets = secrets;
         let cache = SolutionsByHintByGuess::of(&words);
         let game = Wordle::with(&words, &cache);
         let allowed = &game.words.guesses;
-        let mut scores = lowest_total_number_of_remaining_solutions(&game);
+        let mut scores = fewest_remaining_solutions_for_game(&game);
         scores.sort_asc();
         // println!("scores {}", scores.to_string(5));
         assert_eq!(scores[0], (&allowed[0], 7));
