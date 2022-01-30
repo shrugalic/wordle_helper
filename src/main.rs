@@ -368,16 +368,18 @@ impl<'a> Wordle<'a> {
     }
 }
 
-struct HintsBySolutionAndGuess<'a> {
-    by_solution_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, Hints>>,
+#[cfg(test)]
+struct HintsBySecretAndGuess<'a> {
+    by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, Hints>>,
 }
-impl<'a> HintsBySolutionAndGuess<'a> {
+#[cfg(test)]
+impl<'a> HintsBySecretAndGuess<'a> {
     fn of(words: &'a Words) -> Self {
-        HintsBySolutionAndGuess::new(&words.guesses, &words.secrets)
+        HintsBySecretAndGuess::new(&words.guesses, &words.secrets)
     }
     fn new(guesses: &'a [Guess], secrets: &'a [Secret]) -> Self {
-        HintsBySolutionAndGuess {
-            by_solution_by_guess: guesses
+        HintsBySecretAndGuess {
+            by_secret_by_guess: guesses
                 .par_iter()
                 .map(|guess| {
                     let hints_by_solution = secrets
@@ -1210,6 +1212,8 @@ fn words_with_most_wanted_chars<'w>(
 
 #[cfg(test)]
 mod tests {
+    use std::time::{Duration, Instant};
+
     use super::*;
 
     #[ignore] // ~30s for all guesses, ~6s for solutions only
@@ -1406,12 +1410,40 @@ mod tests {
         );
     }
 
-    #[ignore] // 1s for 1, 5s for 5, 10s for 10
+    #[ignore]
     #[test]
-    fn does_hint_cache_help_part_1() {
+    // 0. total time [ms]: 1080 cache initialization
+    // 1. total time [ms]: 1416 cached,  883 w/o cache
+    // 2. total time [ms]: 1772 cached, 1818 w/o cache <- break even
+    // 3. total time [ms]: 2121 cached, 2765 w/o cache <- break even
+    // 4. total time [ms]: 2473 cached, 3722 w/o cache <- break even
+    fn does_hint_cache_help_part_1_without_cache() {
         let words = Words::new(English);
-        for _ in 0..10 {
-            let sum: usize = words
+
+        let start = Instant::now();
+        let hints = HintsBySecretAndGuess::of(&words);
+        let mut t_cached = start.elapsed();
+        println!(
+            "0. total time [ms]: {:4} cache initialization",
+            t_cached.as_millis(),
+        );
+
+        let sum_with_cache = |words: &Words| -> usize {
+            words
+                .guesses
+                .par_iter()
+                .map(|guess| {
+                    words
+                        .secrets
+                        .iter()
+                        .map(|secret| hints.by_secret_by_guess[guess][secret].value() as usize)
+                        .sum::<usize>()
+                })
+                .sum()
+        };
+
+        let sum_without_cache = |words: &Words| -> usize {
+            words
                 .guesses
                 .par_iter()
                 .map(|guess| {
@@ -1421,29 +1453,32 @@ mod tests {
                         .map(|secret| guess.get_hint(secret).value() as usize)
                         .sum::<usize>()
                 })
-                .sum();
-            assert_eq!(1_056_428_862, sum); // 1056428862
-        }
-    }
+                .sum()
+        };
 
-    #[ignore] // 3s for 1, 4.2s for 5, 6.1s for 10
-    #[test]
-    fn does_hint_cache_help_part_2() {
-        let words = Words::new(English);
-        let hints = HintsBySolutionAndGuess::of(&words);
-        for _ in 0..10 {
-            let sum: usize = words
-                .guesses
-                .par_iter()
-                .map(|guess| {
-                    words
-                        .secrets
-                        .iter()
-                        .map(|secret| hints.by_solution_by_guess[guess][secret].value() as usize)
-                        .sum::<usize>()
-                })
-                .sum();
+        let mut t_uncached = Duration::default();
+        for i in 1..5 {
+            let start = Instant::now();
+            let sum = sum_without_cache(&words);
             assert_eq!(1_056_428_862, sum); // 1056428862
+            t_uncached += start.elapsed();
+
+            let start = Instant::now();
+            let sum = sum_with_cache(&words);
+            assert_eq!(1_056_428_862, sum); // 1056428862
+            t_cached += start.elapsed();
+
+            println!(
+                "{}. total time [ms]: {:4} cached, {:4} w/o cache{}",
+                i,
+                t_cached.as_millis(),
+                t_uncached.as_millis(),
+                if t_cached <= t_uncached {
+                    " <- break even"
+                } else {
+                    ""
+                }
+            );
         }
     }
 
@@ -1660,18 +1695,6 @@ mod tests {
             println!("{} = {}", hint, value);
             assert_eq!(value, Hints::from(value).value());
         }
-    }
-
-    #[ignore] // 2-3s
-    #[test]
-    fn hint_by_solution_by_guess() {
-        let words = Words::new(English);
-        let hints = HintsBySolutionAndGuess::of(&words);
-        assert_eq!(hints.by_solution_by_guess.len(), 12972);
-        assert!(hints
-            .by_solution_by_guess
-            .iter()
-            .all(|(_, hint_by_secret)| hint_by_secret.len() == 2315));
     }
 
     #[ignore] // ~75 min
