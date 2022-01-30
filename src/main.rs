@@ -1044,11 +1044,10 @@ impl Hints {
 }
 impl CalcHintValue for Hints {
     fn value(&self) -> HintValue {
-        const MULTIPLIERS: [HintValue; 5] = [81, 27, 9, 3, 1];
-        self.hints
-            .iter()
-            .enumerate()
-            .map(|(i, h)| MULTIPLIERS[i] * h.value())
+        [81, 27, 9, 3, 1]
+            .into_iter()
+            .zip(&self.hints)
+            .map(|(multiplier, h)| multiplier * h.value())
             .sum::<HintValue>()
     }
 }
