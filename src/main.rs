@@ -369,16 +369,16 @@ impl<'a> Wordle<'a> {
 }
 
 #[cfg(test)]
-struct HintsBySecretAndGuess<'a> {
+struct HintsBySecretByGuess<'a> {
     by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, Hints>>,
 }
 #[cfg(test)]
-impl<'a> HintsBySecretAndGuess<'a> {
+impl<'a> HintsBySecretByGuess<'a> {
     fn of(words: &'a Words) -> Self {
-        HintsBySecretAndGuess::new(&words.guesses, &words.secrets)
+        HintsBySecretByGuess::new(&words.guesses, &words.secrets)
     }
     fn new(guesses: &'a [Guess], secrets: &'a [Secret]) -> Self {
-        HintsBySecretAndGuess {
+        HintsBySecretByGuess {
             by_secret_by_guess: guesses
                 .par_iter()
                 .map(|guess| {
@@ -1421,7 +1421,7 @@ mod tests {
         let words = Words::new(English);
 
         let start = Instant::now();
-        let hints = HintsBySecretAndGuess::of(&words);
+        let hints = HintsBySecretByGuess::of(&words);
         let mut t_cached = start.elapsed();
         println!(
             "0. total time [ms]: {:4} cache initialization",
