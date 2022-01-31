@@ -60,23 +60,24 @@ struct Wordle<'a> {
 }
 impl<'a> Wordle<'a> {
     fn with(words: &'a Words, cache: &'a SolutionsByHintByGuess<'a>) -> Self {
-        let empty = HashSet::new;
+        let set = HashSet::new;
         Wordle {
             words,
             cache,
-            illegal_chars: HashSet::new(),
+            illegal_chars: set(),
             correct_chars: [None; 5],
-            illegal_at_pos: [empty(), empty(), empty(), empty(), empty()],
-            mandatory_chars: HashSet::new(),
+            illegal_at_pos: [set(), set(), set(), set(), set()],
+            mandatory_chars: set(),
             guessed: Vec::new(),
             print_output: true,
         }
     }
+
     fn play(&mut self) {
         let mut strategy = ChainedStrategies::new(
             vec![
-                &PickFirstSolutionIfFewerThanTwoLeft,
-                &WordsWithMostCharsFromRemainingSolutions,
+                &FirstOfTwoOrFewerRemainingSolutions,
+                &WordWithMostNewCharsFromRemainingSolutions,
                 &WordThatResultsInFewestRemainingSolutions,
             ],
             PickRandomWord,
@@ -136,6 +137,7 @@ impl<'a> Wordle<'a> {
     fn are_all_chars_known(&self) -> bool {
         self.correct_chars.iter().all(|o| o.is_some())
     }
+
     fn print_remaining_word_count(&self) {
         let len = self.solutions().len();
         if len > 10 {
@@ -250,10 +252,6 @@ impl<'a> Wordle<'a> {
     }
 
     fn update_illegal_chars(&mut self, guess: &Guess) {
-        // println!("guess {:?}", guess);
-        // println!("self.mandatory_chars {:?}", self.mandatory_chars);
-        // println!("self.correct_chars {:?}", self.correct_chars);
-
         let open_positions = self.open_positions();
         for (_, c) in guess
             .iter()
@@ -284,6 +282,7 @@ impl<'a> Wordle<'a> {
             .filter(|guess| !self.guessed.contains(guess))
             .collect()
     }
+
     fn solutions(&self) -> Vec<&Secret> {
         self.words
             .secrets
@@ -348,31 +347,6 @@ impl<'a> Wordle<'a> {
 
     fn attempts(&self) -> usize {
         self.guessed.len()
-    }
-}
-
-#[cfg(test)]
-struct HintsBySecretByGuess<'a> {
-    by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, Hints>>,
-}
-#[cfg(test)]
-impl<'a> HintsBySecretByGuess<'a> {
-    fn of(words: &'a Words) -> Self {
-        HintsBySecretByGuess::new(&words.guesses, &words.secrets)
-    }
-    fn new(guesses: &'a [Guess], secrets: &'a HashSet<Secret>) -> Self {
-        HintsBySecretByGuess {
-            by_secret_by_guess: guesses
-                .par_iter()
-                .map(|guess| {
-                    let hints_by_solution = secrets
-                        .iter()
-                        .map(|secret| (secret, guess.get_hint(secret)))
-                        .collect::<HashMap<&Secret, Hints>>();
-                    (guess, hints_by_solution)
-                })
-                .collect(),
-        }
     }
 }
 
@@ -810,8 +784,8 @@ impl<'w> TryToPickWord for MostFrequentUnusedCharacters<'w> {
     }
 }
 
-struct PickFirstSolutionIfFewerThanTwoLeft;
-impl TryToPickWord for PickFirstSolutionIfFewerThanTwoLeft {
+struct FirstOfTwoOrFewerRemainingSolutions;
+impl TryToPickWord for FirstOfTwoOrFewerRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
         if game.solutions().len() <= 2 {
             game.solutions().into_iter().next().cloned()
@@ -821,8 +795,8 @@ impl TryToPickWord for PickFirstSolutionIfFewerThanTwoLeft {
     }
 }
 
-struct WordsWithMostCharsFromRemainingSolutions;
-impl TryToPickWord for WordsWithMostCharsFromRemainingSolutions {
+struct WordWithMostNewCharsFromRemainingSolutions;
+impl TryToPickWord for WordWithMostNewCharsFromRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
         if !game.has_max_open_positions(2) && game.wanted_chars().len() >= 7 {
             return None;
@@ -1585,6 +1559,29 @@ mod tests {
         }
     }
 
+    struct HintsBySecretByGuess<'a> {
+        by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, Hints>>,
+    }
+    impl<'a> HintsBySecretByGuess<'a> {
+        fn of(words: &'a Words) -> Self {
+            HintsBySecretByGuess::new(&words.guesses, &words.secrets)
+        }
+        fn new(guesses: &'a [Guess], secrets: &'a HashSet<Secret>) -> Self {
+            HintsBySecretByGuess {
+                by_secret_by_guess: guesses
+                    .par_iter()
+                    .map(|guess| {
+                        let hints_by_solution = secrets
+                            .iter()
+                            .map(|secret| (secret, guess.get_hint(secret)))
+                            .collect::<HashMap<&Secret, Hints>>();
+                        (guess, hints_by_solution)
+                    })
+                    .collect(),
+            }
+        }
+    }
+
     #[ignore] // 2-4s
     #[test]
     fn count_solutions_by_secret_by_guess() {
@@ -1896,7 +1893,6 @@ mod tests {
 
     #[ignore]
     #[test]
-    // With PickRandomSolutionIfEnoughAttemptsLeft first
     // Average attempts = 3.564; 0 (0.000%) failed games (> 6 attempts):
     // 2: 41, 3: 530, 4: 502, 5: 94, 6: 4
     fn auto_play_german_raine_holst_dumpf_biwak() {
@@ -2067,8 +2063,8 @@ mod tests {
                 let mut game = Wordle::with(&words, &cache);
                 let strategy = ChainedStrategies::new(
                     vec![
-                        &PickFirstSolutionIfFewerThanTwoLeft,
-                        &WordsWithMostCharsFromRemainingSolutions,
+                        &FirstOfTwoOrFewerRemainingSolutions,
+                        &WordWithMostNewCharsFromRemainingSolutions,
                         &strategy,
                     ],
                     PickRandomWord,
