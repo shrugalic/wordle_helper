@@ -1,11 +1,16 @@
 # Wordle helper
-Helps with suggestions when playing a wordle game, can automatically try strategies etc.
+Helps with smart word suggestions when playing the [Wordle](https://www.powerlanguage.co.uk/wordle/) game. It can also automatically evaluate different strategies or combinations thereof. 
 
-Very messy, do not use 😉
+And it's an excuse for me to mess around with Rust. This code is still a work in progress and rather messy, I wouldn't recommend using it unless you're me. 😉
 
+That said, you might find the [word lists](data/wordlists) or [full decision trees](data/full_decision_trees) helpful.
+
+## Interactive mode (`play()`):
 A typical run (with lots of debug output) looks like this:
 
-```
+```sh
+❯ cargo run --release
+
 2315 words left
 Best (fewest remaining solutions): 139883 roate, 141217 raise, 141981 raile, 144227 soare, 147525 arise
 Enter your guess, or press enter to use the suggestion 'roate':
@@ -50,33 +55,60 @@ Inserting globally illegal char 'k'
 The only word left in the list is 'crimp'
 ```
 
-Part of a typical simulation looks like this:
-```
-Fixed guesses ["roate", "linds", "chump", "gawky"]
+### Interactive mode in German
+```sh
+❯ cargo run --release german
 
+1171 words left
+Best (fewest remaining solutions): 36655 'raine', 41291 'taler', 42405 'raten', 42461 'laser', 42897 'reale'
+Enter your guess, or press enter to use the suggestion 'raine':
+
+Enter feedback using upper-case for correct and lower-case for wrong positions,
+or any non-alphabetic for illegal:
+__INE
+Inserting 'i' as correct character @ 2
+Inserting 'n' as correct character @ 3
+Inserting 'e' as correct character @ 4
+Inserting globally illegal char 'r'
+Inserting globally illegal char 'a'
+
+2 words left: 'deine', 'leine'
+Enter your guess, or press enter to use the suggestion 'deine':
+     
+Enter feedback using upper-case for correct and lower-case for wrong positions,
+or any non-alphabetic for illegal:
+DEINE
+Inserting 'd' as correct character @ 0
+Inserting 'e' as correct character @ 1
+Inserting 'i' as correct character @ 2
+Inserting 'n' as correct character @ 3
+Inserting 'e' as correct character @ 4
+
+The word is 'deine'
+```
+
+## Simulation mode (`autoplay()`):
+A typical simulation might produce output like the following text, but for all 2315 possible solutions:
+```
 2315 solutions left, 1. guess 'roate', hint '⬛⬛🟩⬛⬛', secret 'aback'
-  71 solutions left, 2. guess 'linds', hint '⬛⬛⬛⬛⬛', secret 'aback'
-   6 solutions left, 3. guess 'chump', hint '🟨⬛⬛⬛⬛', secret 'aback'
-After 3 guesses (4. turn): The only word left in the list is 'aback'
+  71 solutions left, 2. guess 'slick', hint '⬛⬛⬛🟩🟩', secret 'aback'
+   4 solutions left, 3. guess 'aback', hint '🟩🟩🟩🟩🟩', secret 'aback'
 
 …
 
 2315 solutions left, 1. guess 'roate', hint '⬛⬛🟨🟨⬛', secret 'taunt'
-  50 solutions left, 2. guess 'linds', hint '⬛⬛🟨⬛⬛', secret 'taunt'
-   6 solutions left, 3. guess 'chump', hint '⬛⬛🟩⬛⬛', secret 'taunt'
-   4 solutions left, 4. guess 'gawky', hint '⬛🟩⬛⬛⬛', secret 'taunt'
-   3 solutions left, 5. guess 'vaunt', hint '⬛🟩🟩🟩🟩', secret 'taunt'
-   2 solutions left, 6. guess 'taunt', hint '🟩🟩🟩🟩🟩', secret 'taunt'
-With 6 guesses: The word is 'taunt'
+  50 solutions left, 2. guess 'clint', hint '⬛⬛⬛🟩🟩', secret 'taunt'
+   6 solutions left, 3. guess 'dight', hint '⬛⬛⬛⬛🟩', secret 'taunt'
+   3 solutions left, 4. guess 'taunt', hint '🟩🟩🟩🟩🟩', secret 'taunt'
 
 …
 
 2315 solutions left, 1. guess 'roate', hint '⬛🟩🟨⬛⬛', secret 'zonal'
-  16 solutions left, 2. guess 'linds', hint '🟨⬛🟩⬛⬛', secret 'zonal'
-After 2 guesses (3. turn): The only word left in the list is 'zonal'
+  16 solutions left, 2. guess 'liman', hint '🟨⬛⬛🟩🟨', secret 'zonal'
+   1 solutions left, 3. guess 'zonal', hint '🟩🟩🟩🟩🟩', secret 'zonal'
 
 Average attempts = 3.806; 2 (0.086%) failed games (> 6 attempts):
 2: 54, 3: 797, 4: 1062, 5: 351, 6: 49, 7: 2
 ```
 
-[Full example](data/simulation_example.txt)
+There is also a full (around 8k lines!) [full example here](data/simulation_example.txt).
