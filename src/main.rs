@@ -73,10 +73,19 @@ impl<'a> Wordle<'a> {
         }
     }
     fn play(&mut self) {
+        let mut strategy = ChainedStrategies::new(
+            vec![
+                &PickFirstSolutionIfFewerThanTwoLeft,
+                &WordsWithMostCharsFromRemainingSolutions,
+                &WordThatResultsInFewestRemainingSolutions,
+            ],
+            PickRandomWord,
+        );
+
         while !self.are_all_chars_known() && self.solutions().len() > 1 {
             self.print_remaining_word_count();
 
-            let suggestion = self.suggest_a_word();
+            let suggestion = strategy.pick(self);
             let guess = self.ask_for_guess(suggestion);
             let feedback = self.ask_for_feedback(&guess);
 
@@ -192,29 +201,6 @@ impl<'a> Wordle<'a> {
             } else {
                 return guess;
             }
-        }
-    }
-
-    fn suggest_a_word(&self) -> Word {
-        self.optimized_suggestion().unwrap_or_else(|| {
-            println!("falling back to random suggestion");
-            PickRandomWord.pick(self)
-        })
-    }
-
-    fn optimized_suggestion(&self) -> Option<Word> {
-        let solutions = self.solutions();
-        if solutions.len() == 1 {
-            solutions.into_iter().next().cloned()
-        } else if solutions.len() == 2 {
-            solutions
-                .into_iter()
-                .choose(&mut ThreadRng::default())
-                .cloned()
-        } else if self.wanted_chars().len() < 10 {
-            WordsWithMostCharsFromRemainingSolutions.pick(self)
-        } else {
-            WordThatResultsInFewestRemainingSolutions.pick(self)
         }
     }
 
@@ -580,7 +566,6 @@ struct ChainedStrategies<'a, F: PickWord> {
     strategies: Vec<&'a dyn TryToPickWord>,
     fallback: F,
 }
-#[cfg(test)]
 impl<'a, F: PickWord> ChainedStrategies<'a, F> {
     fn new(strategies: Vec<&'a dyn TryToPickWord>, fallback: F) -> Self {
         ChainedStrategies {
@@ -825,9 +810,23 @@ impl<'w> TryToPickWord for MostFrequentUnusedCharacters<'w> {
     }
 }
 
+struct PickFirstSolutionIfFewerThanTwoLeft;
+impl TryToPickWord for PickFirstSolutionIfFewerThanTwoLeft {
+    fn pick(&self, game: &Wordle) -> Option<Guess> {
+        if game.solutions().len() <= 2 {
+            game.solutions().into_iter().next().cloned()
+        } else {
+            None
+        }
+    }
+}
+
 struct WordsWithMostCharsFromRemainingSolutions;
 impl TryToPickWord for WordsWithMostCharsFromRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
+        if !game.has_max_open_positions(2) && game.wanted_chars().len() >= 7 {
+            return None;
+        }
         let wanted_chars: HashSet<char> = game.wanted_chars();
         let scores: Vec<(&Word, usize)> =
             words_with_most_wanted_chars(&wanted_chars, game.allowed());
@@ -2047,11 +2046,15 @@ mod tests {
             .iter()
             .map(|secret| {
                 let mut game = Wordle::with(&words, &cache);
-                let mut strategy = ChainedStrategies::new(
-                    vec![&PickRandomSolutionIfEnoughAttemptsLeft, &strategy],
+                let strategy = ChainedStrategies::new(
+                    vec![
+                        &PickFirstSolutionIfFewerThanTwoLeft,
+                        &WordsWithMostCharsFromRemainingSolutions,
+                        &strategy,
+                    ],
                     PickRandomWord,
                 );
-                game.autoplay(secret, &mut strategy);
+                game.autoplay(secret, strategy);
                 game.attempts()
             })
             .collect();
