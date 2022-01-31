@@ -89,7 +89,7 @@ impl<'a> Wordle<'a> {
 
     #[cfg(test)]
     #[allow(clippy::ptr_arg)] // to_string is implemented for Word but not &[char]
-    fn autoplay(&mut self, secret: &Secret, strategy: &mut dyn PickWord) {
+    fn autoplay(&mut self, secret: &Secret, mut strategy: impl PickWord) {
         self.print_output = false;
 
         while !self.are_all_chars_known() && self.guessed.len() < AUTOPLAY_MAX_ATTEMPTS {
@@ -203,11 +203,14 @@ impl<'a> Wordle<'a> {
     }
 
     fn optimized_suggestion(&self) -> Option<Word> {
-        if self.solutions().len() == 1 {
-            return self.solutions().into_iter().next().cloned();
-        } else if self.has_max_open_positions(1) {
-            println!("Falling back to single position strategy");
-            SuggestWordCoveringMostCharsInOpenPositions.pick(self)
+        let solutions = self.solutions();
+        if solutions.len() == 1 {
+            solutions.into_iter().next().cloned()
+        } else if solutions.len() == 2 {
+            solutions
+                .into_iter()
+                .choose(&mut ThreadRng::default())
+                .cloned()
         } else if self.wanted_chars().len() < 10 {
             WordsWithMostCharsFromRemainingSolutions.pick(self)
         } else {
@@ -630,11 +633,9 @@ impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
 }
 
 fn fewest_remaining_solutions_for_game<'a>(game: &'a Wordle) -> Vec<(&'a Guess, usize)> {
-    let words = game.words;
     let guessed: Vec<_> = game.guessed.iter().collect();
     let secrets: HashSet<_> = game.solutions().into_iter().collect();
-    let solutions_hg = game.cache;
-    fewest_remaining_solutions(words, &secrets, &guessed, solutions_hg)
+    fewest_remaining_solutions(game.words, &secrets, &guessed, game.cache)
 }
 
 fn fewest_remaining_solutions<'a>(
@@ -820,30 +821,6 @@ impl<'w> TryToPickWord for MostFrequentUnusedCharacters<'w> {
             scores.sort_asc();
             println!("best unplayed words {}", scores.to_string(5));
         }
-        scores.highest()
-    }
-}
-
-struct SuggestWordCoveringMostCharsInOpenPositions;
-impl TryToPickWord for SuggestWordCoveringMostCharsInOpenPositions {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
-        let candidates: HashSet<char> = game
-            .solutions()
-            .iter()
-            .flat_map(|solution| solution.unique_chars_in(&game.open_positions()))
-            .collect();
-        let scores: Vec<(&Word, usize)> = game
-            .allowed()
-            .into_iter()
-            .map(|word| {
-                let count = word
-                    .unique_chars_in(&ALL_POS)
-                    .into_iter()
-                    .filter(|c| candidates.contains(c))
-                    .count();
-                (word, count)
-            })
-            .collect();
         scores.highest()
     }
 }
@@ -1433,7 +1410,7 @@ mod tests {
         hint_buckets
     }
 
-    // #[ignore] // ~13s
+    #[ignore] // ~13s English or ~2s German
     #[test]
     fn test_print_full_guess_tree() {
         print_full_guess_tree();
