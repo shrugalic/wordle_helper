@@ -1887,6 +1887,25 @@ mod tests {
 
     #[ignore]
     #[test]
+    // Average attempts = 3.564; 0 (0.000%) failed games (> 6 attempts):
+    // 2: 41, 3: 530, 4: 502, 5: 94, 6: 4
+    fn auto_play_german_raine_holst_dumpf_biwak_legen() {
+        let strategy = FixedGuessList::new(vec!["raine", "holst", "dumpf", "biwak", "legen"]);
+        autoplay_and_print_stats_with_language(strategy, German);
+    }
+
+    #[ignore]
+    #[test]
+    // With PickRandomSolutionIfEnoughAttemptsLeft first
+    // Average attempts = 3.564; 0 (0.000%) failed games (> 6 attempts):
+    // 2: 41, 3: 530, 4: 502, 5: 94, 6: 4
+    fn auto_play_german_raine_holst_dumpf_biwak() {
+        let strategy = FixedGuessList::new(vec!["raine", "holst", "dumpf", "biwak"]);
+        autoplay_and_print_stats_with_language(strategy, German);
+    }
+
+    #[ignore]
+    #[test]
     // Average attempts = 3.749; 9 (0.546%) failed games (> 6 attempts):
     // 2: 82, 3: 649, 4: 610, 5: 229, 6: 70, 7: 6, 8: 3
     fn auto_play_german_tarne_helis_gudok_zamba_fiept() {
