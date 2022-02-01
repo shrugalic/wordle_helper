@@ -6,7 +6,6 @@ use std::io;
 use std::iter::Map;
 use std::str::Lines;
 
-use rand::prelude::*;
 use rayon::prelude::*;
 
 use Hint::*;
@@ -21,9 +20,6 @@ const SOLUTIONS: [&str; 2] = [
     include_str!("../data/word_lists/german/solutions.txt"),
 ];
 
-#[cfg(test)]
-const AUTOPLAY_MAX_ATTEMPTS: usize = 10;
-const MAX_ATTEMPTS: usize = 6;
 const ALL_POS: [usize; 5] = [0, 1, 2, 3, 4];
 
 type Word = Vec<char>;
@@ -75,7 +71,7 @@ impl<'a> Wordle<'a> {
                 &WordWithMostNewCharsFromRemainingSolutions,
                 &WordThatResultsInFewestRemainingSolutions,
             ],
-            PickRandomSolution,
+            PickFirstSolution,
         );
 
         while self.solutions.len() != 1 {
@@ -86,15 +82,14 @@ impl<'a> Wordle<'a> {
             let feedback = self.ask_for_feedback(&guess);
             let hint = Hints::from_feedback(feedback);
 
-            self.update_remaining_solutions(guess.clone(), &hint);
-
+            self.update_remaining_solutions(&guess, &hint);
             self.guessed.push(guess);
         }
         self.print_result();
     }
 
-    fn update_remaining_solutions(&mut self, guess: Guess, hint: &Hints) {
-        let solutions = &self.cache.by_hint_by_guess[&guess][&hint.value()];
+    fn update_remaining_solutions(&mut self, guess: &Guess, hint: &Hints) {
+        let solutions = &self.cache.by_hint_by_guess[guess][&hint.value()];
         self.solutions = self
             .solutions
             .intersection(solutions)
@@ -108,6 +103,7 @@ impl<'a> Wordle<'a> {
     fn autoplay(&mut self, secret: &Secret, mut strategy: impl PickWord) {
         self.print_output = false;
 
+        const AUTOPLAY_MAX_ATTEMPTS: usize = 10;
         while self.guessed.len() < AUTOPLAY_MAX_ATTEMPTS {
             let guess: Guess = strategy.pick(self);
             let hint = guess.get_hint(secret);
@@ -117,7 +113,7 @@ impl<'a> Wordle<'a> {
                 self.solutions = self.solutions.drain().filter(|&s| guess.eq(s)).collect();
                 break;
             }
-            self.update_remaining_solutions(guess.clone(), &hint);
+            self.update_remaining_solutions(&guess, &hint);
         }
 
         if self.solutions.len() != 1 {
@@ -245,10 +241,6 @@ impl<'a> Wordle<'a> {
 
     fn guessed_chars(&self) -> HashSet<char> {
         self.guessed.iter().flatten().copied().collect()
-    }
-
-    fn attempts(&self) -> usize {
-        self.guessed.len()
     }
 }
 
@@ -448,14 +440,10 @@ trait PickWord {
     fn pick(&mut self, game: &Wordle) -> Word;
 }
 
-struct PickRandomSolution;
-impl PickWord for PickRandomSolution {
+struct PickFirstSolution;
+impl PickWord for PickFirstSolution {
     fn pick(&mut self, game: &Wordle) -> Word {
-        game.solutions
-            .iter()
-            .choose(&mut ThreadRng::default())
-            .unwrap()
-            .to_vec()
+        game.solutions.iter().next().unwrap().to_vec()
     }
 }
 
@@ -487,20 +475,6 @@ trait TryToPickWord {
     fn pick(&self, game: &Wordle) -> Option<Guess>;
 }
 
-struct PickRandomSolutionIfEnoughAttemptsLeft;
-impl TryToPickWord for PickRandomSolutionIfEnoughAttemptsLeft {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
-        if game.attempts() + game.solutions.len() <= MAX_ATTEMPTS {
-            game.solutions
-                .iter()
-                .choose(&mut ThreadRng::default())
-                .copied()
-                .cloned()
-        } else {
-            None
-        }
-    }
-}
 struct WordThatResultsInFewestRemainingSolutions;
 impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
@@ -1066,6 +1040,8 @@ mod tests {
     use std::time::{Duration, Instant};
 
     use super::*;
+
+    const MAX_ATTEMPTS: usize = 6;
 
     #[ignore] // ~30s for all guesses, ~6s for solutions only
     #[test]
@@ -1723,10 +1699,9 @@ mod tests {
         }
     }
 
-    #[ignore] // ~75 min
+    #[ignore] // ~65min
     #[test]
-    // Average attempts = 3.564; 0 (0.000%) failed games (> 6 attempts):
-    // 2: 61, 3: 1081, 4: 1003, 5: 147, 6: 23
+    // Average attempts = 3.547; 2: 39, 3: 1015, 4: 1216, 5: 45
     fn auto_play_word_that_results_in_fewest_remaining_solutions() {
         autoplay_and_print_stats(WordThatResultsInFewestRemainingSolutions);
     }
@@ -2035,10 +2010,10 @@ mod tests {
                         &WordWithMostNewCharsFromRemainingSolutions,
                         &strategy,
                     ],
-                    PickRandomSolution,
+                    PickFirstSolution,
                 );
                 game.autoplay(secret, strategy);
-                game.attempts()
+                game.guessed.len()
             })
             .collect();
         print_stats(attempts);

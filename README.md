@@ -96,10 +96,11 @@ A typical simulation might produce output like the following text, but for all 2
 
 …
 
-2315 solutions left, 1. guess 'roate', hint '⬛⬛🟨🟨⬛', secret 'taunt'
-  50 solutions left, 2. guess 'clint', hint '⬛⬛⬛🟩🟩', secret 'taunt'
-   6 solutions left, 3. guess 'dight', hint '⬛⬛⬛⬛🟩', secret 'taunt'
-   3 solutions left, 4. guess 'taunt', hint '🟩🟩🟩🟩🟩', secret 'taunt'
+2315 solutions left, 1. guess 'roate', hint ⬛⬛🟨🟨⬛, secret 'taunt'
+  50 solutions left, 2. guess 'clint', hint ⬛⬛⬛🟩🟩, secret 'taunt'
+   6 solutions left, 3. guess 'dight', hint ⬛⬛⬛⬛🟩, secret 'taunt'
+   3 solutions left, 4. guess 'juves', hint ⬛🟨⬛⬛⬛, secret 'taunt'
+   1 solutions left, 5. guess 'taunt', hint 🟩🟩🟩🟩🟩, secret 'taunt'
 
 …
 
@@ -107,8 +108,7 @@ A typical simulation might produce output like the following text, but for all 2
   16 solutions left, 2. guess 'liman', hint '🟨⬛⬛🟩🟨', secret 'zonal'
    1 solutions left, 3. guess 'zonal', hint '🟩🟩🟩🟩🟩', secret 'zonal'
 
-Average attempts = 3.806; 2 (0.086%) failed games (> 6 attempts):
-2: 54, 3: 797, 4: 1062, 5: 351, 6: 49, 7: 2
+Average attempts = 3.547; 2: 39, 3: 1015, 4: 1216, 5: 45
 ```
 
 There is also a full (around 8k lines!) [full example here](data/simulation_example.txt).
