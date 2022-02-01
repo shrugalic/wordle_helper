@@ -29,6 +29,7 @@ const ALL_POS: [usize; 5] = [0, 1, 2, 3, 4];
 type Word = Vec<char>;
 type Guess = Word;
 type Secret = Word;
+type Feedback = Guess;
 type HintValue = u8;
 
 #[derive(Clone)]
@@ -50,24 +51,18 @@ impl Words {
 
 struct Wordle<'a> {
     words: &'a Words,
+    solutions: HashSet<&'a Secret>,
     cache: &'a SolutionsByHintByGuess<'a>,
-    illegal_chars: HashSet<char>,
-    correct_chars: [Option<char>; 5],
-    illegal_at_pos: [HashSet<char>; 5],
-    mandatory_chars: HashSet<char>,
     guessed: Vec<Guess>,
     print_output: bool,
 }
 impl<'a> Wordle<'a> {
     fn with(words: &'a Words, cache: &'a SolutionsByHintByGuess<'a>) -> Self {
-        let set = HashSet::new;
+        let solutions = words.secrets.iter().collect();
         Wordle {
             words,
+            solutions,
             cache,
-            illegal_chars: set(),
-            correct_chars: [None; 5],
-            illegal_at_pos: [set(), set(), set(), set(), set()],
-            mandatory_chars: set(),
             guessed: Vec::new(),
             print_output: true,
         }
@@ -80,21 +75,32 @@ impl<'a> Wordle<'a> {
                 &WordWithMostNewCharsFromRemainingSolutions,
                 &WordThatResultsInFewestRemainingSolutions,
             ],
-            PickRandomWord,
+            PickRandomSolution,
         );
 
-        while !self.are_all_chars_known() && self.solutions().len() > 1 {
+        while self.solutions.len() != 1 {
             self.print_remaining_word_count();
 
             let suggestion = strategy.pick(self);
             let guess = self.ask_for_guess(suggestion);
             let feedback = self.ask_for_feedback(&guess);
+            let hint = Hints::from_feedback(feedback);
 
-            self.process_feedback(feedback, &guess);
-            self.update_illegal_chars(&guess);
+            self.update_remaining_solutions(guess.clone(), &hint);
+
             self.guessed.push(guess);
         }
         self.print_result();
+    }
+
+    fn update_remaining_solutions(&mut self, guess: Guess, hint: &Hints) {
+        let solutions = &self.cache.by_hint_by_guess[&guess][&hint.value()];
+        self.solutions = self
+            .solutions
+            .intersection(solutions)
+            .into_iter()
+            .cloned()
+            .collect();
     }
 
     #[cfg(test)]
@@ -102,48 +108,46 @@ impl<'a> Wordle<'a> {
     fn autoplay(&mut self, secret: &Secret, mut strategy: impl PickWord) {
         self.print_output = false;
 
-        while !self.are_all_chars_known() && self.guessed.len() < AUTOPLAY_MAX_ATTEMPTS {
+        while self.guessed.len() < AUTOPLAY_MAX_ATTEMPTS {
             let guess: Guess = strategy.pick(self);
-
-            let hints = guess.get_hint(secret);
-            println!(
-                "{:4} solutions left, {}. guess {}, hint {}, secret {}",
-                self.solutions().len(),
-                self.guessed.len() + 1,
-                guess.to_string(),
-                hints,
-                secret.to_string(),
-            );
-            for (pos, hint) in hints.hints.into_iter().enumerate() {
-                self.update_illegal_mandatory_and_correct_chars(&guess, pos, hint);
+            let hint = guess.get_hint(secret);
+            self.print_state(&guess, secret, &hint);
+            self.guessed.push(guess.clone());
+            if guess.eq(secret) {
+                self.solutions = self.solutions.drain().filter(|&s| guess.eq(s)).collect();
+                break;
             }
-            self.update_illegal_chars(&guess);
-            self.guessed.push(guess);
+            self.update_remaining_solutions(guess.clone(), &hint);
         }
-        if !self.are_all_chars_known() {
+
+        if self.solutions.len() != 1 {
             println!(
-                "After {} guesses: No solutions for {}",
+                "{:4} solutions left, after {} guesses to find secret {}. :(",
+                self.solutions.len(),
                 self.guessed.len(),
                 secret.to_string()
             );
         }
     }
 
-    fn has_max_open_positions(&self, open_count: usize) -> bool {
-        let known_count = 5 - open_count;
-        self.correct_chars.iter().filter(|o| o.is_some()).count() >= known_count
-    }
-
-    fn are_all_chars_known(&self) -> bool {
-        self.correct_chars.iter().all(|o| o.is_some())
+    #[cfg(test)] // autoplay
+    fn print_state(&self, guess: &Guess, secret: &Secret, hint: &Hints) {
+        println!(
+            "{:4} solutions left, {}. guess {}, hint {}, secret {}",
+            self.solutions.len(),
+            self.guessed.len() + 1,
+            guess.to_string(),
+            hint,
+            secret.to_string(),
+        );
     }
 
     fn print_remaining_word_count(&self) {
-        let len = self.solutions().len();
+        let len = self.solutions.len();
         if len > 10 {
             println!("\n{} words left", len);
         } else {
-            println!("\n{} words left: {}", len, self.solutions().to_string());
+            println!("\n{} words left: {}", len, self.solutions.to_string());
         }
     }
 
@@ -168,17 +172,6 @@ impl<'a> Wordle<'a> {
             } else {
                 return feedback;
             }
-        }
-    }
-
-    fn process_feedback(&mut self, feedback: Guess, guess: &[char]) {
-        for (pos, feedback) in feedback
-            .iter()
-            .enumerate()
-            .filter(|(_, c)| c.is_ascii_alphabetic())
-        {
-            let hint = Self::feedback_to_hint(feedback);
-            self.update_illegal_mandatory_and_correct_chars(guess, pos, hint)
         }
     }
 
@@ -207,72 +200,17 @@ impl<'a> Wordle<'a> {
     }
 
     fn open_positions(&self) -> Vec<usize> {
-        self.correct_chars
-            .iter()
-            .enumerate()
-            .filter(|(_, o)| o.is_none())
-            .map(|(i, _)| i)
+        (0..5)
+            .into_iter()
+            .filter(|i| {
+                1 == self
+                    .solutions
+                    .iter()
+                    .map(|w| w[*i])
+                    .collect::<HashSet<char>>()
+                    .len()
+            })
             .collect()
-    }
-
-    fn update_illegal_mandatory_and_correct_chars(
-        &mut self,
-        guess: &[char],
-        pos: usize,
-        hint: Hint,
-    ) {
-        let ch = guess[pos].to_ascii_lowercase();
-        match hint {
-            Illegal => {}
-            WrongPos => {
-                if self.print_output {
-                    println!("Inserting '{}' as illegal @ {}", ch, pos);
-                }
-                self.illegal_at_pos[pos].insert(ch);
-                self.mandatory_chars.insert(ch);
-            }
-            Correct => {
-                if self.print_output {
-                    println!("Inserting '{}' as correct character @ {}", ch, pos);
-                }
-                self.correct_chars[pos] = Some(ch);
-                self.mandatory_chars.insert(ch);
-            }
-        }
-    }
-
-    fn feedback_to_hint(feedback: &char) -> Hint {
-        if feedback.is_ascii_lowercase() {
-            WrongPos
-        } else if feedback.is_ascii_uppercase() {
-            Correct
-        } else {
-            Illegal
-        }
-    }
-
-    fn update_illegal_chars(&mut self, guess: &Guess) {
-        let open_positions = self.open_positions();
-        for (_, c) in guess
-            .iter()
-            .enumerate()
-            .filter(|(_, c)| !self.mandatory_chars.contains(c))
-            .filter(|&(i, c)| self.correct_chars[i] != Some(*c))
-        {
-            if !self.correct_chars.iter().any(|&o| o == Some(*c)) {
-                if self.print_output {
-                    println!("Inserting globally illegal char '{}'", c);
-                }
-                self.illegal_chars.insert(*c);
-            } else {
-                if self.print_output {
-                    println!("Inserting '{}' as illegal @ {:?}", c, open_positions);
-                }
-                for i in &open_positions {
-                    self.illegal_at_pos[*i].insert(*c);
-                }
-            }
-        }
     }
 
     fn allowed(&self) -> Vec<&Guess> {
@@ -283,48 +221,12 @@ impl<'a> Wordle<'a> {
             .collect()
     }
 
-    fn solutions(&self) -> Vec<&Secret> {
-        self.words
-            .secrets
-            .iter()
-            .filter(|secret| {
-                !self
-                    .illegal_chars
-                    .iter()
-                    .any(|illegal| secret.contains(illegal))
-            })
-            .filter(|secret| {
-                self.mandatory_chars
-                    .iter()
-                    .all(|mandatory| secret.contains(mandatory))
-            })
-            .filter(|secret| {
-                self.correct_chars
-                    .iter()
-                    .enumerate()
-                    .filter(|(_, o)| o.is_some())
-                    .all(|(i, &o)| secret[i] == o.unwrap())
-            })
-            .filter(|secret| {
-                !secret
-                    .iter()
-                    .enumerate()
-                    .any(|(i, c)| self.illegal_at_pos[i].contains(c))
-            })
-            .filter(|secret| !self.guessed.contains(secret))
-            .collect()
-    }
-
     fn print_result(&self) {
-        let solutions = self.solutions();
-        if solutions.len() == 1 {
+        if self.solutions.len() == 1 {
             println!(
-                "\nThe only word left in the list is {}",
-                solutions[0].to_string()
+                "\nThe word is {}",
+                self.solutions.iter().next().unwrap().to_string()
             );
-        } else if self.correct_chars.iter().all(|o| o.is_some()) {
-            let word: Vec<char> = self.correct_chars.iter().filter_map(|&c| c).collect();
-            println!("\nThe word is {}", word.to_string());
         } else {
             println!("No matching word in the solutions!");
         }
@@ -338,11 +240,11 @@ impl<'a> Wordle<'a> {
     }
 
     fn chars_in_possible_solutions(&self) -> HashSet<char> {
-        self.solutions().into_iter().flatten().cloned().collect()
+        self.solutions.iter().cloned().flatten().copied().collect()
     }
 
     fn guessed_chars(&self) -> HashSet<char> {
-        self.guessed.iter().flatten().cloned().collect()
+        self.guessed.iter().flatten().copied().collect()
     }
 
     fn attempts(&self) -> usize {
@@ -467,6 +369,27 @@ impl<W: AsRef<Word>> CharacterCounts for Vec<W> {
         counts
     }
 }
+impl<W: AsRef<Word>> CharacterCounts for HashSet<W> {
+    fn global_character_counts_in(&self, positions: &[usize]) -> HashMap<char, usize> {
+        let mut counts: HashMap<char, usize> = HashMap::new();
+        for word in self.iter() {
+            for i in positions {
+                *counts.entry(word.as_ref()[*i]).or_default() += 1;
+            }
+        }
+        counts
+    }
+    fn character_counts_per_position_in(&self, positions: &[usize]) -> [HashMap<char, usize>; 5] {
+        let empty = || ('a'..='z').into_iter().map(|c| (c, 0)).collect();
+        let mut counts: [HashMap<char, usize>; 5] = [empty(), empty(), empty(), empty(), empty()];
+        for word in self.iter() {
+            for i in positions {
+                *counts[*i].get_mut(&word.as_ref()[*i]).unwrap() += 1;
+            }
+        }
+        counts
+    }
+}
 
 trait ScoreTrait {
     fn sort_asc(&mut self);
@@ -525,14 +448,14 @@ trait PickWord {
     fn pick(&mut self, game: &Wordle) -> Word;
 }
 
-struct PickRandomWord;
-impl PickWord for PickRandomWord {
+struct PickRandomSolution;
+impl PickWord for PickRandomSolution {
     fn pick(&mut self, game: &Wordle) -> Word {
-        game.solutions()
-            .into_iter()
+        game.solutions
+            .iter()
             .choose(&mut ThreadRng::default())
-            .cloned()
             .unwrap()
+            .to_vec()
     }
 }
 
@@ -555,6 +478,7 @@ impl<'a, F: PickWord> PickWord for ChainedStrategies<'a, F> {
                 return word;
             }
         }
+        println!("Using fallback");
         self.fallback.pick(game)
     }
 }
@@ -566,10 +490,11 @@ trait TryToPickWord {
 struct PickRandomSolutionIfEnoughAttemptsLeft;
 impl TryToPickWord for PickRandomSolutionIfEnoughAttemptsLeft {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
-        if game.attempts() + game.solutions().len() <= MAX_ATTEMPTS {
-            game.solutions()
-                .into_iter()
+        if game.attempts() + game.solutions.len() <= MAX_ATTEMPTS {
+            game.solutions
+                .iter()
                 .choose(&mut ThreadRng::default())
+                .copied()
                 .cloned()
         } else {
             None
@@ -584,17 +509,13 @@ impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
             scores.sort_asc();
             println!("Best (fewest remaining solutions): {}", scores.to_string(5));
         }
-        // scores.sort_desc();
-        // println!("Remaining worst: {}", scores.to_string());
-
         scores.lowest()
     }
 }
 
 fn fewest_remaining_solutions_for_game<'a>(game: &'a Wordle) -> Vec<(&'a Guess, usize)> {
     let guessed: Vec<_> = game.guessed.iter().collect();
-    let secrets: HashSet<_> = game.solutions().into_iter().collect();
-    fewest_remaining_solutions(game.words, &secrets, &guessed, game.cache)
+    fewest_remaining_solutions(game.words, &game.solutions, &guessed, game.cache)
 }
 
 fn fewest_remaining_solutions<'a>(
@@ -633,18 +554,18 @@ struct MostFrequentGlobalCharacter;
 impl TryToPickWord for MostFrequentGlobalCharacter {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
         let positions = &game.open_positions();
-        let freq = game.solutions().global_character_counts_in(positions);
+        let freq = game.solutions.global_character_counts_in(positions);
 
         let scores: Vec<_> = game
-            .solutions()
-            .into_iter()
-            .map(|word| {
-                let count = word
+            .solutions
+            .iter()
+            .map(|&secret| {
+                let count = secret
                     .unique_chars_in(positions)
                     .iter()
                     .map(|c| freq[c])
                     .sum::<usize>();
-                (word, count)
+                (secret, count)
             })
             .collect();
         // scores.sort_desc();
@@ -656,8 +577,7 @@ struct MostFrequentGlobalCharacterHighVarietyWord;
 impl TryToPickWord for MostFrequentGlobalCharacterHighVarietyWord {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
         let positions = &game.open_positions();
-        let solutions = game.solutions();
-        let high_variety_words = solutions.high_variety_words(positions);
+        let high_variety_words = game.solutions.high_variety_words(positions);
         if high_variety_words.is_empty() {
             return None;
         }
@@ -703,20 +623,19 @@ impl TryToPickWord for FixedGuessList {
 struct MostFrequentCharactersOfRemainingWords;
 impl TryToPickWord for MostFrequentCharactersOfRemainingWords {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
-        let played_chars: HashSet<char> = game.guessed_chars();
-        let remaining_words_with_unique_unplayed_chars: Vec<_> = game
+        let remaining_words_with_unique_new_chars: Vec<_> = game
             .allowed()
             .iter()
             .filter(|&word| {
                 word.unique_chars_in(&ALL_POS).len() == 5
-                    && !word.iter().any(|c| played_chars.contains(c))
+                    && !word.iter().any(|c| game.guessed_chars().contains(c))
             })
             .cloned()
             .collect();
 
         let positions = &ALL_POS;
-        let freq = remaining_words_with_unique_unplayed_chars.global_character_counts_in(positions);
-        let scores: Vec<_> = remaining_words_with_unique_unplayed_chars
+        let freq = remaining_words_with_unique_new_chars.global_character_counts_in(positions);
+        let scores: Vec<_> = remaining_words_with_unique_new_chars
             .into_iter()
             .map(|word| {
                 let count = word
@@ -731,64 +650,11 @@ impl TryToPickWord for MostFrequentCharactersOfRemainingWords {
     }
 }
 
-struct MostFrequentUnusedCharacters<'w> {
-    combined_global_char_count_sums_by: HashMap<&'w Word, usize>,
-}
-impl<'w> MostFrequentUnusedCharacters<'w> {
-    #[allow(clippy::ptr_arg)] // for global_character_counts_in defined for Vec<Guess> not &[Guess]
-    fn new(guesses: &'w Vec<Guess>) -> Self {
-        let global_count_by_char: HashMap<char, usize> =
-            guesses.global_character_counts_in(&ALL_POS);
-        let combined_global_char_count_sums_by: HashMap<_, usize> = guesses
-            .par_iter()
-            .map(|word| {
-                let count = word
-                    .unique_chars_in(&ALL_POS)
-                    .iter()
-                    .map(|c| global_count_by_char[c])
-                    .sum::<usize>();
-                (word, count)
-            })
-            .collect();
-        MostFrequentUnusedCharacters {
-            combined_global_char_count_sums_by,
-        }
-    }
-}
-impl<'w> TryToPickWord for MostFrequentUnusedCharacters<'w> {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
-        let already_know_all_chars = game.mandatory_chars.len() == 5;
-        let very_few_solutions_left = game.solutions().len() < 10;
-        if already_know_all_chars || very_few_solutions_left {
-            return None;
-        };
-        let used_chars: HashSet<char> = game.guessed_chars();
-        let words_with_most_new_chars: Vec<&Word> =
-            words_with_most_new_chars(&used_chars, game.allowed())
-                .into_iter()
-                .map(|(_, word)| word)
-                .collect();
-
-        let mut scores: Vec<_> = words_with_most_new_chars
-            .iter()
-            .map(|&word| {
-                let count = self.combined_global_char_count_sums_by[word];
-                (word, count)
-            })
-            .collect();
-        if game.print_output {
-            scores.sort_asc();
-            println!("best unplayed words {}", scores.to_string(5));
-        }
-        scores.highest()
-    }
-}
-
 struct FirstOfTwoOrFewerRemainingSolutions;
 impl TryToPickWord for FirstOfTwoOrFewerRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
-        if game.solutions().len() <= 2 {
-            game.solutions().into_iter().next().cloned()
+        if game.solutions.len() <= 2 {
+            game.solutions.iter().next().copied().cloned()
         } else {
             None
         }
@@ -798,16 +664,15 @@ impl TryToPickWord for FirstOfTwoOrFewerRemainingSolutions {
 struct WordWithMostNewCharsFromRemainingSolutions;
 impl TryToPickWord for WordWithMostNewCharsFromRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
-        if !game.has_max_open_positions(2) && game.wanted_chars().len() >= 7 {
+        if game.wanted_chars().len() >= 5 {
             return None;
         }
-        let wanted_chars: HashSet<char> = game.wanted_chars();
         let scores: Vec<(&Word, usize)> =
-            words_with_most_wanted_chars(&wanted_chars, game.allowed());
+            words_with_most_wanted_chars(&game.wanted_chars(), game.allowed());
         if game.print_output {
             println!(
                 "Words with most of wanted chars {:?} are:\n  {}",
-                wanted_chars,
+                game.wanted_chars(),
                 scores.to_string(5)
             );
         }
@@ -818,18 +683,18 @@ impl TryToPickWord for WordWithMostNewCharsFromRemainingSolutions {
 struct MostFrequentCharacterPerPos;
 impl TryToPickWord for MostFrequentCharacterPerPos {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
-        let words = game.solutions();
         let positions = &game.open_positions();
-        let counts = words.character_counts_per_position_in(positions);
+        let counts = game.solutions.character_counts_per_position_in(positions);
 
-        let scores: Vec<_> = words
-            .into_iter()
-            .map(|word| {
+        let scores: Vec<_> = game
+            .solutions
+            .iter()
+            .map(|&secret| {
                 let count = positions
                     .iter()
-                    .map(|&i| counts[i][&word[i]])
+                    .map(|&i| counts[i][&secret[i]])
                     .sum::<usize>();
-                (word, count)
+                (secret, count)
             })
             .collect();
         scores.highest()
@@ -840,8 +705,7 @@ struct MostFrequentCharacterPerPosHighVarietyWord;
 impl TryToPickWord for MostFrequentCharacterPerPosHighVarietyWord {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
         let positions = &game.open_positions();
-        let solutions = game.solutions();
-        let high_variety_words = solutions.high_variety_words(positions);
+        let high_variety_words = game.solutions.high_variety_words(positions);
         if high_variety_words.is_empty() {
             return None;
         }
@@ -867,12 +731,12 @@ impl TryToPickWord for MatchingMostOtherWordsInAtLeastOneOpenPosition {
         let positions = &game.open_positions();
         // for each word, find out how many other words it matches in any open position
         let mut scores: Vec<_> = game
-            .solutions()
-            .into_iter()
-            .map(|word| (word, 0_usize))
+            .solutions
+            .iter()
+            .map(|&secret| (secret, 0_usize))
             .collect();
         let open_chars: Vec<_> = game
-            .solutions()
+            .solutions
             .iter()
             .map(|word| word.chars_in(positions))
             .collect();
@@ -910,8 +774,7 @@ struct MatchingMostOtherWordsInAtLeastOneOpenPositionHighVarietyWord;
 impl TryToPickWord for MatchingMostOtherWordsInAtLeastOneOpenPositionHighVarietyWord {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
         let positions = &game.open_positions();
-        let solutions = game.solutions();
-        let high_variety_words = solutions.high_variety_words(positions);
+        let high_variety_words = game.solutions.high_variety_words(positions);
         if high_variety_words.is_empty() {
             return None;
         }
@@ -943,13 +806,22 @@ impl TryToPickWord for MatchingMostOtherWordsInAtLeastOneOpenPositionHighVariety
 trait HighVarietyWords {
     fn high_variety_words(&self, open_positions: &[usize]) -> Vec<&Word>;
 }
-impl HighVarietyWords for Vec<&Word> {
+impl<W: AsRef<Word> + Clone> HighVarietyWords for Vec<W> {
     fn high_variety_words(&self, open_positions: &[usize]) -> Vec<&Word> {
-        self.iter()
-            .filter(|&&word| word.unique_chars_in(open_positions).len() == open_positions.len())
-            .cloned()
-            .collect()
+        high_variety_words(self.iter().map(|w| w.as_ref()), open_positions)
     }
+}
+impl<W: AsRef<Word>> HighVarietyWords for HashSet<W> {
+    fn high_variety_words(&self, open_positions: &[usize]) -> Vec<&Word> {
+        high_variety_words(self.iter().map(|w| w.as_ref()), open_positions)
+    }
+}
+fn high_variety_words<'a>(
+    it: impl Iterator<Item = &'a Word>,
+    open_positions: &[usize],
+) -> Vec<&'a Word> {
+    it.filter(|&word| word.unique_chars_in(open_positions).len() == open_positions.len())
+        .collect()
 }
 
 trait ToWord {
@@ -977,6 +849,17 @@ impl CalcHintValue for Hint {
             Illegal => 0,
             WrongPos => 1,
             Correct => 2,
+        }
+    }
+}
+impl Hint {
+    fn from_feedback(feedback: char) -> Self {
+        if feedback.is_ascii_lowercase() {
+            WrongPos
+        } else if feedback.is_ascii_uppercase() {
+            Correct
+        } else {
+            Illegal
         }
     }
 }
@@ -1030,6 +913,10 @@ impl Hints {
     }
     fn set_wrong_pos(&mut self, i: usize) {
         self.hints[i] = WrongPos;
+    }
+    fn from_feedback(feedback: Feedback) -> Self {
+        let hints = feedback.into_iter().map(Hint::from_feedback).collect();
+        Hints { hints }
     }
 }
 impl CalcHintValue for Hints {
@@ -1153,30 +1040,6 @@ impl TryFrom<&str> for Language {
             _ => Err(format!("Unknown language '{}'", lang)),
         }
     }
-}
-
-fn words_with_most_new_chars<'w>(
-    used_chars: &HashSet<char>,
-    words: Vec<&'w Word>,
-) -> Vec<(Vec<char>, &'w Word)> {
-    let new: Vec<(Vec<char>, &Word)> = words
-        .into_iter()
-        .map(|word| {
-            let mut unique_unused_chars: Vec<char> = word
-                .unique_chars_in(&ALL_POS)
-                .into_iter()
-                .filter(|c| !used_chars.contains(c))
-                .collect();
-            unique_unused_chars.sort_unstable();
-            (unique_unused_chars, word)
-        })
-        .collect();
-    let max = new.iter().map(|(uc, _)| uc.len()).max().unwrap();
-    // println!("most new chars = {}", max);
-    if max == 0 {
-        return vec![]; // No new chars is not helpful. Returning empty vec signals to use fallback
-    }
-    new.into_iter().filter(|(ch, _)| ch.len() == max).collect()
 }
 
 fn words_with_most_wanted_chars<'w>(
@@ -1393,6 +1256,37 @@ mod tests {
         let secrets: HashSet<_> = words.secrets.iter().collect();
         let hg_solutions = SolutionsByHintByGuess::of(&words);
         let guessed = [];
+        explore_tree(&words, &secrets, &guessed, &hg_solutions);
+    }
+    #[ignore]
+    #[test]
+    fn test_print_partial_guess_tree() {
+        print_partial_guess_tree();
+    }
+    fn print_partial_guess_tree() {
+        let words = Words::new(English);
+        let secret = "piper".to_word();
+        let guess1 = "roate".to_word();
+        let guess2 = "feued".to_word();
+        let hint1 = guess1.get_hint(&secret); // "🟨⬛⬛⬛🟨"
+        let hint2 = guess2.get_hint(&secret); // "⬛⬛⬛🟩⬛"
+        let hg_solutions = SolutionsByHintByGuess::of(&words);
+        let secrets1 = &hg_solutions.by_hint_by_guess[&guess1][&hint1.value()];
+        println!("{} roate secrets {}", secrets1.len(), secrets1.to_string());
+        let secrets2 = &hg_solutions.by_hint_by_guess[&guess2][&hint2.value()];
+        println!("{} feued secrets {}", secrets2.len(), secrets2.to_string());
+        let secrets: HashSet<&Secret> = secrets1
+            .intersection(secrets2)
+            .into_iter()
+            .cloned()
+            .collect();
+        println!(
+            "{} intersected secrets {}",
+            secrets.len(),
+            secrets.to_string()
+        );
+
+        let guessed = [&guess1, &guess2];
         explore_tree(&words, &secrets, &guessed, &hg_solutions);
     }
     fn explore_tree(
@@ -1783,9 +1677,9 @@ mod tests {
             .filter(|next| !guessed.contains(next))
             .map(|next| {
                 let count: usize = game
-                    .solutions()
-                    .into_iter()
-                    .map(|secret| {
+                    .solutions
+                    .iter()
+                    .map(|&secret| {
                         let (solutions1, solutions2) = if use_solutions_by_secret_by_guess {
                             let solutions1 = solutions_sg.by_secret_by_guess[first][secret];
                             let solutions2 = solutions_sg.by_secret_by_guess[next][secret];
@@ -2030,6 +1924,78 @@ mod tests {
         let words = Words::new(English);
         autoplay_and_print_stats(MostFrequentUnusedCharacters::new(&words.guesses));
     }
+    struct MostFrequentUnusedCharacters<'w> {
+        combined_global_char_count_sums_by: HashMap<&'w Word, usize>,
+    }
+    impl<'w> MostFrequentUnusedCharacters<'w> {
+        #[allow(clippy::ptr_arg)] // for global_character_counts_in defined for Vec<Guess> not &[Guess]
+        fn new(guesses: &'w Vec<Guess>) -> Self {
+            let global_count_by_char: HashMap<char, usize> =
+                guesses.global_character_counts_in(&ALL_POS);
+            let combined_global_char_count_sums_by: HashMap<_, usize> = guesses
+                .par_iter()
+                .map(|word| {
+                    let count = word
+                        .unique_chars_in(&ALL_POS)
+                        .iter()
+                        .map(|c| global_count_by_char[c])
+                        .sum::<usize>();
+                    (word, count)
+                })
+                .collect();
+            MostFrequentUnusedCharacters {
+                combined_global_char_count_sums_by,
+            }
+        }
+    }
+    impl<'w> TryToPickWord for MostFrequentUnusedCharacters<'w> {
+        fn pick(&self, game: &Wordle) -> Option<Guess> {
+            if game.solutions.len() < 10 {
+                return None;
+            };
+            let words_with_most_new_chars: Vec<&Word> =
+                words_with_most_new_chars(&game.guessed_chars(), game.allowed())
+                    .into_iter()
+                    .map(|(_, word)| word)
+                    .collect();
+
+            let mut scores: Vec<_> = words_with_most_new_chars
+                .iter()
+                .map(|&word| {
+                    let count = self.combined_global_char_count_sums_by[word];
+                    (word, count)
+                })
+                .collect();
+            if game.print_output {
+                scores.sort_asc();
+                println!("best unplayed words {}", scores.to_string(5));
+            }
+            scores.highest()
+        }
+    }
+    fn words_with_most_new_chars<'w>(
+        used_chars: &HashSet<char>,
+        words: Vec<&'w Word>,
+    ) -> Vec<(Vec<char>, &'w Word)> {
+        let new: Vec<(Vec<char>, &Word)> = words
+            .into_iter()
+            .map(|word| {
+                let mut unique_unused_chars: Vec<char> = word
+                    .unique_chars_in(&ALL_POS)
+                    .into_iter()
+                    .filter(|c| !used_chars.contains(c))
+                    .collect();
+                unique_unused_chars.sort_unstable();
+                (unique_unused_chars, word)
+            })
+            .collect();
+        let max = new.iter().map(|(uc, _)| uc.len()).max().unwrap();
+        // println!("most new chars = {}", max);
+        if max == 0 {
+            return vec![]; // No new chars is not helpful. Returning empty vec signals to use fallback
+        }
+        new.into_iter().filter(|(ch, _)| ch.len() == max).collect()
+    }
 
     #[ignore]
     #[test]
@@ -2056,8 +2022,10 @@ mod tests {
     ) {
         let words = Words::new(language);
         let cache = SolutionsByHintByGuess::of(&words);
-        let attempts: Vec<usize> = words
-            .secrets
+        // let secrets = ["piper".to_word()];
+        let mut secrets: Vec<_> = words.secrets.iter().collect();
+        secrets.sort_unstable();
+        let attempts: Vec<usize> = secrets
             .iter()
             .map(|secret| {
                 let mut game = Wordle::with(&words, &cache);
@@ -2067,7 +2035,7 @@ mod tests {
                         &WordWithMostNewCharsFromRemainingSolutions,
                         &strategy,
                     ],
-                    PickRandomWord,
+                    PickRandomSolution,
                 );
                 game.autoplay(secret, strategy);
                 game.attempts()
@@ -2077,35 +2045,36 @@ mod tests {
     }
 
     fn print_stats(attempts: Vec<usize>) {
-        let mut attempts_map: HashMap<usize, usize> = HashMap::new();
-        for round in attempts {
-            *attempts_map.entry(round).or_default() += 1;
+        let mut counts_by_attempts: HashMap<usize, usize> = HashMap::new();
+        for attempt in attempts {
+            *counts_by_attempts.entry(attempt).or_default() += 1;
         }
-        let mut attempts: Vec<_> = attempts_map.into_iter().collect();
-        attempts.sort_unstable();
-        let total = attempts.iter().map(|&(_, cnt)| cnt).sum::<usize>() as f64;
-        let avg = attempts
+        let mut attempt_counts: Vec<_> = counts_by_attempts.into_iter().collect();
+        attempt_counts.sort_unstable();
+        let total = attempt_counts.iter().map(|&(_, cnt)| cnt).sum::<usize>() as f64;
+        let average = attempt_counts
             .iter()
-            .map(|&(rnd, cnt)| rnd as f64 * cnt as f64)
+            .map(|&(attempts, cnt)| attempts as f64 * cnt as f64)
             .sum::<f64>()
             / total;
-        let failed = attempts
+        let failures = attempt_counts
             .iter()
-            .filter(|&&(rnd, _)| rnd > 6)
+            .filter(|&&(attempts, _)| attempts > MAX_ATTEMPTS)
             .map(|&(_, cnt)| cnt)
             .sum::<usize>();
-        let stats = attempts
+        let stats = attempt_counts
             .iter()
-            .map(|(rnd, cnt)| format!("{}: {}", rnd, cnt))
+            .map(|(attempts, cnt)| format!("{}: {}", attempts, cnt))
             .collect::<Vec<_>>()
             .join(", ");
-        println!(
-            "\nAverage attempts = {:.3}; {} ({:.3}%) failed games (> 6 attempts):\n{}\n",
-            avg,
-            failed,
-            100.0 * failed as f64 / total,
-            stats
-        );
+
+        print!("\n{:.2} average attempts; {}", average, stats);
+        if failures > 0 {
+            let percent_failed = 100.0 * failures as f64 / total;
+            println!("; {} ({:.2}%) failures", failures, percent_failed)
+        } else {
+            println!();
+        }
     }
 
     #[ignore]
