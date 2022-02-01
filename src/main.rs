@@ -1699,11 +1699,18 @@ mod tests {
         }
     }
 
-    #[ignore] // ~65min
+    #[ignore] // ~65min (i9) ~74min (M1)
     #[test]
-    // Average attempts = 3.547; 2: 39, 3: 1015, 4: 1216, 5: 45
+    // 3.55 average attempts; 2: 40, 3: 999, 4: 1234, 5: 42
     fn auto_play_word_that_results_in_fewest_remaining_solutions() {
         autoplay_and_print_stats(WordThatResultsInFewestRemainingSolutions);
+    }
+
+    #[ignore] // ~4min 12s (i9) ~4min15s (M1)
+    #[test]
+    // 3.34 average attempts; 2: 42, 3: 706, 4: 409, 5: 14
+    fn auto_play_word_that_results_in_fewest_remaining_solutions_german() {
+        autoplay_and_print_stats_with_language(WordThatResultsInFewestRemainingSolutions, German);
     }
 
     #[ignore]
