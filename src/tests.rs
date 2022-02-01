@@ -42,9 +42,12 @@ fn compare_best_word_strategies() {
     // Best (lowest) average remaining solution count:
     // 3745512 lares, 3789200 rales, 3923922 tares, 3941294 soare, 3953360 reais
     // 3963578 nares, 4017862 aeros, 4038902 rates, 4082728 arles, 4087910 serai
-    let words = Words::new(English);
-    let cache = SolutionsByHintByGuess::of(&words);
+
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
     let game = Wordle::with(&words, &cache);
+
     let totals = fewest_remaining_solutions_for_game(&game);
     println!(
         "Best (lowest) average remaining solution count:\n{}",
@@ -175,23 +178,26 @@ fn hint_buckets(
     const EMPTY_VEC: Vec<usize> = Vec::new();
     let mut hint_buckets = [EMPTY_VEC; 243];
     for (i, solution) in solutions.iter().enumerate() {
-        let hint = guess.get_hint(solution);
+        let hint = guess.calculate_hint(solution);
         hint_buckets[hint.value() as usize].push(i);
     }
     hint_buckets
 }
 
-#[ignore] // ~13s English or ~2s German
+#[ignore] // ~15s English or ~3s German
 #[test]
 fn test_print_full_guess_tree() {
-    print_full_guess_tree();
+    print_full_guess_tree(English);
 }
-fn print_full_guess_tree() {
-    let words = Words::new(German);
+fn print_full_guess_tree(lang: Language) {
+    let words = Words::new(lang);
     let secrets: HashSet<_> = words.secrets.iter().collect();
-    let hg_solutions = SolutionsByHintByGuess::of(&words);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
+
     let guessed = [];
-    explore_tree(&words, &secrets, &guessed, &hg_solutions);
+    explore_tree(&words, &secrets, &guessed, &cache);
 }
 #[ignore]
 #[test]
@@ -199,16 +205,19 @@ fn test_print_partial_guess_tree() {
     print_partial_guess_tree();
 }
 fn print_partial_guess_tree() {
-    let words = Words::new(English);
+    let lang = English;
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
+
     let secret = "piper".to_word();
-    let guess1 = "roate".to_word();
-    let guess2 = "feued".to_word();
-    let hint1 = guess1.get_hint(&secret); // "🟨⬛⬛⬛🟨"
-    let hint2 = guess2.get_hint(&secret); // "⬛⬛⬛🟩⬛"
-    let hg_solutions = SolutionsByHintByGuess::of(&words);
-    let secrets1 = &hg_solutions.by_hint_by_guess[&guess1][&hint1.value()];
+    let guess1 = "roate".to_word(); // hint "🟨⬛⬛⬛🟨"
+    let guess2 = "feued".to_word(); // hint "⬛⬛⬛🟩⬛"
+
+    let secrets1 = &cache.secret_solutions.by_secret_by_guess[&guess1][&secret];
     println!("{} roate secrets {}", secrets1.len(), secrets1.to_string());
-    let secrets2 = &hg_solutions.by_hint_by_guess[&guess2][&hint2.value()];
+    let secrets2 = &cache.secret_solutions.by_secret_by_guess[&guess2][&secret];
     println!("{} feued secrets {}", secrets2.len(), secrets2.to_string());
     let secrets: HashSet<&Secret> = secrets1
         .intersection(secrets2)
@@ -222,14 +231,9 @@ fn print_partial_guess_tree() {
     );
 
     let guessed = [&guess1, &guess2];
-    explore_tree(&words, &secrets, &guessed, &hg_solutions);
+    explore_tree(&words, &secrets, &guessed, &cache);
 }
-fn explore_tree(
-    words: &Words,
-    secrets: &HashSet<&Secret>,
-    guessed: &[&Word],
-    hg_solutions: &SolutionsByHintByGuess,
-) {
+fn explore_tree(words: &Words, secrets: &HashSet<&Secret>, guessed: &[&Word], cache: &Cache) {
     if guessed.len() == MAX_ATTEMPTS {
         println!(
             "            7. Still not found after 6 guesses {}. Secrets: {}",
@@ -241,7 +245,7 @@ fn explore_tree(
         // 1 and 2 already printed info on how to proceed
         return;
     }
-    let scores = fewest_remaining_solutions(words, secrets, guessed, hg_solutions);
+    let scores = fewest_remaining_solutions(words, secrets, guessed, cache);
     let guess = scores.lowest().unwrap();
     let guessed: Vec<_> = guessed
         .iter()
@@ -249,7 +253,7 @@ fn explore_tree(
         .chain(std::iter::once(&guess))
         .collect();
 
-    let mut pairs: Vec<_> = hg_solutions.by_hint_by_guess[&guess]
+    let mut pairs: Vec<_> = cache.hint_solutions.by_hint_by_guess[&guess]
         .iter()
         .map(|(h, solutions)| {
             (
@@ -269,7 +273,7 @@ fn explore_tree(
     });
     for (hint, secrets) in pairs {
         print_info(&guessed, *hint, &secrets);
-        explore_tree(words, &secrets, &guessed, hg_solutions)
+        explore_tree(words, &secrets, &guessed, cache)
     }
 }
 fn print_info(guessed: &[&Guess], hint: HintValue, secrets: &HashSet<&Secret>) {
@@ -305,7 +309,8 @@ fn print_info(guessed: &[&Guess], hint: HintValue, secrets: &HashSet<&Secret>) {
 #[test]
 fn count_solutions_by_hint_by_guess() {
     let words = Words::new(English);
-    let solutions = SolutionsByHintByGuess::of(&words);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let solutions = SolutionsByHintByGuess::of(&words, &hsg);
     assert_eq!(
         solutions
             .by_hint_by_guess
@@ -342,7 +347,7 @@ fn does_hint_cache_help_part_1_without_cache() {
                 words
                     .secrets
                     .iter()
-                    .map(|secret| hints.by_secret_by_guess[guess][secret].value() as usize)
+                    .map(|secret| hints.by_secret_by_guess[guess][secret] as usize)
                     .sum::<usize>()
             })
             .sum()
@@ -356,7 +361,7 @@ fn does_hint_cache_help_part_1_without_cache() {
                 words
                     .secrets
                     .iter()
-                    .map(|secret| guess.get_hint(secret).value() as usize)
+                    .map(|secret| hints.by_secret_by_guess[guess][secret] as usize)
                     .sum::<usize>()
             })
             .sum()
@@ -388,39 +393,16 @@ fn does_hint_cache_help_part_1_without_cache() {
     }
 }
 
-struct HintsBySecretByGuess<'a> {
-    by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, Hints>>,
-}
-impl<'a> HintsBySecretByGuess<'a> {
-    fn of(words: &'a Words) -> Self {
-        HintsBySecretByGuess::new(&words.guesses, &words.secrets)
-    }
-    fn new(guesses: &'a [Guess], secrets: &'a HashSet<Secret>) -> Self {
-        HintsBySecretByGuess {
-            by_secret_by_guess: guesses
-                .par_iter()
-                .map(|guess| {
-                    let hints_by_solution = secrets
-                        .iter()
-                        .map(|secret| (secret, guess.get_hint(secret)))
-                        .collect::<HashMap<&Secret, Hints>>();
-                    (guess, hints_by_solution)
-                })
-                .collect(),
-        }
-    }
-}
-
 #[ignore] // 2-4s
 #[test]
 fn count_solutions_by_secret_by_guess() {
     let words = Words::new(English);
-    let solutions = SolutionsByHintByGuess::of(&words);
-    let solutions_sg = SolutionsBySecretByGuess::of(&words, &solutions);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let ssg = SolutionsBySecretByGuess::of(&words, &hsg, &shg);
 
     assert_eq!(
-        solutions_sg
-            .by_secret_by_guess
+        ssg.by_secret_by_guess
             .iter()
             .map(|(_, s)| s.len())
             .sum::<usize>(),
@@ -428,43 +410,17 @@ fn count_solutions_by_secret_by_guess() {
     );
 }
 
-struct SolutionsBySecretByGuess<'a> {
-    by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, &'a HashSet<&'a Secret>>>,
-}
-impl<'a> SolutionsBySecretByGuess<'a> {
-    fn of(words: &'a Words, solutions: &'a SolutionsByHintByGuess) -> Self {
-        SolutionsBySecretByGuess::new(&words.guesses, &words.secrets, solutions)
-    }
-    fn new(
-        guesses: &'a [Guess],
-        secrets: &'a HashSet<Secret>,
-        solutions: &'a SolutionsByHintByGuess,
-    ) -> Self {
-        SolutionsBySecretByGuess {
-            by_secret_by_guess: guesses
-                .par_iter()
-                .map(|guess| {
-                    let mut solutions_by_secret: HashMap<&Secret, &HashSet<&Secret>> =
-                        HashMap::new();
-                    for secret in secrets.iter() {
-                        let hint = guess.get_hint(secret).value();
-                        let solutions = &solutions.by_hint_by_guess[guess][&hint];
-                        solutions_by_secret.insert(secret, solutions);
-                    }
-                    (guess, solutions_by_secret)
-                })
-                .collect(),
-        }
-    }
-}
-
 #[ignore] // ~3s
 #[test]
 // Top 5: 139883 roate, 141217 raise, 141981 raile, 144227 soare, 147525 arise
 fn find_optimal_first_word_english() {
-    let words = Words::new(English);
-    let cache = SolutionsByHintByGuess::of(&words);
+    let lang = English;
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
     let game = Wordle::with(&words, &cache);
+
     let scores = fewest_remaining_solutions_for_game(&game);
     // println!("scores {}", scores.to_string(5));
     let optimal = scores.lowest().unwrap();
@@ -475,9 +431,13 @@ fn find_optimal_first_word_english() {
 #[test]
 // Top 5: 71017 tarne, 72729 raine, 74391 trane, 75473 lernt, 75513 raete
 fn find_optimal_first_word_german() {
-    let words = Words::new(German);
-    let cache = SolutionsByHintByGuess::of(&words);
+    let lang = German;
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
     let game = Wordle::with(&words, &cache);
+
     let scores = fewest_remaining_solutions_for_game(&game);
     println!("scores {}", scores.to_string(5));
     let optimal = scores.lowest().unwrap();
@@ -540,9 +500,13 @@ fn find_optimal_first_word_german() {
 // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gompa': 2401 wakfs, 2409 wheft, 2409 fewer, 2413 tweak, 2413 fetwa
 // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gramp': 2407 wakfs, 2413 fewer, 2415 wheft, 2415 fetwa, 2417 swift
 fn find_optimal_word_combos() {
-    let words = Words::new(English);
-    let cache = SolutionsByHintByGuess::of(&words);
+    let lang = English;
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
     let game = Wordle::with(&words, &cache);
+
     let mut scores = fewest_remaining_solutions_for_game(&game);
     println!("Best 1. guesses: {}", scores.to_string(5));
     scores.sort_asc();
@@ -598,14 +562,10 @@ fn find_optimal_word_combos() {
 
 fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Guess]) -> Vec<(&'g Guess, usize)> {
     let first = *guessed.iter().next().unwrap();
-    let words = &game.words;
-    let solutions_hg = SolutionsByHintByGuess::of(words);
-    let solutions_sg = SolutionsBySecretByGuess::of(words, &solutions_hg);
-    // false solutions_sg.by_secret_by_guess 25s/25s/25s
-    // false solutions_sg.by_secret_by_guess 19s/22s/22s/23s
-    let use_solutions_by_secret_by_guess = false;
+    let hsg = HintsBySecretByGuess::of(&game.words);
+    let shg = SolutionsByHintByGuess::of(&game.words, &hsg);
+    let ssg = SolutionsBySecretByGuess::of(&game.words, &hsg, &shg);
 
-    let solutions_bh_bg = SolutionsByHintByGuess::of(words);
     let mut scores: Vec<_> = game
         .allowed()
         .into_par_iter()
@@ -615,24 +575,16 @@ fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Guess]) -> Vec<(&'g 
                 .solutions
                 .iter()
                 .map(|&secret| {
-                    let (solutions1, solutions2) = if use_solutions_by_secret_by_guess {
-                        let solutions1 = solutions_sg.by_secret_by_guess[first][secret];
-                        let solutions2 = solutions_sg.by_secret_by_guess[next][secret];
-                        (solutions1, solutions2)
-                    } else {
-                        let hint1 = first.get_hint(secret);
-                        let solutions1 = &solutions_bh_bg.by_hint_by_guess[first][&hint1.value()];
-                        let hint2 = next.get_hint(secret);
-                        let solutions2 = &solutions_bh_bg.by_hint_by_guess[next][&hint2.value()];
-                        (solutions1, solutions2)
-                    };
+                    let solutions1 = &ssg.by_secret_by_guess[first][secret];
+                    let solutions2 = &ssg.by_secret_by_guess[next][secret];
+
                     // apply first and next guess
                     let mut solutions: HashSet<_> =
                         solutions1.intersection(solutions2).cloned().collect();
 
                     // Apply other previous guesses
                     for other in guessed.iter().skip(1).cloned() {
-                        let solutions3 = solutions_sg.by_secret_by_guess[other][secret];
+                        let solutions3 = ssg.by_secret_by_guess[other][secret];
                         solutions = solutions.intersection(solutions3).cloned().collect();
                     }
                     solutions.len()
@@ -656,16 +608,16 @@ fn test_hint_from_value_and_back() {
     }
 }
 
-#[ignore] // ~65min (i9) ~74min (M1)
+#[ignore] // ~26 min (i9) ~39 min (M1)
 #[test]
 // 3.55 average attempts; 2: 40, 3: 999, 4: 1234, 5: 42
 fn auto_play_word_that_results_in_fewest_remaining_solutions() {
     autoplay_and_print_stats(WordThatResultsInFewestRemainingSolutions);
 }
 
-#[ignore] // ~4min 12s (i9) ~4min15s (M1)
+#[ignore] // 1min 38s (i9) 1min 53s (M1)
 #[test]
-// 3.34 average attempts; 2: 42, 3: 706, 4: 409, 5: 14
+// 3.36 average attempts; 2: 42, 3: 685, 4: 429, 5: 15
 fn auto_play_word_that_results_in_fewest_remaining_solutions_german() {
     autoplay_and_print_stats_with_language(WordThatResultsInFewestRemainingSolutions, German);
 }
@@ -679,7 +631,7 @@ fn auto_play_tubes_fling_champ_wordy_every_time() {
     autoplay_and_print_stats(strategy);
 }
 
-// #[ignore]
+#[ignore]
 #[test]
 // Average attempts = 3.829; 7 (0.302%) failed games (> 6 attempts):
 // 2: 57, 3: 770, 4: 1077, 5: 342, 6: 62, 7: 6, 8: 1
@@ -954,12 +906,12 @@ fn auto_play_most_other_words_in_at_least_one_open_position_high_variety_word() 
 fn autoplay_and_print_stats<S: TryToPickWord + Sync>(strategy: S) {
     autoplay_and_print_stats_with_language(strategy, English);
 }
-fn autoplay_and_print_stats_with_language<S: TryToPickWord + Sync>(
-    strategy: S,
-    language: Language,
-) {
-    let words = Words::new(language);
-    let cache = SolutionsByHintByGuess::of(&words);
+fn autoplay_and_print_stats_with_language<S: TryToPickWord + Sync>(strategy: S, lang: Language) {
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
+
     // let secrets = ["piper".to_word()];
     let mut secrets: Vec<_> = words.secrets.iter().collect();
     secrets.sort_unstable();
@@ -1019,9 +971,13 @@ fn print_stats(attempts: Vec<usize>) {
 // Takes around 6s for the 2'315 solution words
 #[test]
 fn test_word_that_results_in_fewest_remaining_possible_words() {
-    let words = Words::new(English);
-    let cache = SolutionsByHintByGuess::of(&words);
+    let lang = English;
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
     let game = Wordle::with(&words, &cache);
+
     let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
     // Worst:
@@ -1055,9 +1011,13 @@ fn test_word_that_results_in_fewest_remaining_possible_words() {
 // Takes around a minute for the 12'972 words in the combined list
 #[test]
 fn test_word_that_results_in_fewest_remaining_possible_words_for_full_word_list() {
-    let words = Words::new(English);
-    let cache = SolutionsByHintByGuess::of(&words);
+    let lang = English;
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
     let game = Wordle::with(&words, &cache);
+
     let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
     // Worst:
@@ -1091,9 +1051,13 @@ fn test_word_that_results_in_fewest_remaining_possible_words_for_full_word_list(
 // Takes around 24s (parallel) guessing with 12'972 combined words in 2'315 solutions.
 #[test]
 fn test_word_from_combined_list_that_results_in_fewest_remaining_possible_solution_words() {
-    let words = Words::new(English);
-    let cache = SolutionsByHintByGuess::of(&words);
+    let lang = English;
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
     let game = Wordle::with(&words, &cache);
+
     let word = WordThatResultsInFewestRemainingSolutions.pick(&game);
 
     // Using 12'972 combined words on 2'315 solutions
@@ -1111,9 +1075,13 @@ fn test_word_from_combined_list_that_results_in_fewest_remaining_possible_soluti
 #[ignore]
 #[test]
 fn test_pick_word_that_exactly_matches_most_others_in_at_least_one_open_position() {
-    let words = Words::new(English);
-    let cache = SolutionsByHintByGuess::of(&words);
+    let lang = English;
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
     let game = Wordle::with(&words, &cache);
+
     let word = MatchingMostOtherWordsInAtLeastOneOpenPosition.pick(&game);
     assert_eq!(word.unwrap().to_string(), "sauce");
 }
@@ -1148,19 +1116,19 @@ fn test_word_hint_values() {
 #[ignore]
 #[test]
 fn test_get_hint() {
-    let hint = "guest".to_word().get_hint(&"truss".to_word());
+    let hint = "guest".to_word().calculate_hint(&"truss".to_word());
     assert_eq!("⬛🟨⬛🟩🟨", hint.to_string());
 
-    let hint = "briar".to_word().get_hint(&"error".to_word());
+    let hint = "briar".to_word().calculate_hint(&"error".to_word());
     assert_eq!("⬛🟩⬛⬛🟩", hint.to_string());
 
-    let hint = "sissy".to_word().get_hint(&"truss".to_word());
+    let hint = "sissy".to_word().calculate_hint(&"truss".to_word());
     assert_eq!("🟨⬛⬛🟩⬛", hint.to_string());
 
-    let hint = "eject".to_word().get_hint(&"geese".to_word());
+    let hint = "eject".to_word().calculate_hint(&"geese".to_word());
     assert_eq!("🟨⬛🟩⬛⬛", hint.to_string());
 
-    let hint = "three".to_word().get_hint(&"beret".to_word());
+    let hint = "three".to_word().calculate_hint(&"beret".to_word());
     assert_eq!("🟨⬛🟩🟩🟨", hint.to_string());
 }
 
@@ -1175,11 +1143,15 @@ fn lowest_total_number_of_remaining_solutions_only_counts_remaining_viable_solut
         .iter()
         .map(|w| w.to_word())
         .collect();
-    let mut words = Words::new(English);
+    let lang = English;
+    let mut words = Words::new(lang);
     words.guesses = guesses;
     words.secrets = secrets;
-    let cache = SolutionsByHintByGuess::of(&words);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
     let game = Wordle::with(&words, &cache);
+
     let allowed = &game.words.guesses;
     let mut scores = fewest_remaining_solutions_for_game(&game);
     scores.sort_asc();

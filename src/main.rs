@@ -48,12 +48,12 @@ impl Words {
 struct Wordle<'a> {
     words: &'a Words,
     solutions: HashSet<&'a Secret>,
-    cache: &'a SolutionsByHintByGuess<'a>,
+    cache: &'a Cache<'a>,
     guessed: Vec<Guess>,
     print_output: bool,
 }
 impl<'a> Wordle<'a> {
-    fn with(words: &'a Words, cache: &'a SolutionsByHintByGuess<'a>) -> Self {
+    fn with(words: &'a Words, cache: &'a Cache) -> Self {
         let solutions = words.secrets.iter().collect();
         Wordle {
             words,
@@ -80,7 +80,7 @@ impl<'a> Wordle<'a> {
             let suggestion = strategy.pick(self);
             let guess = self.ask_for_guess(suggestion);
             let feedback = self.ask_for_feedback(&guess);
-            let hint = Hints::from_feedback(feedback);
+            let hint = Hints::from_feedback(feedback).value();
 
             self.update_remaining_solutions(&guess, &hint);
             self.guessed.push(guess);
@@ -88,8 +88,8 @@ impl<'a> Wordle<'a> {
         self.print_result();
     }
 
-    fn update_remaining_solutions(&mut self, guess: &Guess, hint: &Hints) {
-        let solutions = &self.cache.by_hint_by_guess[guess][&hint.value()];
+    fn update_remaining_solutions(&mut self, guess: &Guess, hint: &HintValue) {
+        let solutions = &self.cache.hint_solutions.by_hint_by_guess[guess][hint];
         self.solutions = self
             .solutions
             .intersection(solutions)
@@ -106,8 +106,9 @@ impl<'a> Wordle<'a> {
         const AUTOPLAY_MAX_ATTEMPTS: usize = 10;
         while self.guessed.len() < AUTOPLAY_MAX_ATTEMPTS {
             let guess: Guess = strategy.pick(self);
-            let hint = guess.get_hint(secret);
-            self.print_state(&guess, secret, &hint);
+            let hint = self.cache.hints.by_secret_by_guess[&guess][secret];
+
+            self.print_state(&guess, secret, hint);
             self.guessed.push(guess.clone());
             if guess.eq(secret) {
                 self.solutions = self.solutions.drain().filter(|&s| guess.eq(s)).collect();
@@ -127,13 +128,13 @@ impl<'a> Wordle<'a> {
     }
 
     #[cfg(test)] // autoplay
-    fn print_state(&self, guess: &Guess, secret: &Secret, hint: &Hints) {
+    fn print_state(&self, guess: &Guess, secret: &Secret, hint: HintValue) {
         println!(
             "{:4} solutions left, {}. guess {}, hint {}, secret {}",
             self.solutions.len(),
             self.guessed.len() + 1,
             guess.to_string(),
-            hint,
+            Hints::from(hint),
             secret.to_string(),
         );
     }
@@ -244,26 +245,74 @@ impl<'a> Wordle<'a> {
     }
 }
 
+struct HintsBySecretByGuess<'a> {
+    by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, HintValue>>,
+}
+impl<'a> HintsBySecretByGuess<'a> {
+    fn of(words: &'a Words) -> Self {
+        HintsBySecretByGuess {
+            by_secret_by_guess: words
+                .guesses
+                .par_iter()
+                .map(|guess| {
+                    let hint_value_by_secret = words
+                        .secrets
+                        .iter()
+                        .map(|secret| (secret, guess.calculate_hint(secret).value()))
+                        .collect::<HashMap<&Secret, HintValue>>();
+                    (guess, hint_value_by_secret)
+                })
+                .collect(),
+        }
+    }
+}
+
 struct SolutionsByHintByGuess<'a> {
     by_hint_by_guess: HashMap<&'a Guess, HashMap<HintValue, HashSet<&'a Secret>>>,
 }
 impl<'a> SolutionsByHintByGuess<'a> {
-    fn of(words: &'a Words) -> Self {
-        SolutionsByHintByGuess::new(&words.guesses, &words.secrets)
-    }
-    fn new(guesses: &'a [Guess], secrets: &'a HashSet<Secret>) -> Self {
+    fn of(words: &'a Words, hsg: &'a HintsBySecretByGuess) -> Self {
         SolutionsByHintByGuess {
-            by_hint_by_guess: guesses
+            by_hint_by_guess: words
+                .guesses
                 .par_iter()
                 .map(|guess| {
                     let mut solutions_by_hint: HashMap<HintValue, HashSet<&Guess>> = HashMap::new();
-                    for solution in secrets {
+                    for secret in &words.secrets {
                         solutions_by_hint
-                            .entry(guess.get_hint(solution).value())
+                            .entry(hsg.by_secret_by_guess[guess][secret])
                             .or_default()
-                            .insert(solution);
+                            .insert(secret);
                     }
                     (guess, solutions_by_hint)
+                })
+                .collect(),
+        }
+    }
+}
+
+struct SolutionsBySecretByGuess<'a> {
+    by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, &'a HashSet<&'a Secret>>>,
+}
+impl<'a> SolutionsBySecretByGuess<'a> {
+    fn of(
+        words: &'a Words,
+        hsg: &'a HintsBySecretByGuess,
+        shg: &'a SolutionsByHintByGuess,
+    ) -> Self {
+        SolutionsBySecretByGuess {
+            by_secret_by_guess: words
+                .guesses
+                .par_iter()
+                .map(|guess| {
+                    let mut solutions_by_secret: HashMap<&Secret, &HashSet<&Secret>> =
+                        HashMap::new();
+                    for secret in words.secrets.iter() {
+                        let hint = &hsg.by_secret_by_guess[guess][secret];
+                        let solutions = &shg.by_hint_by_guess[guess][hint];
+                        solutions_by_secret.insert(secret, solutions);
+                    }
+                    (guess, solutions_by_secret)
                 })
                 .collect(),
         }
@@ -496,7 +545,7 @@ fn fewest_remaining_solutions<'a>(
     words: &'a Words,
     secrets: &HashSet<&Secret>,
     guessed: &[&Guess],
-    solutions: &SolutionsByHintByGuess,
+    cache: &Cache,
 ) -> Vec<(&'a Guess, usize)> {
     let is_first_turn = secrets.len() == words.secrets.len();
     let mut scores: Vec<(&Guess, usize)> = words
@@ -506,12 +555,11 @@ fn fewest_remaining_solutions<'a>(
         .map(|guess| {
             let count: usize = secrets
                 .iter()
-                .map(|secret| {
-                    let hint = guess.get_hint(secret);
+                .map(|&secret| {
                     if is_first_turn {
-                        solutions.by_hint_by_guess[guess][&hint.value()].len()
+                        cache.secret_solutions.by_secret_by_guess[guess][secret].len()
                     } else {
-                        solutions.by_hint_by_guess[guess][&hint.value()]
+                        cache.secret_solutions.by_secret_by_guess[guess][secret]
                             .intersection(secrets)
                             .count()
                     }
@@ -946,10 +994,10 @@ trait GetHint {
     /// which depends on its index `i` within the word (the first index being 0).
     ///
     /// Returns a hints for the given guess and solution
-    fn get_hint(&self, secret: &Word) -> Hints;
+    fn calculate_hint(&self, secret: &Word) -> Hints;
 }
 impl GetHint for Word {
-    fn get_hint(&self, secret: &Word) -> Hints {
+    fn calculate_hint(&self, secret: &Word) -> Hints {
         // Initialize as every position incorrect
         let mut hint = Hints::default();
 
@@ -995,8 +1043,31 @@ fn main() {
     };
     // print_word_combinations();
     let words = Words::new(lang);
-    let cache = SolutionsByHintByGuess::of(&words);
-    Wordle::with(&words, &cache).play()
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
+    let mut game = Wordle::with(&words, &cache);
+    game.play();
+}
+
+struct Cache<'a> {
+    hint_solutions: &'a SolutionsByHintByGuess<'a>,
+    hints: &'a HintsBySecretByGuess<'a>,
+    secret_solutions: SolutionsBySecretByGuess<'a>,
+}
+impl<'a> Cache<'a> {
+    fn new(
+        words: &'a Words,
+        hints: &'a HintsBySecretByGuess,
+        hint_solutions: &'a SolutionsByHintByGuess,
+    ) -> Self {
+        let secret_solutions = SolutionsBySecretByGuess::of(words, hints, hint_solutions);
+        Cache {
+            hint_solutions,
+            hints,
+            secret_solutions,
+        }
+    }
 }
 
 #[derive(Copy, Clone)]
