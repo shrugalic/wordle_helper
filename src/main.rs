@@ -13,12 +13,12 @@ use Hint::*;
 use Language::*;
 
 const GUESSES: [&str; 2] = [
-    include_str!("../data/wordlists/original/combined.txt"),
-    include_str!("../data/wordlists/german/combined.txt"),
+    include_str!("../data/word_lists/original/combined.txt"),
+    include_str!("../data/word_lists/german/combined.txt"),
 ];
 const SOLUTIONS: [&str; 2] = [
-    include_str!("../data/wordlists/original/solutions.txt"),
-    include_str!("../data/wordlists/german/solutions.txt"),
+    include_str!("../data/word_lists/original/solutions.txt"),
+    include_str!("../data/word_lists/german/solutions.txt"),
 ];
 
 #[cfg(test)]

@@ -3,7 +3,7 @@ Helps with smart word suggestions when playing the [Wordle](https://www.powerlan
 
 And it's an excuse for me to mess around with Rust. This code is still a work in progress and rather messy, I wouldn't recommend using it unless you're me. 😉
 
-That said, you might find the [word lists](data/wordlists) or [full decision trees](data/full_decision_trees) helpful.
+That said, you might find the [word lists](data/word_lists) or [full decision trees](data/full_decision_trees) helpful.
 
 ## Interactive mode (`play()`):
 A typical run (with lots of debug output) looks like this:
