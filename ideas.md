@@ -1,24 +1,21 @@
 Wordle helper ideas:
 --------------------
-- Try more strategies with auto-play
-- Look at failures of certain strategies
-  - Many are suboptimal when 4 characters are known, and there are multiple options for the remaining characters
-- MostFrequentUnusedCharacters:
-  - It seems pretty stable
-  - Switch to better strategy if very few words left
-- Allow specifying multiple strategies (fallback)
-- Combine "most unplayed characters" with other strategies, such as "least possible words left after guess"
-- Store results of some calculations to not repeat them every time
-- Don't lock the know positions right away, use them to evaluate new characters, to make them must-have or illegal.
 - Implement strategy that minimizes number of total guesses?
-- Possibly use larger wordlist when guessing
-- Re-evaluate strategies:
-  - Use all allowed words as guesses, but only use the smaller solutions list to judge it.
-  - There are guesses that yield more information, even though they cannot be solutions.
 - What can be learned from finding good paths for all words? [How To Always Win Wordle](https://www.youtube.com/watch?v=Xv7JBbOiBkI)
 
 Done:
 -----
+- Look at failures of certain strategies
+  - Many are suboptimal when 4 characters are known, and there are multiple options for the remaining characters
+- Try more strategies with auto-play
+- Don't lock the know positions right away, use them to evaluate new characters, to make them must-have or illegal.
+- Possibly use larger wordlist when guessing
+- Re-evaluate strategies:
+  - Use all allowed words as guesses, but only use the smaller solutions list to judge it.
+  - There are guesses that yield more information, even though they cannot be solutions.
+- Allow specifying multiple strategies (fallback)
+- Combine "most unplayed characters" with other strategies, such as "least possible words left after guess"
+- Store results of some calculations to not repeat them every time
 - Tried many other word combinations
 - Implement strategy that starts with a few good words almost regardless of outcome, such as: TUBES, FLING, CHAMP, WORDY from [Why I ALWAYS Guess the Same Four Words](https://youtu.be/l92g6Yy8t5g)
   - What are possible next words?
