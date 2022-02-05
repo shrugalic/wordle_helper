@@ -91,12 +91,7 @@ impl<'a> Wordle<'a> {
 
     fn update_remaining_solutions(&mut self, guess: &Guess, hint: &HintValue) {
         let solutions = &self.cache.hint_solutions.by_hint_by_guess[guess][hint];
-        self.solutions = self
-            .solutions
-            .intersection(solutions)
-            .into_iter()
-            .cloned()
-            .collect();
+        self.solutions = self.solutions.intersect(solutions);
     }
 
     #[cfg(test)]
@@ -1104,6 +1099,15 @@ fn words_with_most_wanted_chars<'w>(
         .collect();
     scores.sort_desc();
     scores
+}
+
+trait Intersect {
+    fn intersect(&self, other: &Self) -> Self;
+}
+impl Intersect for Solutions<'_> {
+    fn intersect(&self, other: &Self) -> Self {
+        self.intersection(other).into_iter().cloned().collect()
+    }
 }
 
 #[cfg(test)]

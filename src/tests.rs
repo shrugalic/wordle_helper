@@ -214,11 +214,7 @@ fn print_partial_guess_tree() {
     println!("{} roate secrets {}", secrets1.len(), secrets1.to_string());
     let secrets2 = &cache.secret_solutions.by_secret_by_guess[&guess2][&secret];
     println!("{} feued secrets {}", secrets2.len(), secrets2.to_string());
-    let secrets: Solutions = secrets1
-        .intersection(secrets2)
-        .into_iter()
-        .cloned()
-        .collect();
+    let secrets: Solutions = secrets1.intersect(secrets2);
     println!(
         "{} intersected secrets {}",
         secrets.len(),
@@ -250,16 +246,7 @@ fn explore_tree(words: &Words, secrets: &Solutions, guessed: &[&Word], cache: &C
 
     let mut pairs: Vec<_> = cache.hint_solutions.by_hint_by_guess[&guess]
         .iter()
-        .map(|(h, solutions)| {
-            (
-                h,
-                solutions
-                    .intersection(secrets)
-                    .into_iter()
-                    .cloned()
-                    .collect::<HashSet<_>>(),
-            )
-        })
+        .map(|(hint, solutions)| (hint, solutions.intersect(secrets)))
         .filter(|(_, solutions)| !solutions.is_empty())
         .collect();
     pairs.sort_unstable_by(|(v1, s1), (v2, s2)| match s1.len().cmp(&s2.len()) {
@@ -574,13 +561,12 @@ fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Guess]) -> Vec<(&'g 
                     let solutions2 = &ssg.by_secret_by_guess[next][secret];
 
                     // apply first and next guess
-                    let mut solutions: Solutions =
-                        solutions1.intersection(solutions2).cloned().collect();
+                    let mut solutions: Solutions = solutions1.intersect(solutions2);
 
                     // Apply other previous guesses
                     for other in guessed.iter().skip(1).cloned() {
                         let solutions3 = ssg.by_secret_by_guess[other][secret];
-                        solutions = solutions.intersection(solutions3).cloned().collect();
+                        solutions = solutions.intersect(solutions3);
                     }
                     solutions.len()
                 })
