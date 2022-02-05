@@ -238,11 +238,8 @@ fn explore_tree(words: &Words, secrets: &Solutions, guessed: &[&Word], cache: &C
     }
     let scores = fewest_remaining_solutions(words, secrets, guessed, cache);
     let guess = scores.lowest().unwrap();
-    let guessed: Vec<_> = guessed
-        .iter()
-        .cloned()
-        .chain(std::iter::once(&guess))
-        .collect();
+    let mut guessed = guessed.to_vec();
+    guessed.push(&guess);
 
     let mut pairs: Vec<_> = cache.hint_solutions.by_hint_by_guess[&guess]
         .iter()
@@ -544,9 +541,9 @@ fn find_optimal_word_combos() {
 
 fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Guess]) -> Vec<(&'g Guess, usize)> {
     let first = *guessed.iter().next().unwrap();
-    let hsg = HintsBySecretByGuess::of(&game.words);
-    let shg = SolutionsByHintByGuess::of(&game.words, &hsg);
-    let ssg = SolutionsBySecretByGuess::of(&game.words, &hsg, &shg);
+    let hsg = HintsBySecretByGuess::of(game.words);
+    let shg = SolutionsByHintByGuess::of(game.words, &hsg);
+    let ssg = SolutionsBySecretByGuess::of(game.words, &hsg, &shg);
 
     let mut scores: Vec<_> = game
         .allowed()
@@ -912,27 +909,24 @@ fn autoplay_and_print_stats_with_language<S: TryToPickWord + Sync>(strategy: S, 
             game.guessed.len()
         })
         .collect();
-    print_stats(attempts);
+    let mut count_by_attempts: HashMap<usize, usize> = HashMap::new();
+    for attempt in attempts {
+        *count_by_attempts.entry(attempt).or_default() += 1;
+    }
+    print_stats(&count_by_attempts);
 }
 
-fn print_stats(attempts: Vec<usize>) {
-    let mut counts_by_attempts: HashMap<usize, usize> = HashMap::new();
-    for attempt in attempts {
-        *counts_by_attempts.entry(attempt).or_default() += 1;
-    }
-    let mut attempt_counts: Vec<_> = counts_by_attempts.into_iter().collect();
-    attempt_counts.sort_unstable();
-    let total = attempt_counts.iter().map(|&(_, cnt)| cnt).sum::<usize>() as f64;
-    let average = attempt_counts
+fn print_stats(count_by_attempts: &HashMap<usize, usize>) {
+    let total = count_by_attempts.iter().map(|(_, cnt)| cnt).sum::<usize>() as f64;
+    let sum = sum(count_by_attempts);
+    let average = sum as f64 / total;
+    let failures = count_by_attempts
         .iter()
-        .map(|&(attempts, cnt)| attempts as f64 * cnt as f64)
-        .sum::<f64>()
-        / total;
-    let failures = attempt_counts
-        .iter()
-        .filter(|&&(attempts, _)| attempts > MAX_ATTEMPTS)
-        .map(|&(_, cnt)| cnt)
+        .filter(|&(&attempts, _)| attempts > MAX_ATTEMPTS)
+        .map(|(_, cnt)| cnt)
         .sum::<usize>();
+    let mut attempt_counts: Vec<_> = count_by_attempts.iter().collect();
+    attempt_counts.sort_unstable();
     let stats = attempt_counts
         .iter()
         .map(|(attempts, cnt)| format!("{}: {}", attempts, cnt))
@@ -946,6 +940,13 @@ fn print_stats(attempts: Vec<usize>) {
     } else {
         println!();
     }
+}
+
+fn sum(counts_by_attempts: &HashMap<usize, usize>) -> usize {
+    counts_by_attempts
+        .iter()
+        .map(|(&attempts, &cnt)| attempts * cnt)
+        .sum()
 }
 
 #[ignore]
