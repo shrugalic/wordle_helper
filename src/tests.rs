@@ -16,7 +16,7 @@ fn compare_best_word_strategies() {
     // 12563.92 lares, 12743.70 rales, 13298.11 tares, 13369.60 soare, 13419.26 reais
     // 13461.31 nares, 13684.70 aeros, 13771.28 rates, 13951.64 arles, 13972.96 serai
     let variances = variance_of_remaining_words(&words);
-    println!("Best (lowest) variance:\n{}", variances.to_string(10));
+    println!("Best (lowest) variance:\n{}", variances.to_string(5));
     assert_eq!(variances.len(), words.guesses.len());
 
     // panic!(); // ~2s
@@ -30,7 +30,7 @@ fn compare_best_word_strategies() {
     let remaining = expected_remaining_solution_counts(&words);
     println!(
         "Best (lowest) expected remaining solution count:\n{}",
-        remaining.to_string(10)
+        remaining.to_string(5)
     );
     assert_eq!(remaining.len(), words.guesses.len());
 
@@ -46,17 +46,16 @@ fn compare_best_word_strategies() {
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let cache = Cache::new(&words, &hsg, &shg);
-    let game = Wordle::with(&words, &cache);
-
-    let totals = fewest_remaining_solutions_for_game(&game);
+    let solutions = words.secrets.iter().collect();
+    let totals = fewest_remaining_solutions(&words, &solutions, &Vec::new(), &cache);
     println!(
         "Best (lowest) average remaining solution count:\n{}",
-        totals.to_string(10)
+        totals.to_string(5)
     );
     assert_eq!(totals.len(), words.guesses.len());
 
     // panic!(); // ~8s
-
+    println!("\ndifferences between fewest total and expected remaining:");
     let (mut different, mut same) = (0, 0);
     for (i, ((low_w, count), (rem_w, remaining))) in totals.iter().zip(remaining.iter()).enumerate()
     {
@@ -106,6 +105,7 @@ fn compare_best_word_strategies() {
     // 8091 (geyan, 11675600) (tatus, 45198.022252705174)
     // 8092 (tatus, 11675600) (geyan, 45198.02225270514)
 
+    println!("differences between fewest total and lowest variance:");
     let (mut different, mut same) = (0, 0);
     for (i, ((low_w, count), (var_w, variance))) in totals.iter().zip(variances.iter()).enumerate()
     {
@@ -133,10 +133,10 @@ fn variance_of_remaining_words(words: &Words) -> Vec<(&Guess, f64)> {
         .guesses
         .par_iter()
         .map(|guess| {
-            let buckets = hint_buckets(guess, &words.secrets);
-            let variance = buckets
+            let count_by_hint = count_by_hint(guess, &words.secrets);
+            let variance = count_by_hint
                 .into_iter()
-                .map(|indices| (indices.len() as f64 - average).powf(2.0))
+                .map(|count| (count as f64 - average).powf(2.0))
                 .sum::<f64>() as f64
                 / 243.0;
             (guess, variance)
@@ -146,23 +146,19 @@ fn variance_of_remaining_words(words: &Words) -> Vec<(&Guess, f64)> {
     scores
 }
 
-// Previously used method, slightly less stable than lowest_total_number_of_remaining_solutions
+// Previously used method
 fn expected_remaining_solution_counts(words: &Words) -> Vec<(&Guess, f64)> {
     let total_solutions = words.secrets.len() as f64;
     let mut scores: Vec<_> = words
         .guesses
         .par_iter()
         .map(|guess| {
-            let buckets = hint_buckets(guess, &words.secrets);
-            let expected_remaining_word_count = buckets
+            let count_by_hint = count_by_hint(guess, &words.secrets);
+            let expected_remaining_word_count = count_by_hint
                 .into_iter()
-                .map(|indices| {
-                    let solutions_in_bucket: f64 = indices.len() as f64;
-                    let bucket_probability = solutions_in_bucket / total_solutions;
-                    bucket_probability * solutions_in_bucket
-                    // solutions_in_bucket ^ 2 / total_solutions;
-                })
-                .sum();
+                .map(|count| count.pow(2))
+                .sum::<usize>() as f64
+                / total_solutions;
             (guess, expected_remaining_word_count)
         })
         .collect();
@@ -171,17 +167,16 @@ fn expected_remaining_solution_counts(words: &Words) -> Vec<(&Guess, f64)> {
 }
 
 // Allow because determine_hints expects &Guess not &[char]
-fn hint_buckets(
+fn count_by_hint(
     #[allow(clippy::ptr_arg)] guess: &Guess,
     solutions: &HashSet<Secret>,
-) -> [Vec<usize>; 243] {
-    const EMPTY_VEC: Vec<usize> = Vec::new();
-    let mut hint_buckets = [EMPTY_VEC; 243];
-    for (i, solution) in solutions.iter().enumerate() {
+) -> [usize; 243] {
+    let mut count_by_hint = [0; 243];
+    for solution in solutions.iter() {
         let hint = guess.calculate_hint(solution);
-        hint_buckets[hint.value() as usize].push(i);
+        count_by_hint[hint.value() as usize] += 1;
     }
-    hint_buckets
+    count_by_hint
 }
 
 #[ignore] // ~15s English or ~3s German
