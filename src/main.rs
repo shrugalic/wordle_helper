@@ -27,6 +27,7 @@ type Guess = Word;
 type Secret = Word;
 type Feedback = Guess;
 type HintValue = u8;
+type Solutions<'a> = HashSet<&'a Secret>;
 
 #[derive(Clone)]
 struct Words {
@@ -47,7 +48,7 @@ impl Words {
 
 struct Wordle<'a> {
     words: &'a Words,
-    solutions: HashSet<&'a Secret>,
+    solutions: Solutions<'a>,
     cache: &'a Cache<'a>,
     guessed: Vec<Guess>,
     print_output: bool,
@@ -268,7 +269,7 @@ impl<'a> HintsBySecretByGuess<'a> {
 }
 
 struct SolutionsByHintByGuess<'a> {
-    by_hint_by_guess: HashMap<&'a Guess, HashMap<HintValue, HashSet<&'a Secret>>>,
+    by_hint_by_guess: HashMap<&'a Guess, HashMap<HintValue, Solutions<'a>>>,
 }
 impl<'a> SolutionsByHintByGuess<'a> {
     fn of(words: &'a Words, hsg: &'a HintsBySecretByGuess) -> Self {
@@ -277,7 +278,7 @@ impl<'a> SolutionsByHintByGuess<'a> {
                 .guesses
                 .par_iter()
                 .map(|guess| {
-                    let mut solutions_by_hint: HashMap<HintValue, HashSet<&Guess>> = HashMap::new();
+                    let mut solutions_by_hint: HashMap<HintValue, Solutions> = HashMap::new();
                     for secret in &words.secrets {
                         solutions_by_hint
                             .entry(hsg.by_secret_by_guess[guess][secret])
@@ -292,7 +293,7 @@ impl<'a> SolutionsByHintByGuess<'a> {
 }
 
 struct SolutionsBySecretByGuess<'a> {
-    by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, &'a HashSet<&'a Secret>>>,
+    by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, &'a Solutions<'a>>>,
 }
 impl<'a> SolutionsBySecretByGuess<'a> {
     fn of(
@@ -305,8 +306,7 @@ impl<'a> SolutionsBySecretByGuess<'a> {
                 .guesses
                 .par_iter()
                 .map(|guess| {
-                    let mut solutions_by_secret: HashMap<&Secret, &HashSet<&Secret>> =
-                        HashMap::new();
+                    let mut solutions_by_secret: HashMap<&Secret, &Solutions> = HashMap::new();
                     for secret in words.secrets.iter() {
                         let hint = &hsg.by_secret_by_guess[guess][secret];
                         let solutions = &shg.by_hint_by_guess[guess][hint];
@@ -543,7 +543,7 @@ fn fewest_remaining_solutions_for_game<'a>(game: &'a Wordle) -> Vec<(&'a Guess, 
 
 fn fewest_remaining_solutions<'a>(
     words: &'a Words,
-    secrets: &HashSet<&Secret>,
+    secrets: &Solutions,
     guessed: &[&Guess],
     cache: &Cache,
 ) -> Vec<(&'a Guess, usize)> {

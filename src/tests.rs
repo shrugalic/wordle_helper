@@ -186,7 +186,7 @@ fn test_print_full_guess_tree() {
 }
 fn print_full_guess_tree(lang: Language) {
     let words = Words::new(lang);
-    let secrets: HashSet<_> = words.secrets.iter().collect();
+    let secrets: Solutions = words.secrets.iter().collect();
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let cache = Cache::new(&words, &hsg, &shg);
@@ -214,7 +214,7 @@ fn print_partial_guess_tree() {
     println!("{} roate secrets {}", secrets1.len(), secrets1.to_string());
     let secrets2 = &cache.secret_solutions.by_secret_by_guess[&guess2][&secret];
     println!("{} feued secrets {}", secrets2.len(), secrets2.to_string());
-    let secrets: HashSet<&Secret> = secrets1
+    let secrets: Solutions = secrets1
         .intersection(secrets2)
         .into_iter()
         .cloned()
@@ -228,7 +228,7 @@ fn print_partial_guess_tree() {
     let guessed = [&guess1, &guess2];
     explore_tree(&words, &secrets, &guessed, &cache);
 }
-fn explore_tree(words: &Words, secrets: &HashSet<&Secret>, guessed: &[&Word], cache: &Cache) {
+fn explore_tree(words: &Words, secrets: &Solutions, guessed: &[&Word], cache: &Cache) {
     if guessed.len() == MAX_ATTEMPTS {
         println!(
             "            7. Still not found after 6 guesses {}. Secrets: {}",
@@ -271,7 +271,7 @@ fn explore_tree(words: &Words, secrets: &HashSet<&Secret>, guessed: &[&Word], ca
         explore_tree(words, &secrets, &guessed, cache)
     }
 }
-fn print_info(guessed: &[&Guess], hint: HintValue, secrets: &HashSet<&Secret>) {
+fn print_info(guessed: &[&Guess], hint: HintValue, secrets: &Solutions) {
     let turn = guessed.len();
     let indent = "\t".repeat(turn - 1);
     let guess = guessed.last().unwrap().to_string();
@@ -574,7 +574,7 @@ fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Guess]) -> Vec<(&'g 
                     let solutions2 = &ssg.by_secret_by_guess[next][secret];
 
                     // apply first and next guess
-                    let mut solutions: HashSet<_> =
+                    let mut solutions: Solutions =
                         solutions1.intersection(solutions2).cloned().collect();
 
                     // Apply other previous guesses
