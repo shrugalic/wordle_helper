@@ -1,5 +1,5 @@
 use std::cmp::{Ordering, Reverse};
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 use std::env::args;
 use std::fmt::{Display, Formatter};
 use std::io;
@@ -27,12 +27,12 @@ type Guess = Word;
 type Secret = Word;
 type Feedback = Guess;
 type HintValue = u8;
-type Solutions<'a> = HashSet<&'a Secret>;
+type Solutions<'a> = BTreeSet<&'a Secret>;
 
 #[derive(Clone)]
 struct Words {
     guesses: Vec<Guess>,
-    secrets: HashSet<Secret>,
+    secrets: BTreeSet<Secret>,
 }
 impl Words {
     fn new(lang: Language) -> Self {
@@ -107,7 +107,12 @@ impl<'a> Wordle<'a> {
             self.print_state(&guess, secret, hint);
             self.guessed.push(guess.clone());
             if guess.eq(secret) {
-                self.solutions = self.solutions.drain().filter(|&s| guess.eq(s)).collect();
+                self.solutions = self
+                    .solutions
+                    .iter()
+                    .filter(|&&s| guess.eq(s))
+                    .cloned()
+                    .collect();
                 break;
             }
             self.update_remaining_solutions(&guess, &hint);
@@ -376,6 +381,11 @@ impl<W: AsRef<Word>> WordsToString for HashSet<W> {
         to_sorted_string(self.iter())
     }
 }
+impl<W: AsRef<Word>> WordsToString for BTreeSet<W> {
+    fn to_string(&self) -> String {
+        to_sorted_string(self.iter())
+    }
+}
 
 trait CharacterCounts {
     /// Global character frequency
@@ -406,6 +416,28 @@ impl<W: AsRef<Word>> CharacterCounts for Vec<W> {
     }
 }
 impl<W: AsRef<Word>> CharacterCounts for HashSet<W> {
+    fn global_character_counts_in(&self, positions: &[usize]) -> HashMap<char, usize> {
+        let mut counts: HashMap<char, usize> = HashMap::new();
+        for word in self.iter() {
+            for i in positions {
+                *counts.entry(word.as_ref()[*i]).or_default() += 1;
+            }
+        }
+        counts
+    }
+    fn character_counts_per_position_in(&self, positions: &[usize]) -> [HashMap<char, usize>; 5] {
+        let empty = || ('a'..='z').into_iter().map(|c| (c, 0)).collect();
+        let mut counts: [HashMap<char, usize>; 5] = [empty(), empty(), empty(), empty(), empty()];
+        for word in self.iter() {
+            for i in positions {
+                *counts[*i].get_mut(&word.as_ref()[*i]).unwrap() += 1;
+            }
+        }
+        counts
+    }
+}
+
+impl<W: AsRef<Word>> CharacterCounts for BTreeSet<W> {
     fn global_character_counts_in(&self, positions: &[usize]) -> HashMap<char, usize> {
         let mut counts: HashMap<char, usize> = HashMap::new();
         for word in self.iter() {
@@ -531,7 +563,7 @@ impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
     }
 }
 
-fn fewest_remaining_solutions_for_game<'a>(game: &'a Wordle) -> Vec<(&'a Guess, usize)> {
+fn fewest_remaining_solutions_for_game<'a>(game: &'a Wordle) -> Vec<(&'a Guess, f64)> {
     let guessed: Vec<_> = game.guessed.iter().collect();
     fewest_remaining_solutions(game.words, &game.solutions, &guessed, game.cache)
 }
@@ -541,9 +573,10 @@ fn fewest_remaining_solutions<'a>(
     secrets: &Solutions,
     guessed: &[&Guess],
     cache: &Cache,
-) -> Vec<(&'a Guess, usize)> {
+) -> Vec<(&'a Guess, f64)> {
     let is_first_turn = secrets.len() == words.secrets.len();
-    let mut scores: Vec<(&Guess, usize)> = words
+    let len = secrets.len() as f64;
+    let mut scores: Vec<(&Guess, f64)> = words
         .guesses
         .par_iter()
         .filter(|guess| !guessed.contains(guess))
@@ -560,7 +593,7 @@ fn fewest_remaining_solutions<'a>(
                     }
                 })
                 .sum();
-            (guess, count)
+            (guess, count as f64 / len)
         })
         .collect();
     scores.sort_asc();
@@ -829,6 +862,11 @@ impl<W: AsRef<Word> + Clone> HighVarietyWords for Vec<W> {
     }
 }
 impl<W: AsRef<Word>> HighVarietyWords for HashSet<W> {
+    fn high_variety_words(&self, open_positions: &[usize]) -> Vec<&Word> {
+        high_variety_words(self.iter().map(|w| w.as_ref()), open_positions)
+    }
+}
+impl<W: AsRef<Word>> HighVarietyWords for BTreeSet<W> {
     fn high_variety_words(&self, open_positions: &[usize]) -> Vec<&Word> {
         high_variety_words(self.iter().map(|w| w.as_ref()), open_positions)
     }

@@ -1,6 +1,7 @@
-use super::*;
-
+use std::collections::BTreeMap;
 use std::time::{Duration, Instant};
+
+use super::*;
 
 const MAX_ATTEMPTS: usize = 6;
 
@@ -169,7 +170,7 @@ fn expected_remaining_solution_counts(words: &Words) -> Vec<(&Guess, f64)> {
 // Allow because determine_hints expects &Guess not &[char]
 fn count_by_hint(
     #[allow(clippy::ptr_arg)] guess: &Guess,
-    solutions: &HashSet<Secret>,
+    solutions: &BTreeSet<Secret>,
 ) -> [usize; 243] {
     let mut count_by_hint = [0; 243];
     for solution in solutions.iter() {
@@ -391,7 +392,7 @@ fn count_solutions_by_secret_by_guess() {
 
 #[ignore] // ~3s
 #[test]
-// Top 5: 139883 roate, 141217 raise, 141981 raile, 144227 soare, 147525 arise
+// Top 5: 60.42 'roate', 61.00 'raise', 61.33 'raile', 62.30 'soare', 63.73 'arise'
 fn find_optimal_first_word_english() {
     let lang = English;
     let words = Words::new(lang);
@@ -401,14 +402,14 @@ fn find_optimal_first_word_english() {
     let game = Wordle::with(&words, &cache);
 
     let scores = fewest_remaining_solutions_for_game(&game);
-    // println!("scores {}", scores.to_string(5));
+    println!("scores {}", scores.to_string(5));
     let optimal = scores.lowest().unwrap();
     assert_eq!("roate".to_word(), optimal);
 }
 
 #[ignore] // ~1s
 #[test]
-// Top 5: 71017 tarne, 72729 raine, 74391 trane, 75473 lernt, 75513 raete
+// Top 5: 31.30 'raine', 35.26 'taler', 36.21 'raten', 36.26 'laser', 36.63 'reale'
 fn find_optimal_first_word_german() {
     let lang = German;
     let words = Words::new(lang);
@@ -427,18 +428,20 @@ fn find_optimal_first_word_german() {
 #[test]
 // ~10s (i9) or ~13s (M1) or 6.5s (M1 Max) for 5 single German words
 // ~1min 51s (i9) or ~2min 21s (M1) or 67s (M1 Max) for 5 single English words
+//
 // Deutsch:
-// Best 1. guesses: 36655 raine, 41291 taler, 42405 raten, 42461 laser, 42897 reale
-// Best 2. guesses after 1. 'raine': 3803 holst, 3893 kults, 3911 lotus, 3965 stuhl, 4117 buhlt
-// Best 3. guesses after 1. 'raine' and 2. 'holst': 1635 dumpf, 1677 umgab, 1709 umweg, 1745 bekam, 1761 bezug
-// Best 4. guesses after 1. 'raine' and 2. 'holst' and 3. 'dumpf': 1247 biwak, 1261 abweg, 1271 bezog, 1271 bezug, 1273 beeck
-// Best 5. guesses after 1. 'raine' and 2. 'holst' and 3. 'dumpf' and 4. 'biwak': 1179 legen, 1179 leger, 1181 engen, 1181 enzen, 1181 genen
+// Best 1. guesses: 31.30 'raine', 35.26 'taler', 36.21 'raten', 36.26 'laser', 36.63 'reale'
+// Best 2. guesses after 1. 'raine': 3.25 'holst', 3.32 'kults', 3.34 'lotus', 3.39 'stuhl', 3.52 'buhlt'
+// Best 3. guesses after 1. 'raine' and 2. 'holst': 1.40 'dumpf', 1.43 'umgab', 1.46 'umweg', 1.49 'bekam', 1.50 'bezug'
+// Best 4. guesses after 1. 'raine' and 2. 'holst' and 3. 'dumpf': 1.06 'biwak', 1.08 'abweg', 1.09 'bezog', 1.09 'bezug', 1.09 'beeck'
+// Best 5. guesses after 1. 'raine' and 2. 'holst' and 3. 'dumpf' and 4. 'biwak': 1.01 'legen', 1.01 'leger', 1.01 'engen', 1.01 'enzen', 1.01 'genen'
 //
 // English
-// Best 2. guesses after 1. 'roate': 11847 linds, 11947 sling, 12033 clips, 12237 limns, 12337 blins
-// Best 3. guesses after 1. 'roate' and 2. 'linds': 3803 chump, 3905 bumph, 4117 crump, 4169 clump, 4173 bumpy
-// Best 4. guesses after 1. 'roate' and 2. 'linds' and 3. 'chump': 2659 gleby, 2673 gawky, 2675 gybed, 2685 befog, 2685 bogey
-// Best 5. guesses after 1. 'roate' and 2. 'linds' and 3. 'chump' and 4. 'gleby': 2399 wakfs, 2419 waift, 2421 swift, 2427 fatwa, 2431 fawns
+// Best 1. guesses: 60.42 'roate', 61.00 'raise', 61.33 'raile', 62.30 'soare', 63.73 'arise'
+// Best 2. guesses after 1. 'roate': 5.12 'linds', 5.16 'sling', 5.20 'clips', 5.29 'limns', 5.33 'blins'
+// Best 3. guesses after 1. 'roate' and 2. 'linds': 1.64 'chump', 1.69 'bumph', 1.78 'crump', 1.80 'clump', 1.80 'bumpy'
+// Best 4. guesses after 1. 'roate' and 2. 'linds' and 3. 'chump': 1.15 'gleby', 1.15 'gawky', 1.16 'gybed', 1.16 'befog', 1.16 'bogey'
+// Best 5. guesses after 1. 'roate' and 2. 'linds' and 3. 'chump' and 4. 'gleby': 1.04 'wakfs', 1.04 'waift', 1.05 'swift', 1.05 'fatwa', 1.05 'fawns'
 //
 // Best top-2 5-combos in 13min 30s:
 // Best 2. guesses after 1. 'roate': 11847 linds, 11947 sling, 12033 clips, 12237 limns, 12337 blins
@@ -539,7 +542,7 @@ fn find_optimal_word_combos() {
     }
 }
 
-fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Guess]) -> Vec<(&'g Guess, usize)> {
+fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Guess]) -> Vec<(&'g Guess, f64)> {
     let first = *guessed.iter().next().unwrap();
     let hsg = HintsBySecretByGuess::of(game.words);
     let shg = SolutionsByHintByGuess::of(game.words, &hsg);
@@ -550,6 +553,7 @@ fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Guess]) -> Vec<(&'g 
         .into_par_iter()
         .filter(|next| !guessed.contains(next))
         .map(|next| {
+            let len = game.solutions.len() as f64;
             let count: usize = game
                 .solutions
                 .iter()
@@ -568,7 +572,7 @@ fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Guess]) -> Vec<(&'g 
                     solutions.len()
                 })
                 .sum();
-            (next, count)
+            (next, count as f64 / len)
         })
         .collect();
 
@@ -909,44 +913,42 @@ fn autoplay_and_print_stats_with_language<S: TryToPickWord + Sync>(strategy: S, 
             game.guessed.len()
         })
         .collect();
-    let mut count_by_attempts: HashMap<usize, usize> = HashMap::new();
+    let mut count_by_attempts: BTreeMap<Attempt, Count> = BTreeMap::new();
     for attempt in attempts {
         *count_by_attempts.entry(attempt).or_default() += 1;
     }
-    print_stats(&count_by_attempts);
+    print_stats(count_by_attempts.iter());
 }
 
-fn print_stats(count_by_attempts: &HashMap<usize, usize>) {
-    let total = count_by_attempts.iter().map(|(_, cnt)| cnt).sum::<usize>() as f64;
-    let sum = sum(count_by_attempts);
-    let average = sum as f64 / total;
-    let failures = count_by_attempts
-        .iter()
-        .filter(|&(&attempts, _)| attempts > MAX_ATTEMPTS)
-        .map(|(_, cnt)| cnt)
-        .sum::<usize>();
-    let mut attempt_counts: Vec<_> = count_by_attempts.iter().collect();
-    attempt_counts.sort_unstable();
-    let stats = attempt_counts
-        .iter()
-        .map(|(attempts, cnt)| format!("{}: {}", attempts, cnt))
-        .collect::<Vec<_>>()
-        .join(", ");
+fn print_stats<'a>(count_by_attempts: impl Iterator<Item = (&'a Attempt, &'a Count)>) {
+    let mut games = 0;
+    let mut attempts_sum = 0;
+    let mut failures = 0;
+    let mut descs = vec![];
+    for (attempts, count) in count_by_attempts {
+        games += count;
+        attempts_sum += attempts * count;
+        if attempts > &MAX_ATTEMPTS {
+            failures += 1;
+        }
+        descs.push(format!("{}: {}", attempts, count));
+    }
+    let average = attempts_sum as f64 / games as f64;
 
-    print!("\n{:.2} average attempts; {}", average, stats);
+    print!("\n{:.3} average attempts; {}", average, descs.join(", "));
     if failures > 0 {
-        let percent_failed = 100.0 * failures as f64 / total;
+        let percent_failed = 100.0 * failures as f64 / games as f64;
         println!("; {} ({:.2}%) failures", failures, percent_failed)
     } else {
         println!();
     }
 }
 
-fn sum(counts_by_attempts: &HashMap<usize, usize>) -> usize {
+/// Sum of attempts * count
+fn attempts_sum<'a>(counts_by_attempts: impl Iterator<Item = (&'a Attempt, &'a Count)>) -> usize {
     counts_by_attempts
-        .iter()
-        .map(|(&attempts, &cnt)| attempts * cnt)
-        .sum()
+        .map(|(attempts, count)| attempts * count)
+        .sum::<usize>()
 }
 
 #[ignore]
@@ -1117,10 +1119,11 @@ fn test_get_hint() {
 #[ignore]
 #[test]
 fn lowest_total_number_of_remaining_solutions_only_counts_remaining_viable_solutions() {
-    let secrets: HashSet<Secret> = ["augur", "briar", "friar", "lunar", "sugar"]
+    let secrets: BTreeSet<Secret> = ["augur", "briar", "friar", "lunar", "sugar"]
         .iter()
         .map(|w| w.to_word())
         .collect();
+    let len = secrets.len() as f64;
     let guesses: Vec<Guess> = ["fubar", "rural", "aurar", "goier", "urial"]
         .iter()
         .map(|w| w.to_word())
@@ -1138,9 +1141,9 @@ fn lowest_total_number_of_remaining_solutions_only_counts_remaining_viable_solut
     let mut scores = fewest_remaining_solutions_for_game(&game);
     scores.sort_asc();
     // println!("scores {}", scores.to_string(5));
-    assert_eq!(scores[0], (&allowed[0], 7));
-    assert_eq!(scores[1], (&allowed[1], 7));
-    assert_eq!(scores[2], (&allowed[4], 7));
-    assert_eq!(scores[3], (&allowed[2], 9));
-    assert_eq!(scores[4], (&allowed[3], 9));
+    assert_eq!(scores[0], (&allowed[0], 7.0 / len));
+    assert_eq!(scores[1], (&allowed[1], 7.0 / len));
+    assert_eq!(scores[2], (&allowed[4], 7.0 / len));
+    assert_eq!(scores[3], (&allowed[2], 9.0 / len));
+    assert_eq!(scores[4], (&allowed[3], 9.0 / len));
 }
