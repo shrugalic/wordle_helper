@@ -542,7 +542,9 @@ impl<'a, F: PickWord> PickWord for ChainedStrategies<'a, F> {
                 return word;
             }
         }
-        println!("Using fallback");
+        if game.print_output {
+            println!("Using fallback");
+        }
         self.fallback.pick(game)
     }
 }
@@ -714,7 +716,8 @@ impl TryToPickWord for FirstOfTwoOrFewerRemainingSolutions {
 struct WordWithMostNewCharsFromRemainingSolutions;
 impl TryToPickWord for WordWithMostNewCharsFromRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
-        if game.wanted_chars().len() >= 5 {
+        let wanted_char_count = game.wanted_chars().len();
+        if !(1..=5).contains(&wanted_char_count) {
             return None;
         }
         let scores: Vec<(&Word, usize)> =
