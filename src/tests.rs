@@ -212,14 +212,22 @@ fn print_partial_guess_tree() {
     let guess2 = "feued".to_word(); // hint "⬛⬛⬛🟩⬛"
 
     let secrets1 = &cache.secret_solutions.by_secret_by_guess[&guess1][&secret];
-    println!("{} roate secrets {}", secrets1.len(), secrets1.to_string());
+    println!(
+        "{} roate secrets {}",
+        secrets1.len(),
+        secrets1.sorted_string()
+    );
     let secrets2 = &cache.secret_solutions.by_secret_by_guess[&guess2][&secret];
-    println!("{} feued secrets {}", secrets2.len(), secrets2.to_string());
+    println!(
+        "{} feued secrets {}",
+        secrets2.len(),
+        secrets2.sorted_string()
+    );
     let secrets: Solutions = secrets1.intersect(secrets2);
     println!(
         "{} intersected secrets {}",
         secrets.len(),
-        secrets.to_string()
+        secrets.sorted_string()
     );
 
     let guessed = [&guess1, &guess2];
@@ -229,8 +237,8 @@ fn explore_tree(words: &Words, secrets: &Solutions, guessed: &[&Word], cache: &C
     if guessed.len() == MAX_ATTEMPTS {
         println!(
             "            7. Still not found after 6 guesses {}. Secrets: {}",
-            guessed.to_string(),
-            secrets.to_string()
+            guessed.sorted_string(),
+            secrets.sorted_string()
         );
         return;
     } else if secrets.len() <= 2 {
@@ -279,7 +287,7 @@ fn print_info(guessed: &[&Guess], hint: HintValue, secrets: &Solutions) {
             turn + 2
         );
     } else if secrets.len() <= 5 {
-        println!("{} secrets {}.", secrets.len(), secrets.to_string());
+        println!("{} secrets {}.", secrets.len(), secrets.sorted_string());
     } else {
         println!("{} secrets, for example {}.", secrets.len(), first);
     }

@@ -151,7 +151,7 @@ impl<'a> Wordle<'a> {
         if len > 10 {
             println!("\n{} words left", len);
         } else {
-            println!("\n{} words left: {}", len, self.solutions.to_string());
+            println!("\n{} words left: {}", len, self.solutions.sorted_string());
         }
     }
 
@@ -369,28 +369,58 @@ impl CharFrequencyToString for HashMap<char, usize> {
 trait WordsToString {
     fn to_string(&self) -> String;
 }
+impl<W: AsRef<Word>> WordsToString for Vec<W> {
+    fn to_string(&self) -> String {
+        to_string(self.iter())
+    }
+}
+impl<W: AsRef<Word>> WordsToString for &[W] {
+    fn to_string(&self) -> String {
+        to_string(self.iter())
+    }
+}
+impl<W: AsRef<Word>> WordsToString for HashSet<W> {
+    fn to_string(&self) -> String {
+        to_string(self.iter())
+    }
+}
+impl<W: AsRef<Word>> WordsToString for BTreeSet<W> {
+    fn to_string(&self) -> String {
+        to_string(self.iter())
+    }
+}
+fn to_string<W: AsRef<Word>>(words: impl Iterator<Item = W>) -> String {
+    words
+        .map(|w| w.as_ref().to_string())
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
+trait WordsToSortedString {
+    fn sorted_string(&self) -> String;
+}
 fn to_sorted_string<W: AsRef<Word>>(words: impl Iterator<Item = W>) -> String {
     let mut words: Vec<_> = words.map(|w| w.as_ref().to_string()).collect();
     words.sort_unstable();
     words.join(", ")
 }
-impl<W: AsRef<Word>> WordsToString for Vec<W> {
-    fn to_string(&self) -> String {
+impl<W: AsRef<Word>> WordsToSortedString for Vec<W> {
+    fn sorted_string(&self) -> String {
         to_sorted_string(self.iter())
     }
 }
-impl<W: AsRef<Word>> WordsToString for &[W] {
-    fn to_string(&self) -> String {
+impl<W: AsRef<Word>> WordsToSortedString for &[W] {
+    fn sorted_string(&self) -> String {
         to_sorted_string(self.iter())
     }
 }
-impl<W: AsRef<Word>> WordsToString for HashSet<W> {
-    fn to_string(&self) -> String {
+impl<W: AsRef<Word>> WordsToSortedString for HashSet<W> {
+    fn sorted_string(&self) -> String {
         to_sorted_string(self.iter())
     }
 }
-impl<W: AsRef<Word>> WordsToString for BTreeSet<W> {
-    fn to_string(&self) -> String {
+impl<W: AsRef<Word>> WordsToSortedString for BTreeSet<W> {
+    fn sorted_string(&self) -> String {
         to_sorted_string(self.iter())
     }
 }
