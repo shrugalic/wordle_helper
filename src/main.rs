@@ -11,13 +11,17 @@ use rayon::prelude::*;
 use Hint::*;
 use Language::*;
 
-const GUESSES: [&str; 2] = [
+const GUESSES: [&str; 4] = [
     include_str!("../data/word_lists/original/combined.txt"),
     include_str!("../data/word_lists/german/combined.txt"),
+    include_str!("../data/word_lists/ny_times/combined.txt"),
+    include_str!("../data/word_lists/primal/combined.txt"),
 ];
-const SOLUTIONS: [&str; 2] = [
+const SOLUTIONS: [&str; 4] = [
     include_str!("../data/word_lists/original/solutions.txt"),
     include_str!("../data/word_lists/german/solutions.txt"),
+    include_str!("../data/word_lists/ny_times/solutions.txt"),
+    include_str!("../data/word_lists/primal/solutions.txt"),
 ];
 
 const ALL_POS: [usize; 5] = [0, 1, 2, 3, 4];
@@ -31,12 +35,14 @@ type Solutions<'a> = BTreeSet<&'a Secret>;
 
 #[derive(Clone)]
 struct Words {
+    lang: Language,
     guesses: Vec<Guess>,
     secrets: BTreeSet<Secret>,
 }
 impl Words {
     fn new(lang: Language) -> Self {
         Words {
+            lang,
             secrets: Words::from_str(SOLUTIONS[lang as usize]).collect(),
             guesses: Words::from_str(GUESSES[lang as usize]).collect(),
         }
@@ -161,6 +167,8 @@ impl<'a> Wordle<'a> {
 
             if feedback.len() > 5 {
                 println!("Enter at most 5 characters!")
+            } else if self.words.lang == Primal {
+                return feedback;
             } else if let Some(illegal) = feedback
                 .iter()
                 .filter(|c| c.is_ascii_alphabetic())
@@ -1106,10 +1114,12 @@ impl<'a> Cache<'a> {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 enum Language {
     English,
     German,
+    NYTimes,
+    Primal,
 }
 impl TryFrom<&str> for Language {
     type Error = String;
@@ -1117,6 +1127,8 @@ impl TryFrom<&str> for Language {
     fn try_from(lang: &str) -> Result<Self, Self::Error> {
         match lang.to_ascii_lowercase().as_str() {
             "english" => Ok(English),
+            "nytimes" => Ok(NYTimes),
+            "primal" => Ok(Primal),
             "german" | "deutsch" => Ok(German),
             _ => Err(format!("Unknown language '{}'", lang)),
         }
