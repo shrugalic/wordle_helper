@@ -170,7 +170,7 @@ fn expected_remaining_solution_counts(words: &Words) -> Vec<(&Guess, f64)> {
 // Allow because determine_hints expects &Guess not &[char]
 fn count_by_hint(
     #[allow(clippy::ptr_arg)] guess: &Guess,
-    solutions: &BTreeSet<Secret>,
+    solutions: &HashSet<Secret>,
 ) -> [usize; 243] {
     let mut count_by_hint = [0; 243];
     for solution in solutions.iter() {
@@ -291,6 +291,229 @@ fn print_info(guessed: &[&Guess], hint: HintValue, secrets: &Solutions) {
     } else {
         println!("{} secrets, for example {}.", secrets.len(), first);
     }
+}
+
+#[ignore]
+#[test]
+fn test_trivial_turn_sums() {
+    let lang = English;
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
+    let guessed = &vec![];
+
+    // if there's only one secret left, its score is 1
+    let first = words.secrets.iter().next().unwrap();
+    let secrets1: &Solutions = &[first].into_iter().collect();
+    let picks = secrets1.len();
+    let scores = turn_sums(&words, secrets1, guessed, &cache, picks, true);
+    for (_, score) in scores {
+        assert_eq!(score, 1);
+    }
+
+    // With 2 secrets left, their score (turn sum) is 3
+    let guessed = &vec![];
+    let second = words.secrets.iter().nth(1).unwrap();
+    let secrets2: &Solutions = &[first, second].into_iter().collect();
+    let picks = secrets2.len();
+    let scores = turn_sums(&words, secrets2, guessed, &cache, picks, true);
+    for (_, score) in scores {
+        assert_eq!(score, 3);
+    }
+}
+
+#[ignore]
+#[test]
+fn test_very_small_turn_sums() {
+    let lang = English;
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
+    let guessed = &vec![];
+
+    let log = true;
+    let count = 4;
+    let secrets = &words.secrets.iter().take(count).collect();
+    let scores = turn_sums(&words, secrets, guessed, &cache, secrets.len(), log);
+    let (_, min) = scores.first().unwrap();
+    let count = scores.iter().filter(|(_, s)| s == min).count();
+    println!(
+        "Turn sums {} ({} have value {}, avg {:.2})",
+        scores.to_string(5),
+        count,
+        min,
+        *min as f64 / secrets.len() as f64
+    );
+    for (_, score) in scores {
+        assert_eq!(score, 8);
+    }
+}
+
+#[ignore]
+#[test]
+fn test_small_turn_sums() {
+    let lang = English;
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
+    let guessed = &vec![];
+
+    let log = true;
+    let count = 500;
+    let picks = 5;
+    let secrets: &Solutions = &words.secrets.iter().take(count).collect();
+    if log {
+        println!("\n{} secrets = {}", secrets.len(), secrets.sorted_string());
+    }
+    let scores = turn_sums(&words, secrets, guessed, &cache, picks, log);
+    let (_, min) = scores.first().unwrap();
+    let count = scores.iter().filter(|(_, s)| s == min).count();
+    println!(
+        "Turn sums {} ({} have value {})",
+        scores.to_string(5),
+        count,
+        min
+    );
+}
+
+// Times cached and un-cached (UC)
+//   1: 8209 'roate' (12s)
+//   2: 8190 'roate', 8200 'raise' (25s)
+//   3: 8150 'raile', 8181 'roate', 8195 'raise' (39s, 41s UC)
+//   4: 8150 'raile', 8163 'soare', 8173 'roate', 8183 'raise' (71s, 75s UC)
+//   5: 8144 'raile', 8156 'soare', 8168 'roate', 8181 'raise', 8200 'arise'
+//      (1min 30s) (1min 17s more global cache)
+//  10: 8131 'raile', 8150 'roate', 8150 'soare', 8153 'raine', 8172 'arose'
+//      8175 'orate', 8175 'raise', 8184 'ariel', 8187 'irate', 8196 'arise'
+//      (4min 25s) (4min 14s more global cache) (4min 10s top-level-parallel)
+//  20: 8118 'snare', 8124 'raile', 8128 'roate', 8141 'saner', 8141 'soare', 8144 'raine',
+//      8149 'orate', 8152 'artel', 8155 'raise', 8161 'arose', 8165 'taler', 8169 'alter',
+//      8174 'irate', 8175 'ratel', 8182 'ariel', 8185 'arise', 8195 'later', 8204 'arles',
+//      8235 'aesir', 8251 'realo' (21min) (18min top-level-parallel)
+//  30: 8045 'slate', 8055 'reast', 8068 'salet', 8101 'stare', 8111 'taser', 8117 'snare',
+//      8122 'raile', 8123 'roate', 8125 'tares', 8134 'soare', 8141 'saner', 8143 'raine',
+//      8144 'orate', 8145 'artel', 8147 'raise', 8151 'alert', 8153 'taler', 8156 'arose',
+//      8163 'alter', 8164 'irate', 8169 'ratel', 8178 'ariel', 8179 'arise', 8182 'later',
+//      8201 'lares', 8202 'arles', 8232 'aesir', 8234 'oater', 8246 'realo', 8274 'reais' (63min)
+// #[ignore]
+#[test]
+fn test_medium_turn_sums() {
+    let lang = English;
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
+    let guessed = vec![];
+
+    let picks = 2;
+    let log = true;
+    let count = 2315;
+    let secrets: Solutions = words.secrets.iter().take(count).collect();
+    let scores = turn_sums(&words, &secrets, &guessed, &cache, picks, log);
+    println!("Turn sums: {}", scores.to_string(picks));
+}
+
+#[ignore]
+#[test]
+fn test_tree_depth() {
+    tree_depth(English);
+}
+type Attempt = usize;
+type Count = usize;
+// According to full easy mode tree:
+// ( 2×(23+11) + 3×(11+795+216) + 4×(216+974+30) + 5×(30+9) ) / 2315 = 3.546
+fn tree_depth(lang: Language) {
+    let words = Words::new(lang);
+    let secrets: Solutions = words.secrets.iter().collect();
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
+
+    let guessed = [];
+
+    // let cache2 = BTreeMap<>
+
+    let count_by_attempts = count_by_attempts(&words, &secrets, &guessed, &cache);
+    print_stats(count_by_attempts.iter());
+
+    // roate with 1 top 1 sub
+    let expected = vec![(2, 34), (3, 1022), (4, 1220), (5, 39)]
+        .into_iter()
+        .collect();
+    assert_eq!(count_by_attempts, expected);
+}
+
+fn count_by_attempts<'a>(
+    words: &'a Words,
+    secrets: &Solutions,
+    guessed: &[&Word],
+    cache: &Cache<'a>,
+) -> BTreeMap<Attempt, Count> {
+    if guessed.len() > MAX_ATTEMPTS {
+        // avoid unsolvable paths my making them cost a lot
+        return [(usize::MAX, 1)].into_iter().collect();
+    }
+    let top = 1;
+    let sub = 1;
+    let picks = if guessed.is_empty() { top } else { sub };
+    fewest_remaining_solutions(words, secrets, guessed, cache)
+        .into_par_iter()
+        .take(picks)
+        .map(|(guess, _score)| {
+            let mut guessed = guessed.to_vec();
+            guessed.push(guess);
+
+            let mut counts_by_attempts: BTreeMap<Attempt, Count> = BTreeMap::new();
+
+            for solutions in cache.hint_solutions.by_hint_by_guess[&guess]
+                .values()
+                .map(|solutions| solutions.intersect(secrets))
+                .filter(|solutions| !solutions.is_empty())
+            {
+                let attempt = guessed.len();
+                match solutions.len() {
+                    1 => {
+                        // We guess this only viable solution on the next attempt
+                        *counts_by_attempts.entry(attempt + 1).or_default() += 1;
+                    }
+                    2 => {
+                        // If there are two solutions left, there is a 50/50 chance of
+                        // getting it on the next guess, or the one after that
+                        *counts_by_attempts.entry(attempt + 1).or_default() += 1;
+                        *counts_by_attempts.entry(attempt + 2).or_default() += 1;
+                    }
+                    _ => {
+                        // If there are more guesses, add all the result to the map
+                        for (attempt, count) in
+                            count_by_attempts(words, &solutions, &guessed, cache)
+                        {
+                            *counts_by_attempts.entry(attempt).or_default() += count
+                        }
+                    }
+                }
+            }
+            let total = counts_by_attempts.iter().map(|(_, cnt)| cnt).sum::<usize>() as f64;
+            let sum = attempts_sum(counts_by_attempts.iter());
+            let average = sum as f64 / total;
+            if total == 2315_f64 {
+                println!(
+                    "{:.3} avg ({} sum) for 1. guess {} with {:2} top and {:2} sub",
+                    average,
+                    sum,
+                    guess.to_string(),
+                    top,
+                    sub
+                );
+            }
+
+            (counts_by_attempts, sum)
+        })
+        .min_by_key(|(_count_by_attempts, sum)| *sum)
+        .map(|(count_by_attempts, _sum)| count_by_attempts)
+        .unwrap()
 }
 
 #[ignore] // < 2s
@@ -1201,7 +1424,7 @@ fn test_get_hint() {
 #[ignore]
 #[test]
 fn lowest_total_number_of_remaining_solutions_only_counts_remaining_viable_solutions() {
-    let secrets: BTreeSet<Secret> = ["augur", "briar", "friar", "lunar", "sugar"]
+    let secrets: HashSet<Secret> = ["augur", "briar", "friar", "lunar", "sugar"]
         .iter()
         .map(|w| w.to_word())
         .collect();

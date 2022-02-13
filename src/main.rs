@@ -37,7 +37,7 @@ type Solutions<'a> = BTreeSet<&'a Secret>;
 struct Words {
     lang: Language,
     guesses: Vec<Guess>,
-    secrets: BTreeSet<Secret>,
+    secrets: HashSet<Secret>,
 }
 impl Words {
     fn new(lang: Language) -> Self {
@@ -77,6 +77,7 @@ impl<'a> Wordle<'a> {
                 &FirstOfTwoOrFewerRemainingSolutions,
                 &WordWithMostNewCharsFromRemainingSolutions,
                 &WordThatResultsInFewestRemainingSolutions,
+                &WordThatResultsInShortestGameApproximation,
             ],
             PickFirstSolution,
         );
@@ -605,9 +606,145 @@ trait TryToPickWord {
     fn pick(&self, game: &Wordle) -> Option<Guess>;
 }
 
+struct WordThatResultsInShortestGameApproximation;
+impl TryToPickWord for WordThatResultsInShortestGameApproximation {
+    fn pick(&self, game: &Wordle) -> Option<Guess> {
+        let guessed: Vec<_> = game.guessed.iter().collect();
+        let picks = 10;
+        let mut scores = turn_sums(
+            game.words,
+            &game.solutions,
+            &guessed,
+            game.cache,
+            picks,
+            false,
+        );
+        if game.print_output {
+            scores.sort_asc();
+            println!(
+                "Best (fewest remaining solutions): {}",
+                scores.to_string(picks)
+            );
+        }
+        scores.lowest()
+    }
+}
+/// Returns a turn sum for each guess. The expected number of turns
+/// for a guess is this sum divided by number of solutions left
+fn turn_sums<'a>(
+    words: &'a Words,
+    secrets: &'a Solutions,
+    guessed: &'a [&Guess],
+    cache: &'a Cache,
+    picks: usize,
+    log: bool,
+) -> Vec<(&'a Guess, usize)> {
+    if secrets.len() <= 2 {
+        return trivial_turn_sum(words, secrets, guessed, log);
+    } else if guessed.len() >= 6 {
+        panic!();
+    }
+    let best = fewest_remaining_solutions(words, secrets, guessed, cache);
+    let mut sum_by_solutions_cache: HashMap<Solutions, usize> = HashMap::new();
+    let mut scores: Vec<(&Guess, usize)> = best
+        .into_iter()
+        .enumerate()
+        .take(picks) // only the best ${picks} guesses
+        .inspect(|&(i, (guess, score))| {
+            if log {
+                println!(
+                    "{} {}/{} ({}.) guess {} reduces {} solutions to {:.3}",
+                    "\t".repeat(guessed.len()),
+                    i + 1,
+                    picks,
+                    guessed.len() + 1,
+                    guess.to_string(),
+                    secrets.len(),
+                    score,
+                );
+            }
+        })
+        .map(|(i, (guess, score))| {
+            let mut guessed = guessed.to_vec();
+            guessed.push(guess);
+            let solutions = &cache.hint_solutions.by_hint_by_guess[guess];
+            let sum: usize = solutions
+                .iter()
+                .map(|(_hint, solutions)| solutions.intersect(secrets))
+                .filter(|intersection| !intersection.is_empty())
+                .map(|intersection| {
+                    if intersection.len() > 3 && sum_by_solutions_cache.contains_key(&intersection)
+                    {
+                        *sum_by_solutions_cache.get(&intersection).unwrap()
+                    } else {
+                        let min_score =
+                            turn_sums(words, &intersection, &guessed, cache, picks, log)
+                                .lowest_score()
+                                .unwrap();
+                        sum_by_solutions_cache.insert(intersection, min_score);
+                        min_score
+                    }
+                })
+                .sum();
+            (guess, sum)
+        })
+        .collect();
+    scores.sort_asc();
+    scores.into_iter().take(picks).collect()
+}
+
+fn trivial_turn_sum<'a>(
+    words: &'a Words,
+    secrets: &Solutions,
+    guessed: &[&Guess],
+    log: bool,
+) -> Vec<(&'a Guess, usize)> {
+    assert!(secrets.len() <= 2);
+    let first = secrets.iter().next().unwrap();
+    let first = words.guesses.iter().find(|g| g == first).unwrap();
+
+    let this_turn = guessed.len() + 1;
+    return if secrets.len() == 1 {
+        // With only one solution left, the optimal "strategy" picks it
+        if log {
+            println!(
+                "{}{}. guess is the solution: {}",
+                "\t".repeat(this_turn - 1),
+                this_turn,
+                first.to_string()
+            );
+        }
+        vec![(first, this_turn)]
+    } else {
+        let second = secrets.iter().nth(1).unwrap();
+        let second = words.guesses.iter().find(|g| g == second).unwrap();
+        let next_turn = this_turn + 1;
+        let sum = this_turn + next_turn;
+        // With two remaining solutions there is no better strategy than choosing either,
+        // which will be right 50% of the time. The optimal sum of turns is 3, one turn if picked
+        // correctly, and 2 turns if not. The average would be 1.5.
+        if log {
+            println!(
+                "{}{}. guess or {}. guess is the solution: {} or {}",
+                "\t".repeat(this_turn - 1),
+                next_turn,
+                this_turn,
+                first.to_string(),
+                second.to_string()
+            );
+        }
+        vec![(first, sum), (second, sum)]
+    };
+}
+
 struct WordThatResultsInFewestRemainingSolutions;
 impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Guess> {
+        // Use this for first guess, because the more complicated
+        // methods are too slow with all possible solutions
+        if !game.guessed.is_empty() {
+            return None;
+        }
         let mut scores = fewest_remaining_solutions_for_game(game);
         if game.print_output {
             scores.sort_asc();
