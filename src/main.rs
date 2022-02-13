@@ -497,14 +497,28 @@ impl<W: AsRef<Word>> CharacterCounts for BTreeSet<W> {
     }
 }
 
-trait ScoreTrait {
+trait ScoreTrait<T: PartialOrd + Copy> {
     fn sort_asc(&mut self);
     fn sort_desc(&mut self);
     fn to_string(&self, count: usize) -> String;
-    fn lowest(&self) -> Option<Word>;
-    fn highest(&self) -> Option<Word>;
+    fn lowest_pair(&self) -> Option<(T, Word)>;
+    fn highest_pair(&self) -> Option<(T, Word)>;
+
+    fn lowest(&self) -> Option<Word> {
+        self.lowest_pair().map(|(_, word)| word)
+    }
+    fn highest(&self) -> Option<Word> {
+        self.highest_pair().map(|(_, word)| word)
+    }
+
+    fn lowest_score(&self) -> Option<T> {
+        self.lowest_pair().map(|(score, _)| score)
+    }
+    fn highest_score(&self) -> Option<T> {
+        self.highest_pair().map(|(score, _)| score)
+    }
 }
-impl<T: PartialOrd + Display> ScoreTrait for Vec<(&Word, T)> {
+impl<T: PartialOrd + Copy + Display> ScoreTrait<T> for Vec<(&Word, T)> {
     fn sort_asc(&mut self) {
         self.sort_unstable_by(|(a_word, a_value), (b_word, b_value)| {
             match a_value.partial_cmp(b_value) {
@@ -524,11 +538,11 @@ impl<T: PartialOrd + Display> ScoreTrait for Vec<(&Word, T)> {
     fn to_string(&self, count: usize) -> String {
         self.iter()
             .take(count)
-            .map(|(word, value)| format!("{:.2} {}", value, word.to_string()))
+            .map(|(word, value)| format!("{:.3} {}", value, word.to_string()))
             .collect::<Vec<_>>()
             .join(", ")
     }
-    fn lowest(&self) -> Option<Word> {
+    fn lowest_pair(&self) -> Option<(T, Word)> {
         self.iter()
             .min_by(
                 |(a_word, a_value), (b_word, b_value)| match a_value.partial_cmp(b_value) {
@@ -536,9 +550,9 @@ impl<T: PartialOrd + Display> ScoreTrait for Vec<(&Word, T)> {
                     Some(by_value) => by_value,
                 },
             )
-            .map(|&(word, _)| word.clone())
+            .map(|&(word, v)| (v, word.clone()))
     }
-    fn highest(&self) -> Option<Word> {
+    fn highest_pair(&self) -> Option<(T, Word)> {
         self.iter()
             .max_by(
                 |(a_word, a_value), (b_word, b_value)| match a_value.partial_cmp(b_value) {
@@ -546,7 +560,7 @@ impl<T: PartialOrd + Display> ScoreTrait for Vec<(&Word, T)> {
                     Some(by_value) => by_value,
                 },
             )
-            .map(|&(word, _)| word.clone())
+            .map(|&(word, v)| (v, word.clone()))
     }
 }
 
