@@ -1,5 +1,5 @@
 use std::cmp::{Ordering, Reverse};
-use std::collections::{BTreeSet, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::env::args;
 use std::fmt::{Display, Formatter};
 use std::io;
@@ -24,6 +24,8 @@ const SOLUTIONS: [&str; 4] = [
     include_str!("../data/word_lists/primal/solutions.txt"),
 ];
 
+const MAX_ATTEMPTS: usize = 6;
+const AUTOPLAY_MAX_ATTEMPTS: usize = 10;
 const ALL_POS: [usize; 5] = [0, 1, 2, 3, 4];
 
 type Word = Vec<char>;
@@ -32,6 +34,8 @@ type Secret = Word;
 type Feedback = Guess;
 type HintValue = u8;
 type Solutions<'a> = BTreeSet<&'a Secret>;
+type Attempt = usize;
+type Count = usize;
 
 #[derive(Clone)]
 struct Words {
@@ -101,12 +105,10 @@ impl<'a> Wordle<'a> {
         self.solutions = self.solutions.intersect(solutions);
     }
 
-    #[cfg(test)]
     #[allow(clippy::ptr_arg)] // to_string is implemented for Word but not &[char]
     fn autoplay(&mut self, secret: &Secret, mut strategy: impl PickWord) {
         self.print_output = false;
 
-        const AUTOPLAY_MAX_ATTEMPTS: usize = 10;
         while self.guessed.len() < AUTOPLAY_MAX_ATTEMPTS {
             let guess: Guess = strategy.pick(self);
             let hint = self.cache.hints.by_secret_by_guess[&guess][secret];
@@ -135,7 +137,6 @@ impl<'a> Wordle<'a> {
         }
     }
 
-    #[cfg(test)] // autoplay
     fn print_state(&self, guess: &Guess, secret: &Secret, hint: HintValue) {
         println!(
             "{:4} solutions left, {}. guess {}, hint {}, secret {}",
@@ -847,10 +848,9 @@ struct FixedGuessList {
     guesses: Vec<Guess>,
 }
 impl FixedGuessList {
-    #[cfg(test)]
-    fn new(guesses: Vec<&str>) -> Self {
-        println!("Fixed guesses {:?}\n", guesses);
-        let guesses = guesses.into_iter().map(|w| w.to_word()).collect();
+    fn new<S: AsRef<str>>(guesses: Vec<S>) -> Self {
+        let guesses: Vec<Guess> = guesses.into_iter().map(|w| w.as_ref().to_word()).collect();
+        println!("Fixed guesses {}\n", guesses.to_string());
         FixedGuessList { guesses }
     }
 }
@@ -1261,18 +1261,94 @@ impl GetHint for Word {
 
 fn main() {
     let args: Vec<String> = args().collect();
-    let lang = if args.len() > 1 {
-        Language::try_from(args[1].as_str()).unwrap_or(English)
+    let mut lang: Option<Language> = None;
+    let mut consumed_args = 1;
+    if args.len() > 1 {
+        if let Ok(parsed_lang) = Language::try_from(args[1].as_str()) {
+            println!("Parsed language '{}'", parsed_lang);
+            lang = Some(parsed_lang);
+            consumed_args = 2;
+        }
+    }
+    let lang = lang.unwrap_or(English);
+    println!(
+        "Language: {}. Choices: English, NYTimes, German, Primal.",
+        lang
+    );
+    if args.len() > consumed_args {
+        let guesses = args
+            .iter()
+            .skip(consumed_args)
+            .map(|s| s.to_ascii_lowercase())
+            .collect();
+        let strategy = FixedGuessList::new(guesses);
+        autoplay_and_print_stats_with_language(strategy, lang);
     } else {
-        English
-    };
-    // print_word_combinations();
+        let words = Words::new(lang);
+        let hsg = HintsBySecretByGuess::of(&words);
+        let shg = SolutionsByHintByGuess::of(&words, &hsg);
+        let cache = Cache::new(&words, &hsg, &shg);
+        let mut game = Wordle::with(&words, &cache);
+        game.play();
+    }
+}
+
+fn autoplay_and_print_stats_with_language<S: TryToPickWord + Sync>(strategy: S, lang: Language) {
     let words = Words::new(lang);
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let cache = Cache::new(&words, &hsg, &shg);
-    let mut game = Wordle::with(&words, &cache);
-    game.play();
+
+    let mut secrets: Vec<_> = words
+        .secrets
+        .iter()
+        // .filter(|w| w.to_string().eq("'rowdy'"))
+        .collect();
+    secrets.sort_unstable();
+    let attempts: Vec<usize> = secrets
+        .iter()
+        .map(|secret| {
+            let mut game = Wordle::with(&words, &cache);
+            let strategy = ChainedStrategies::new(
+                vec![
+                    &FirstOfTwoOrFewerRemainingSolutions,
+                    &WordWithMostNewCharsFromRemainingSolutions,
+                    &strategy,
+                ],
+                PickFirstSolution,
+            );
+            game.autoplay(secret, strategy);
+            game.guessed.len()
+        })
+        .collect();
+    let mut count_by_attempts: BTreeMap<Attempt, Count> = BTreeMap::new();
+    for attempt in attempts {
+        *count_by_attempts.entry(attempt).or_default() += 1;
+    }
+    print_stats(count_by_attempts.iter());
+}
+fn print_stats<'a>(count_by_attempts: impl Iterator<Item = (&'a Attempt, &'a Count)>) {
+    let mut games = 0;
+    let mut attempts_sum = 0;
+    let mut failures = 0;
+    let mut descs = vec![];
+    for (attempts, count) in count_by_attempts {
+        games += count;
+        attempts_sum += attempts * count;
+        if attempts > &MAX_ATTEMPTS {
+            failures += count;
+        }
+        descs.push(format!("{}: {}", attempts, count));
+    }
+    let average = attempts_sum as f64 / games as f64;
+
+    print!("\n{:.3} average attempts; {}", average, descs.join(", "));
+    if failures > 0 {
+        let percent_failed = 100.0 * failures as f64 / games as f64;
+        println!("; {} ({:.2}%) failures", failures, percent_failed)
+    } else {
+        println!();
+    }
 }
 
 struct Cache<'a> {
@@ -1313,6 +1389,20 @@ impl TryFrom<&str> for Language {
             "german" | "deutsch" => Ok(German),
             _ => Err(format!("Unknown language '{}'", lang)),
         }
+    }
+}
+impl Display for Language {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                English => "English",
+                German => "German",
+                NYTimes => "NYTimes",
+                Primal => "Primal",
+            }
+        )
     }
 }
 

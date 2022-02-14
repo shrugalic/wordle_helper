@@ -112,3 +112,25 @@ Average attempts = 3.547; 2: 39, 3: 1015, 4: 1216, 5: 45
 ```
 
 There is also a full (around 8k lines!) [full example here](data/simulation_example.txt).
+
+### Simulation of fixed word list:
+```sh
+❯ cargo run --release NYTimes roate linds chump gleby
+
+Parsed language 'NYTimes'
+Language: NYTimes. Choices: English, NYTimes, German, Primal.
+Fixed guesses 'roate', 'linds', 'chump', 'gleby'
+
+2309 solutions left, 1. guess 'roate', hint ⬛⬛🟩⬛⬛, secret 'aback'
+  71 solutions left, 2. guess 'linds', hint ⬛⬛⬛⬛⬛, secret 'aback'
+   6 solutions left, 3. guess 'chump', hint 🟨⬛⬛⬛⬛, secret 'aback'
+   1 solutions left, 4. guess 'aback', hint 🟩🟩🟩🟩🟩, secret 'aback'
+   
+…
+
+2309 solutions left, 1. guess 'roate', hint ⬛🟩🟨⬛⬛, secret 'zonal'
+  16 solutions left, 2. guess 'linds', hint 🟨⬛🟩⬛⬛, secret 'zonal'
+   1 solutions left, 3. guess 'zonal', hint 🟩🟩🟩🟩🟩, secret 'zonal'
+
+3.848 average attempts; 2: 34, 3: 691, 4: 1211, 5: 338, 6: 34, 7: 1; 1 (0.04%) failures
+```

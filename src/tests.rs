@@ -3,8 +3,6 @@ use std::time::{Duration, Instant};
 
 use super::*;
 
-const MAX_ATTEMPTS: usize = 6;
-
 #[ignore] // ~30s for all guesses, ~6s for solutions only
 #[test]
 fn compare_best_word_strategies() {
@@ -421,8 +419,7 @@ fn test_medium_turn_sums() {
 fn test_tree_depth() {
     tree_depth(English);
 }
-type Attempt = usize;
-type Count = usize;
+
 // According to full easy mode tree:
 // ( 2×(23+11) + 3×(11+795+216) + 4×(216+974+30) + 5×(30+9) ) / 2315 = 3.546
 fn tree_depth(lang: Language) {
@@ -1189,64 +1186,6 @@ fn auto_play_most_other_words_in_at_least_one_open_position_high_variety_word() 
 
 fn autoplay_and_print_stats<S: TryToPickWord + Sync>(strategy: S) {
     autoplay_and_print_stats_with_language(strategy, English);
-}
-fn autoplay_and_print_stats_with_language<S: TryToPickWord + Sync>(strategy: S, lang: Language) {
-    let words = Words::new(lang);
-    let hsg = HintsBySecretByGuess::of(&words);
-    let shg = SolutionsByHintByGuess::of(&words, &hsg);
-    let cache = Cache::new(&words, &hsg, &shg);
-
-    let mut secrets: Vec<_> = words
-        .secrets
-        .iter()
-        // .filter(|w| w.to_string().eq("'rowdy'"))
-        .collect();
-    secrets.sort_unstable();
-    let attempts: Vec<usize> = secrets
-        .iter()
-        .map(|secret| {
-            let mut game = Wordle::with(&words, &cache);
-            let strategy = ChainedStrategies::new(
-                vec![
-                    &FirstOfTwoOrFewerRemainingSolutions,
-                    &WordWithMostNewCharsFromRemainingSolutions,
-                    &strategy,
-                ],
-                PickFirstSolution,
-            );
-            game.autoplay(secret, strategy);
-            game.guessed.len()
-        })
-        .collect();
-    let mut count_by_attempts: BTreeMap<Attempt, Count> = BTreeMap::new();
-    for attempt in attempts {
-        *count_by_attempts.entry(attempt).or_default() += 1;
-    }
-    print_stats(count_by_attempts.iter());
-}
-
-fn print_stats<'a>(count_by_attempts: impl Iterator<Item = (&'a Attempt, &'a Count)>) {
-    let mut games = 0;
-    let mut attempts_sum = 0;
-    let mut failures = 0;
-    let mut descs = vec![];
-    for (attempts, count) in count_by_attempts {
-        games += count;
-        attempts_sum += attempts * count;
-        if attempts > &MAX_ATTEMPTS {
-            failures += count;
-        }
-        descs.push(format!("{}: {}", attempts, count));
-    }
-    let average = attempts_sum as f64 / games as f64;
-
-    print!("\n{:.3} average attempts; {}", average, descs.join(", "));
-    if failures > 0 {
-        let percent_failed = 100.0 * failures as f64 / games as f64;
-        println!("; {} ({:.2}%) failures", failures, percent_failed)
-    } else {
-        println!();
-    }
 }
 
 /// Sum of attempts * count
