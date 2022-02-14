@@ -1343,21 +1343,17 @@ fn test_word_hint_values() {
 
 #[ignore]
 #[test]
-fn test_get_hint() {
-    let hint = "guest".to_word().calculate_hint(&"truss".to_word());
-    assert_eq!("⬛🟨⬛🟩🟨", hint.to_string());
+fn test_calculate_hint() {
+    assert_eq!("⬛🟨⬛🟩🟨", "guest".calculate_hint(&"truss").to_string());
+    assert_eq!("⬛🟩⬛⬛🟩", "briar".calculate_hint(&"error").to_string());
+    assert_eq!("🟨⬛⬛🟩⬛", "sissy".calculate_hint(&"truss").to_string());
+    assert_eq!("🟨⬛🟩⬛⬛", "eject".calculate_hint(&"geese").to_string());
+    assert_eq!("🟨⬛🟩🟩🟨", "three".calculate_hint(&"beret").to_string());
 
-    let hint = "briar".to_word().calculate_hint(&"error".to_word());
-    assert_eq!("⬛🟩⬛⬛🟩", hint.to_string());
-
-    let hint = "sissy".to_word().calculate_hint(&"truss".to_word());
-    assert_eq!("🟨⬛⬛🟩⬛", hint.to_string());
-
-    let hint = "eject".to_word().calculate_hint(&"geese".to_word());
-    assert_eq!("🟨⬛🟩⬛⬛", hint.to_string());
-
-    let hint = "three".to_word().calculate_hint(&"beret".to_word());
-    assert_eq!("🟨⬛🟩🟩🟨", hint.to_string());
+    assert_eq!("⬛⬛🟨⬛🟨", "speed".calculate_hint(&"abide").to_string());
+    assert_eq!("🟨⬛🟨🟨⬛", "speed".calculate_hint(&"erase").to_string());
+    assert_eq!("🟩⬛🟩⬛⬛", "speed".calculate_hint(&"steal").to_string());
+    assert_eq!("⬛🟨🟩🟨⬛", "speed".calculate_hint(&"crepe").to_string());
 }
 
 #[ignore]

@@ -1219,10 +1219,10 @@ trait GetHint {
     /// which depends on its index `i` within the word (the first index being 0).
     ///
     /// Returns a hints for the given guess and solution
-    fn calculate_hint(&self, secret: &Word) -> Hints;
+    fn calculate_hint(&self, secret: &Self) -> Hints;
 }
 impl GetHint for Word {
-    fn calculate_hint(&self, secret: &Word) -> Hints {
+    fn calculate_hint(&self, secret: &Self) -> Hints {
         // Initialize as every position incorrect
         let mut hint = Hints::default();
 
@@ -1256,6 +1256,11 @@ impl GetHint for Word {
             }
         }
         hint
+    }
+}
+impl GetHint for &str {
+    fn calculate_hint(&self, secret: &Self) -> Hints {
+        self.to_word().calculate_hint(&secret.to_word())
     }
 }
 
