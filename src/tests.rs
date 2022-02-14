@@ -821,138 +821,22 @@ fn test_hint_from_value_and_back() {
 #[ignore] // ~26 min (i9) or ~39 min (M1) or 21.7min (M1 Max)
 #[test]
 // 3.55 average attempts; 2: 40, 3: 999, 4: 1234, 5: 42
-fn auto_play_word_that_results_in_fewest_remaining_solutions() {
+fn autoplay_word_that_results_in_fewest_remaining_solutions() {
     autoplay_and_print_stats(WordThatResultsInFewestRemainingSolutions);
 }
 
 #[ignore] // 1min 38s (i9) or 1min 53s (M1) or 74s (M1 Max)
 #[test]
 // 3.36 average attempts; 2: 42, 3: 685, 4: 429, 5: 15
-fn auto_play_word_that_results_in_fewest_remaining_solutions_german() {
+fn autoplay_word_that_results_in_fewest_remaining_solutions_german() {
     autoplay_and_print_stats_with_language(WordThatResultsInFewestRemainingSolutions, German);
-}
-
-#[ignore]
-#[test]
-// 4.071 average attempts; 2: 41, 3: 438, 4: 1185, 5: 617, 6: 34
-fn auto_play_tubes_fling_champ_wordy_every_time() {
-    let strategy = FixedGuessList::new(vec!["tubes", "fling", "champ", "wordy"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// 4.332 average attempts; 2: 27, 3: 364, 4: 944, 5: 788, 6: 178, 7: 14; 14 (0.60%) failures
-fn auto_play_crwth_faxed_vulgo_zinky_jambs_every_time() {
-    let strategy = FixedGuessList::new(vec!["crwth", "faxed", "vulgo", "zinky", "jambs"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// 3.821 average attempts; 1: 1, 2: 48, 3: 710, 4: 1201, 5: 317, 6: 37, 7: 1; 1 (0.04%) failures
-fn auto_play_crane_sloth_pudgy_every_time() {
-    let strategy = FixedGuessList::new(vec!["crane", "sloth", "pudgy"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// 4.107 average attempts; 1: 1, 2: 31, 3: 429, 4: 1164, 5: 641, 6: 47, 7: 2; 2 (0.09%) failures
-fn auto_play_spade_lucky_brown_fight_every_time() {
-    let strategy = FixedGuessList::new(vec!["spade", "lucky", "brown", "fight"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// 3.982 average attempts; 1: 1, 2: 52, 3: 537, 4: 1194, 5: 466, 6: 58, 7: 7; 7 (0.30%) failures
-fn auto_play_stale_dough_brink_every_time() {
-    let strategy = FixedGuessList::new(vec!["stale", "dough", "brink"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// 4.549 average attempts; 1: 1, 2: 19, 3: 258, 4: 821, 5: 889, 6: 301, 7: 26; 26 (1.12%) failures
-fn auto_play_fjord_waltz_nymph_quick_vexes_every_time() {
-    let strategy = FixedGuessList::new(vec!["fjord", "waltz", "nymph", "quick", "vexes"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// 4.495 average attempts; 1: 1, 2: 19, 3: 257, 4: 828, 5: 988, 6: 210, 7: 12; 12 (0.52%) failures
-fn auto_play_fjord_waltz_psych_imbue_every_time() {
-    let strategy = FixedGuessList::new(vec!["fjord", "waltz", "psych", "imbue"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// 4.599 average attempts; 1: 1, 2: 32, 3: 198, 4: 683, 5: 1159, 6: 234, 7: 8; 8 (0.35%) failures
-fn auto_play_glyph_jocks_fixed_brawn_every_time() {
-    let strategy = FixedGuessList::new(vec!["glyph", "jocks", "fixed", "brawn"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// 4.259 average attempts; 2: 30, 3: 457, 4: 924, 5: 713, 6: 169, 7: 22; 22 (0.95%) failures
-fn auto_play_glent_brick_jumpy_vozhd_waqfs_every_time() {
-    let strategy = FixedGuessList::new(vec!["glent", "brick", "jumpy", "vozhd", "waqfs"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// 4.256 average attempts; 2: 30, 3: 457, 4: 924, 5: 715, 6: 172, 7: 17; 17 (0.73%) failures
-fn auto_play_glent_brick_jumpy_vozhd_every_time() {
-    let strategy = FixedGuessList::new(vec!["glent", "brick", "jumpy", "vozhd"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// Average attempts = 3.829; 7 (0.302%) failed games (> 6 attempts):
-// 2: 57, 3: 770, 4: 1077, 5: 342, 6: 62, 7: 6, 8: 1
-fn auto_play_roate_linds_chump_gawky_befit() {
-    let strategy = FixedGuessList::new(vec!["roate", "linds", "chump", "gawky", "befit"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// Average attempts = 3.816; 2 (0.086%) failed games (> 6 attempts):
-// 2: 47, 3: 796, 4: 1065, 5: 353, 6: 52, 7: 2
-fn auto_play_roate_linds_chump_gawky() {
-    let strategy = FixedGuessList::new(vec!["roate", "linds", "chump", "gawky"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// Average attempts = 3.807; 5 (0.216%) failed games (> 6 attempts):
-// 2: 62, 3: 789, 4: 1073, 5: 321, 6: 65, 7: 4, 8: 1
-fn auto_play_roate_linds_chump_gleby_wakfs() {
-    let strategy = FixedGuessList::new(vec!["roate", "linds", "chump", "gleby", "wakfs"]);
-    autoplay_and_print_stats(strategy);
-}
-
-#[ignore]
-#[test]
-// Average attempts = 3.809; 4 (0.173%) failed games (> 6 attempts):
-// 2: 65, 3: 769, 4: 1085, 5: 340, 6: 52, 7: 4
-fn auto_play_roate_linds_chump_gleby() {
-    let strategy = FixedGuessList::new(vec!["roate", "linds", "chump", "gleby"]);
-    autoplay_and_print_stats(strategy);
 }
 
 #[ignore]
 #[test]
 // Average attempts = 3.564; 0 (0.000%) failed games (> 6 attempts):
 // 2: 41, 3: 530, 4: 502, 5: 94, 6: 4
-fn auto_play_german_raine_holst_dumpf_biwak_legen() {
+fn autoplay_german_raine_holst_dumpf_biwak_legen() {
     let strategy = FixedGuessList::new(vec!["raine", "holst", "dumpf", "biwak", "legen"]);
     autoplay_and_print_stats_with_language(strategy, German);
 }
@@ -961,7 +845,7 @@ fn auto_play_german_raine_holst_dumpf_biwak_legen() {
 #[test]
 // Average attempts = 3.564; 0 (0.000%) failed games (> 6 attempts):
 // 2: 41, 3: 530, 4: 502, 5: 94, 6: 4
-fn auto_play_german_raine_holst_dumpf_biwak() {
+fn autoplay_german_raine_holst_dumpf_biwak() {
     let strategy = FixedGuessList::new(vec!["raine", "holst", "dumpf", "biwak"]);
     autoplay_and_print_stats_with_language(strategy, German);
 }
@@ -970,7 +854,7 @@ fn auto_play_german_raine_holst_dumpf_biwak() {
 #[test]
 // Average attempts = 3.749; 9 (0.546%) failed games (> 6 attempts):
 // 2: 82, 3: 649, 4: 610, 5: 229, 6: 70, 7: 6, 8: 3
-fn auto_play_german_tarne_helis_gudok_zamba_fiept() {
+fn autoplay_german_tarne_helis_gudok_zamba_fiept() {
     let strategy = FixedGuessList::new(vec!["tarne", "helis", "gudok", "zamba", "fiept"]);
     autoplay_and_print_stats_with_language(strategy, German);
 }
@@ -979,16 +863,132 @@ fn auto_play_german_tarne_helis_gudok_zamba_fiept() {
 #[test]
 // Average attempts = 3.763; 7 (0.424%) failed games (> 6 attempts):
 // 2: 79, 3: 623, 4: 631, 5: 249, 6: 60, 7: 6, 8: 1
-fn auto_play_german_tarne_helis_gudok_zamba() {
+fn autoplay_german_tarne_helis_gudok_zamba() {
     let strategy = FixedGuessList::new(vec!["tarne", "helis", "gudok", "zamba"]);
     autoplay_and_print_stats_with_language(strategy, German);
 }
 
 #[ignore]
 #[test]
+// 4.071 average attempts; 2: 41, 3: 438, 4: 1185, 5: 617, 6: 34
+fn autoplay_tubes_fling_champ_wordy() {
+    let strategy = FixedGuessList::new(vec!["tubes", "fling", "champ", "wordy"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// 4.332 average attempts; 2: 27, 3: 364, 4: 944, 5: 788, 6: 178, 7: 14; 14 (0.60%) failures
+fn autoplay_crwth_faxed_vulgo_zinky_jambs() {
+    let strategy = FixedGuessList::new(vec!["crwth", "faxed", "vulgo", "zinky", "jambs"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// 3.821 average attempts; 1: 1, 2: 48, 3: 710, 4: 1201, 5: 317, 6: 37, 7: 1; 1 (0.04%) failures
+fn autoplay_crane_sloth_pudgy() {
+    let strategy = FixedGuessList::new(vec!["crane", "sloth", "pudgy"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// 4.107 average attempts; 1: 1, 2: 31, 3: 429, 4: 1164, 5: 641, 6: 47, 7: 2; 2 (0.09%) failures
+fn autoplay_spade_lucky_brown_fight() {
+    let strategy = FixedGuessList::new(vec!["spade", "lucky", "brown", "fight"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// 3.982 average attempts; 1: 1, 2: 52, 3: 537, 4: 1194, 5: 466, 6: 58, 7: 7; 7 (0.30%) failures
+fn autoplay_stale_dough_brink() {
+    let strategy = FixedGuessList::new(vec!["stale", "dough", "brink"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// 4.549 average attempts; 1: 1, 2: 19, 3: 258, 4: 821, 5: 889, 6: 301, 7: 26; 26 (1.12%) failures
+fn autoplay_fjord_waltz_nymph_quick_vexes() {
+    let strategy = FixedGuessList::new(vec!["fjord", "waltz", "nymph", "quick", "vexes"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// 4.495 average attempts; 1: 1, 2: 19, 3: 257, 4: 828, 5: 988, 6: 210, 7: 12; 12 (0.52%) failures
+fn autoplay_fjord_waltz_psych_imbue() {
+    let strategy = FixedGuessList::new(vec!["fjord", "waltz", "psych", "imbue"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// 4.599 average attempts; 1: 1, 2: 32, 3: 198, 4: 683, 5: 1159, 6: 234, 7: 8; 8 (0.35%) failures
+fn autoplay_glyph_jocks_fixed_brawn() {
+    let strategy = FixedGuessList::new(vec!["glyph", "jocks", "fixed", "brawn"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// 4.259 average attempts; 2: 30, 3: 457, 4: 924, 5: 713, 6: 169, 7: 22; 22 (0.95%) failures
+fn autoplay_glent_brick_jumpy_vozhd_waqfs() {
+    let strategy = FixedGuessList::new(vec!["glent", "brick", "jumpy", "vozhd", "waqfs"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// 4.256 average attempts; 2: 30, 3: 457, 4: 924, 5: 715, 6: 172, 7: 17; 17 (0.73%) failures
+fn autoplay_glent_brick_jumpy_vozhd() {
+    let strategy = FixedGuessList::new(vec!["glent", "brick", "jumpy", "vozhd"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// Average attempts = 3.829; 7 (0.302%) failed games (> 6 attempts):
+// 2: 57, 3: 770, 4: 1077, 5: 342, 6: 62, 7: 6, 8: 1
+fn autoplay_roate_linds_chump_gawky_befit() {
+    let strategy = FixedGuessList::new(vec!["roate", "linds", "chump", "gawky", "befit"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// Average attempts = 3.816; 2 (0.086%) failed games (> 6 attempts):
+// 2: 47, 3: 796, 4: 1065, 5: 353, 6: 52, 7: 2
+fn autoplay_roate_linds_chump_gawky() {
+    let strategy = FixedGuessList::new(vec!["roate", "linds", "chump", "gawky"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// Average attempts = 3.807; 5 (0.216%) failed games (> 6 attempts):
+// 2: 62, 3: 789, 4: 1073, 5: 321, 6: 65, 7: 4, 8: 1
+fn autoplay_roate_linds_chump_gleby_wakfs() {
+    let strategy = FixedGuessList::new(vec!["roate", "linds", "chump", "gleby", "wakfs"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
+// Average attempts = 3.809; 4 (0.173%) failed games (> 6 attempts):
+// 2: 65, 3: 769, 4: 1085, 5: 340, 6: 52, 7: 4
+fn autoplay_roate_linds_chump_gleby() {
+    let strategy = FixedGuessList::new(vec!["roate", "linds", "chump", "gleby"]);
+    autoplay_and_print_stats(strategy);
+}
+
+#[ignore]
+#[test]
 // Average attempts = 3.994; 21 (0.907%) failed games (> 6 attempts):
 // 2: 53, 3: 738, 4: 873, 5: 496, 6: 134, 7: 19, 8: 2
-fn auto_play_soare_until_pygmy_whack_every_time() {
+fn autoplay_soare_until_pygmy_whack() {
     let strategy = FixedGuessList::new(vec!["soare", "until", "pygmy", "whack"]);
     autoplay_and_print_stats(strategy);
 }
@@ -997,7 +997,7 @@ fn auto_play_soare_until_pygmy_whack_every_time() {
 #[test]
 // Average attempts = 4.879; 219 (9.460%) failed games (> 6 attempts):
 // 1: 1, 2: 18, 3: 317, 4: 592, 5: 622, 6: 546, 7: 200, 8: 18, 9: 1
-fn auto_play_quick_brown_foxed_jumps_glazy_vetch_every_time() {
+fn autoplay_quick_brown_foxed_jumps_glazy_vetch() {
     let strategy = FixedGuessList::new(vec!["quick", "brown", "foxed", "jumps", "glazy", "vetch"]);
     autoplay_and_print_stats(strategy);
 }
@@ -1006,7 +1006,7 @@ fn auto_play_quick_brown_foxed_jumps_glazy_vetch_every_time() {
 #[test]
 // Average attempts = 4.024; 2 (0.086%) failed games (> 6 attempts):
 // 1: 1, 2: 51, 3: 500, 4: 1177, 5: 513, 6: 71, 7: 2
-fn auto_play_fixed_guess_list_1() {
+fn autoplay_brake_dying_clots_whump() {
     let strategy = FixedGuessList::new(vec!["brake", "dying", "clots", "whump"]);
     autoplay_and_print_stats(strategy);
 }
@@ -1015,7 +1015,7 @@ fn auto_play_fixed_guess_list_1() {
 #[test]
 // Average attempts = 3.910; 1 (0.043%) failed games (> 6 attempts):
 // 1: 1, 2: 64, 3: 636, 4: 1114, 5: 443, 6: 56, 7: 1
-fn auto_play_fixed_guess_list_2() {
+fn autoplay_maple_sight_frown_ducky() {
     let strategy = FixedGuessList::new(vec!["maple", "sight", "frown", "ducky"]);
     autoplay_and_print_stats(strategy);
 }
@@ -1024,7 +1024,7 @@ fn auto_play_fixed_guess_list_2() {
 #[test]
 // Average attempts = 4.034; 5 (0.216%) failed games (> 6 attempts):
 // 1: 1, 2: 49, 3: 550, 4: 1081, 5: 544, 6: 85, 7: 5
-fn auto_play_fixed_guess_list_3() {
+fn autoplay_fiend_paths_crumb_glows() {
     let strategy = FixedGuessList::new(vec!["fiend", "paths", "crumb", "glows"]);
     autoplay_and_print_stats(strategy);
 }
@@ -1033,7 +1033,7 @@ fn auto_play_fixed_guess_list_3() {
 #[test]
 // Average attempts = 3.785; 11 (0.475%) failed games (> 6 attempts):
 // 2: 67, 3: 854, 4: 974, 5: 364, 6: 45, 7: 7, 8: 4
-fn auto_play_fixed_guess_list_4() {
+fn autoplay_reals_point_ducky() {
     let strategy = FixedGuessList::new(vec!["reals", "point", "ducky"]);
     autoplay_and_print_stats(strategy);
 }
@@ -1042,7 +1042,7 @@ fn auto_play_fixed_guess_list_4() {
 #[test]
 // Average attempts = 3.831; 8 (0.346%) failed games (> 6 attempts):
 // 2: 72, 3: 725, 4: 1113, 5: 344, 6: 53, 7: 6, 8: 1, 9: 1
-fn auto_play_fixed_guess_list_5() {
+fn autoplay_laser_pitch_mound() {
     let strategy = FixedGuessList::new(vec!["laser", "pitch", "mound"]);
     autoplay_and_print_stats(strategy);
 }
@@ -1051,7 +1051,7 @@ fn auto_play_fixed_guess_list_5() {
 #[test]
 // Average attempts = 3.743; 23 (0.994%) failed games (> 6 attempts):
 // 1: 1, 2: 135, 3: 853, 4: 924, 5: 304, 6: 75, 7: 16, 8: 5, 9: 2
-fn auto_play_most_frequent_global_characters() {
+fn autoplay_most_frequent_global_characters() {
     autoplay_and_print_stats(MostFrequentGlobalCharacter);
 }
 
@@ -1059,7 +1059,7 @@ fn auto_play_most_frequent_global_characters() {
 #[test]
 // Average attempts = 3.715; 26 (1.123%) failed games (> 6 attempts):
 // 1: 1, 2: 130, 3: 919, 4: 888, 5: 268, 6: 83, 7: 18, 8: 7, 10: 1
-fn auto_play_most_frequent_global_characters_high_variety_word() {
+fn autoplay_most_frequent_global_characters_high_variety_word() {
     autoplay_and_print_stats(MostFrequentGlobalCharacterHighVarietyWord);
 }
 
@@ -1067,7 +1067,7 @@ fn auto_play_most_frequent_global_characters_high_variety_word() {
 #[test]
 // Average attempts = 3.778; 22 (0.950%) failed games (> 6 attempts):
 // 1: 1, 2: 148, 3: 773, 4: 955, 5: 343, 6: 73, 7: 19, 8: 2, 9: 1
-fn auto_play_most_frequent_characters_per_pos() {
+fn autoplay_most_frequent_characters_per_pos() {
     autoplay_and_print_stats(MostFrequentCharacterPerPos);
 }
 
@@ -1075,7 +1075,7 @@ fn auto_play_most_frequent_characters_per_pos() {
 #[test]
 // Average attempts = 3.667; 19 (0.821%) failed games (> 6 attempts):
 // 1: 1, 2: 148, 3: 903, 4: 929, 5: 263, 6: 52, 7: 15, 8: 2, 9: 2
-fn auto_play_most_frequent_characters_per_pos_high_variety_word() {
+fn autoplay_most_frequent_characters_per_pos_high_variety_word() {
     autoplay_and_print_stats(MostFrequentCharacterPerPosHighVarietyWord);
 }
 
@@ -1083,7 +1083,7 @@ fn auto_play_most_frequent_characters_per_pos_high_variety_word() {
 #[test]
 // Average attempts = 3.951; 54 (2.333%) failed games (> 6 attempts):
 // 2: 50, 3: 829, 4: 873, 5: 390, 6: 119, 7: 34, 8: 15, 9: 5
-fn auto_play_most_frequent_characters_of_words() {
+fn autoplay_most_frequent_characters_of_words() {
     autoplay_and_print_stats(MostFrequentCharactersOfRemainingWords);
 }
 
@@ -1091,7 +1091,7 @@ fn auto_play_most_frequent_characters_of_words() {
 #[test]
 // Average attempts = 3.861; 32 (1.382%) failed games (> 6 attempts):
 // 2: 78, 3: 813, 4: 932, 5: 380, 6: 80, 7: 22, 8: 8, 9: 2
-fn auto_play_most_frequent_unused_characters() {
+fn autoplay_most_frequent_unused_characters() {
     let words = Words::new(English);
     autoplay_and_print_stats(MostFrequentUnusedCharacters::new(&words.guesses));
 }
@@ -1172,7 +1172,7 @@ fn words_with_most_new_chars<'w>(
 #[test]
 // Average attempts = 4.004; 40 (1.728%) failed games (> 6 attempts):
 // 1: 1, 2: 126, 3: 632, 4: 887, 5: 495, 6: 134, 7: 29, 8: 8, 9: 3
-fn auto_play_most_other_words_in_at_least_one_open_position() {
+fn autoplay_most_other_words_in_at_least_one_open_position() {
     autoplay_and_print_stats(MatchingMostOtherWordsInAtLeastOneOpenPosition);
 }
 
@@ -1180,7 +1180,7 @@ fn auto_play_most_other_words_in_at_least_one_open_position() {
 #[test]
 // Average attempts = 3.794; 29 (1.253%) failed games (> 6 attempts):
 // 1: 1, 2: 114, 3: 856, 4: 886, 5: 341, 6: 88, 7: 23, 8: 6
-fn auto_play_most_other_words_in_at_least_one_open_position_high_variety_word() {
+fn autoplay_most_other_words_in_at_least_one_open_position_high_variety_word() {
     autoplay_and_print_stats(MatchingMostOtherWordsInAtLeastOneOpenPositionHighVarietyWord);
 }
 
