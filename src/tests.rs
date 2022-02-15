@@ -627,9 +627,9 @@ fn find_optimal_first_word_english() {
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let cache = Cache::new(&words, &hsg, &shg);
-    let game = Wordle::with(&words, &cache);
-
-    let scores = fewest_remaining_solutions_for_game(&game);
+    let solutions = words.secrets.iter().collect();
+    let guessed = vec![];
+    let scores = fewest_remaining_solutions(&words, &solutions, &guessed, &cache);
     println!("scores {}", scores.to_string(5));
     let optimal = scores.lowest().unwrap();
     assert_eq!("roate".to_word(), optimal);
@@ -644,16 +644,14 @@ fn find_optimal_first_word_german() {
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let cache = Cache::new(&words, &hsg, &shg);
-    let game = Wordle::with(&words, &cache);
-
-    let scores = fewest_remaining_solutions_for_game(&game);
+    let solutions = words.secrets.iter().collect();
+    let guessed = vec![];
+    let scores = fewest_remaining_solutions(&words, &solutions, &guessed, &cache);
     println!("scores {}", scores.to_string(5));
     let optimal = scores.lowest().unwrap();
     assert_eq!("raine".to_word(), optimal);
 }
 
-#[ignore]
-#[test]
 // ~10s (i9) or ~13s (M1) or 6.5s (M1 Max) for 5 single German words
 // ~1min 51s (i9) or ~2min 21s (M1) or 67s (M1 Max) for 5 single English words
 //
@@ -709,6 +707,8 @@ fn find_optimal_first_word_german() {
 // Best 4. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy': 2643 gompa, 2645 gramp, 2659 grump, 2669 gimps, 2671 gimpy
 // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gompa': 2401 wakfs, 2409 wheft, 2409 fewer, 2413 tweak, 2413 fetwa
 // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gramp': 2407 wakfs, 2413 fewer, 2415 wheft, 2415 fetwa, 2417 swift
+#[ignore]
+#[test]
 fn find_optimal_word_combos() {
     let lang = English;
     let words = Words::new(lang);
@@ -717,9 +717,10 @@ fn find_optimal_word_combos() {
     let cache = Cache::new(&words, &hsg, &shg);
     let game = Wordle::with(&words, &cache);
 
-    let mut scores = fewest_remaining_solutions_for_game(&game);
+    let solutions = words.secrets.iter().collect();
+    let guessed = vec![];
+    let scores = fewest_remaining_solutions(&words, &solutions, &guessed, &cache);
     println!("Best 1. guesses: {}", scores.to_string(5));
-    scores.sort_asc();
 
     let top_pick_count = 1;
     for (guess1, _) in scores.into_iter().take(top_pick_count) {
@@ -1375,11 +1376,11 @@ fn lowest_total_number_of_remaining_solutions_only_counts_remaining_viable_solut
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let cache = Cache::new(&words, &hsg, &shg);
-    let game = Wordle::with(&words, &cache);
 
-    let allowed = &game.words.guesses;
-    let mut scores = fewest_remaining_solutions_for_game(&game);
-    scores.sort_asc();
+    let allowed = &words.guesses;
+    let solutions = words.secrets.iter().collect();
+    let guessed = vec![];
+    let scores = fewest_remaining_solutions(&words, &solutions, &guessed, &cache);
     // println!("scores {}", scores.to_string(5));
     assert_eq!(scores[0], (&allowed[0], 7.0 / len));
     assert_eq!(scores[1], (&allowed[1], 7.0 / len));

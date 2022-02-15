@@ -37,7 +37,6 @@ type Solutions<'a> = BTreeSet<&'a Secret>;
 type Attempt = usize;
 type Count = usize;
 
-#[derive(Clone)]
 struct Words {
     lang: Language,
     guesses: Vec<Guess>,
@@ -634,9 +633,9 @@ impl TryToPickWord for WordThatResultsInShortestGameApproximation {
 /// for a guess is this sum divided by number of solutions left
 fn turn_sums<'a>(
     words: &'a Words,
-    secrets: &'a Solutions,
+    secrets: &'a Solutions<'a>,
     guessed: &'a [&Guess],
-    cache: &'a Cache,
+    cache: &'a Cache<'a>,
     picks: usize,
     log: bool,
 ) -> Vec<(&'a Guess, usize)> {
@@ -691,7 +690,7 @@ fn turn_sums<'a>(
         })
         .collect();
     scores.sort_asc();
-    scores.into_iter().take(picks).collect()
+    scores
 }
 
 fn trivial_turn_sum<'a>(
@@ -762,25 +761,25 @@ fn fewest_remaining_solutions_for_game<'a>(game: &'a Wordle) -> Vec<(&'a Guess, 
 
 fn fewest_remaining_solutions<'a>(
     words: &'a Words,
-    secrets: &Solutions,
+    solutions: &Solutions,
     guessed: &[&Guess],
     cache: &Cache,
 ) -> Vec<(&'a Guess, f64)> {
-    let is_first_turn = secrets.len() == words.secrets.len();
-    let len = secrets.len() as f64;
+    let is_first_turn = solutions.len() == words.secrets.len();
+    let len = solutions.len() as f64;
     let mut scores: Vec<(&Guess, f64)> = words
         .guesses
         .par_iter()
         .filter(|guess| !guessed.contains(guess))
         .map(|guess| {
-            let count: usize = secrets
+            let count: usize = solutions
                 .iter()
                 .map(|&secret| {
                     if is_first_turn {
                         cache.secret_solutions.by_secret_by_guess[guess][secret].len()
                     } else {
                         cache.secret_solutions.by_secret_by_guess[guess][secret]
-                            .intersection(secrets)
+                            .intersection(solutions)
                             .count()
                     }
                 })
@@ -1270,7 +1269,6 @@ fn main() {
     let mut consumed_args = 1;
     if args.len() > 1 {
         if let Ok(parsed_lang) = Language::try_from(args[1].as_str()) {
-            println!("Parsed language '{}'", parsed_lang);
             lang = Some(parsed_lang);
             consumed_args = 2;
         }
