@@ -624,14 +624,114 @@ fn count_solutions_by_secret_by_guess() {
 fn find_optimal_first_word_english() {
     let lang = English;
     let words = Words::new(lang);
+    let start = Instant::now();
     let hsg = HintsBySecretByGuess::of(&words);
+    let elapsed = start.elapsed();
+    println!(
+        "{:?} to calc {} HintsBySecretByGuess",
+        elapsed,
+        hsg.by_secret_by_guess.len()
+    );
+    let start = Instant::now();
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let elapsed = start.elapsed();
+    println!(
+        "{:?} to calc {} SolutionsByHintByGuess",
+        elapsed,
+        shg.by_hint_by_guess.len()
+    );
     let cache = Cache::new(&words, &hsg, &shg);
     let solutions = words.secrets.iter().collect();
     let guessed = vec![];
     let scores = fewest_remaining_solutions(&words, &solutions, &guessed, &cache);
-    println!("scores {}", scores.to_string(5));
+    println!("top 5 {}", scores.to_string(5));
     let optimal = scores.lowest().unwrap();
+    assert_eq!("roate".to_word(), optimal);
+}
+
+// #[ignore]
+#[test]
+fn try_using_collections_of_word_indices_instead_of_hashmaps_to_calc_first_guesses_with_fewest_remaining_solutions(
+) {
+    let words: Vec<Guess> = include_str!("../data/word_lists/original/solutions.txt")
+        .lines()
+        .chain(include_str!("../data/word_lists/original/extras.txt").lines())
+        .map(|w| w.to_word())
+        .collect();
+
+    let guesses: Vec<usize> = (0..words.len()).into_iter().collect();
+
+    let start = Instant::now();
+    let hint_by_secret_by_guess: Vec<Vec<HintValue>> = guesses
+        .par_iter()
+        .map(|&guess_idx| {
+            (0..2315)
+                .into_iter()
+                .map(|secret_idx| words[guess_idx].calculate_hint(&words[secret_idx]).value())
+                .collect()
+        })
+        .collect();
+    let elapsed = start.elapsed();
+    println!(
+        "{:?} to calc {} hint_by_secret_by_guess",
+        elapsed,
+        hint_by_secret_by_guess.len()
+    );
+
+    let start = Instant::now();
+    let secrets_by_hint_by_guess: Vec<Vec<BTreeSet<usize>>> = guesses
+        .par_iter()
+        .map(|&guess_idx| {
+            let mut solutions_by_hint: Vec<BTreeSet<usize>> = vec![BTreeSet::new(); 243];
+            (0..2315).into_iter().for_each(|secret_idx| {
+                let hint = hint_by_secret_by_guess[guess_idx][secret_idx] as usize;
+                solutions_by_hint[hint].insert(secret_idx);
+            });
+            solutions_by_hint
+        })
+        .collect();
+    let elapsed = start.elapsed();
+    println!(
+        "{:?} to calc {} secrets_by_hint_by_guess",
+        elapsed,
+        secrets_by_hint_by_guess.len()
+    );
+
+    let start = Instant::now();
+    let len = 2315_f64;
+    let mut scores: Vec<(usize, f64)> = guesses
+        .par_iter()
+        .map(|&guess_idx| {
+            let count: usize = (0..2315)
+                .into_iter()
+                .map(|secret_idx| {
+                    let hint = hint_by_secret_by_guess[guess_idx][secret_idx] as usize;
+                    secrets_by_hint_by_guess[guess_idx][hint].len()
+                })
+                .sum();
+            (guess_idx, count as f64 / len)
+        })
+        .collect();
+    scores.sort_unstable_by(|(a_word, a_value), (b_word, b_value)| {
+        match a_value.partial_cmp(b_value) {
+            Some(Ordering::Equal) | None => a_word.cmp(b_word),
+            Some(by_value) => by_value,
+        }
+    });
+    let elapsed = start.elapsed();
+    println!("{:?} to calc {} scores", elapsed, scores.len());
+
+    println!(
+        "top 5: {}",
+        scores
+            .iter()
+            .take(5)
+            .map(|&(idx, value)| format!("{:.3} {}", value, words[idx].to_string()))
+            .collect::<Vec<_>>()
+            .join(", ")
+    );
+
+    let optimal = words[(scores.first().unwrap().0)].clone();
     assert_eq!("roate".to_word(), optimal);
 }
 
