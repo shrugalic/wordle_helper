@@ -549,7 +549,7 @@ fn turn_sums<'a>(
         .inspect(|&(i, (guess, score))| {
             if log {
                 println!(
-                    "{} {}/{} ({}.) guess {} reduces {} solutions to {:.3}",
+                    "{}pre  {}/{} ({}.) guess {} reduces {} solutions to {:.3}",
                     "\t".repeat(guessed.len()),
                     i + 1,
                     picks,
@@ -560,28 +560,72 @@ fn turn_sums<'a>(
                 );
             }
         })
-        .map(|(i, (guess, _score))| {
+        .map(|(i, (guess, score))| {
             let mut guessed = guessed.to_vec();
             guessed.push(guess);
-            let sum: usize = cache
-                .solutions_by_hint_for(guess)
-                .values()
-                .map(|(_hint, solutions)| solutions.intersect(secrets))
-                .filter(|intersection| !intersection.is_empty())
-                .map(|intersection| {
-                    if intersection.len() > 3 && sum_by_solutions_cache.contains_key(&intersection)
-                    {
-                        *sum_by_solutions_cache.get(&intersection).unwrap()
-                    } else {
-                        let min_score =
-                            turn_sums(words, &intersection, &guessed, cache, picks, log)
-                                .lowest_score()
-                                .unwrap();
-                        sum_by_solutions_cache.insert(intersection, min_score);
-                        min_score
-                    }
-                })
-                .sum();
+
+            let sum: usize = if true {
+                let mut solutions_by_hint: HashMap<HintValue, Solutions> = HashMap::new();
+                for &secret in secrets {
+                    let hint = cache.hint_by_secret_by_guess(guess, secret);
+                    solutions_by_hint.entry(hint).or_default().insert(secret);
+                }
+                solutions_by_hint
+                    .into_par_iter()
+                    .map(|(_k, v)| v)
+                    .map(|rem_solutions| {
+                        if rem_solutions.len() == 1 {
+                            guessed.len() + 1
+                        } else if rem_solutions.len() == 2 {
+                            2 * (guessed.len() + 1) + 1
+                        } else {
+                            let min_score =
+                                turn_sums(words, &rem_solutions, &guessed, cache, picks, log)
+                                    .lowest_score()
+                                    .unwrap();
+                            min_score
+                        }
+                    })
+                    .sum()
+            } else {
+                cache
+                    .solutions_by_hint_for(guess)
+                    .values()
+                    .map(|solutions| solutions.intersect(secrets))
+                    .filter(|intersection| !intersection.is_empty())
+                    .map(|intersection| {
+                        if intersection.len() == 1 {
+                            guessed.len() + 1
+                        } else if intersection.len() == 2 {
+                            2 * (guessed.len() + 1) + 1
+                        } else if intersection.len() > 3
+                            && sum_by_solutions_cache.contains_key(&intersection)
+                        {
+                            *sum_by_solutions_cache.get(&intersection).unwrap()
+                        } else {
+                            let min_score =
+                                turn_sums(words, &intersection, &guessed, cache, picks, log)
+                                    .lowest_score()
+                                    .unwrap();
+                            sum_by_solutions_cache.insert(intersection, min_score);
+                            min_score
+                        }
+                    })
+                    .sum()
+            };
+            if log {
+                println!(
+                    "{}post {}/{} ({}.) guess {} reduces {} solutions to {:.3}, sub-sum {}",
+                    "\t".repeat(guessed.len() - 1),
+                    i + 1,
+                    picks,
+                    guessed.len(),
+                    guess.to_string(),
+                    secrets.len(),
+                    score,
+                    sum
+                );
+            }
             (guess, sum)
         })
         .collect();
