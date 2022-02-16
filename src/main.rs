@@ -1,10 +1,12 @@
 use std::collections::BTreeMap;
 use std::env::args;
-use wordle_helper::Language::*;
+
+use wordle_helper::words::Language::English;
+use wordle_helper::words::{Language, Words};
 use wordle_helper::{
     Attempt, Cache, ChainedStrategies, Count, FirstOfTwoOrFewerRemainingSolutions, FixedGuessList,
-    HintsBySecretByGuess, Language, PickFirstSolution, SolutionsByHintByGuess, TryToPickWord,
-    WordWithMostNewCharsFromRemainingSolutions, Wordle, Words, MAX_ATTEMPTS,
+    HintsBySecretByGuess, PickFirstSolution, SolutionsByHintByGuess, TryToPickWord,
+    WordWithMostNewCharsFromRemainingSolutions, Wordle, MAX_ATTEMPTS,
 };
 
 fn main() {

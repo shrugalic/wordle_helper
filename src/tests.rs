@@ -409,7 +409,7 @@ fn test_medium_turn_sums() {
     let picks = 2;
     let log = true;
     let count = 2315;
-    let secrets: Solutions = words.secrets.iter().take(count).collect();
+    let secrets: Solutions = words.secrets().iter().take(count).collect();
     let scores = turn_sums(&words, &secrets, &guessed, &cache, picks, log);
     println!("Turn sums: {}", scores.to_string(picks));
 }

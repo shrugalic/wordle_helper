@@ -1,65 +1,26 @@
 use std::cmp::{Ordering, Reverse};
-use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
-use std::env::args;
+use std::collections::{BTreeSet, HashMap, HashSet};
 use std::fmt::{Display, Formatter};
 use std::io;
-use std::iter::Map;
-use std::str::Lines;
 
 use rayon::prelude::*;
 
 use Hint::*;
-use Language::*;
 
-const GUESSES: [&str; 4] = [
-    include_str!("../data/word_lists/original/combined.txt"),
-    include_str!("../data/word_lists/german/combined.txt"),
-    include_str!("../data/word_lists/ny_times/combined.txt"),
-    include_str!("../data/word_lists/primal/combined.txt"),
-];
-const SOLUTIONS: [&str; 4] = [
-    include_str!("../data/word_lists/original/solutions.txt"),
-    include_str!("../data/word_lists/german/solutions.txt"),
-    include_str!("../data/word_lists/ny_times/solutions.txt"),
-    include_str!("../data/word_lists/primal/solutions.txt"),
-];
+use crate::words::Language::*;
+use crate::words::{Guess, Secret, ToWord, Word, Words};
 
 pub const MAX_ATTEMPTS: usize = 6;
 const AUTOPLAY_MAX_ATTEMPTS: usize = 10;
 const ALL_POS: [usize; 5] = [0, 1, 2, 3, 4];
 
-type Word = Vec<char>;
-type Guess = Word;
-type Secret = Word;
 type Feedback = Guess;
 type HintValue = u8;
 type Solutions<'a> = BTreeSet<&'a Secret>;
 pub type Attempt = usize;
 pub type Count = usize;
 
-pub struct Words {
-    lang: Language,
-    guesses: Vec<Guess>,
-    secrets: HashSet<Secret>,
-}
-impl Words {
-    pub fn new(lang: Language) -> Self {
-        Words {
-            lang,
-            secrets: Words::from_str(SOLUTIONS[lang as usize]).collect(),
-            guesses: Words::from_str(GUESSES[lang as usize]).collect(),
-        }
-    }
-    fn from_str(txt: &str) -> Map<Lines<'_>, fn(&'_ str) -> Word> {
-        txt.lines().map(|w| w.to_word())
-    }
-    fn guesses(&self) -> &Vec<Guess> {
-        &self.guesses
-    }
-    pub fn secrets(&self) -> &HashSet<Secret> {
-        &self.secrets
-    }
-}
+pub mod words;
 
 pub struct Wordle<'a> {
     words: &'a Words,
@@ -70,7 +31,7 @@ pub struct Wordle<'a> {
 }
 impl<'a> Wordle<'a> {
     pub fn with(words: &'a Words, cache: &'a Cache) -> Self {
-        let solutions = words.secrets.iter().collect();
+        let solutions = words.secrets().iter().collect();
         Wordle {
             words,
             solutions,
@@ -174,7 +135,7 @@ impl<'a> Wordle<'a> {
 
             if feedback.len() > 5 {
                 println!("Enter at most 5 characters!")
-            } else if self.words.lang == Primal {
+            } else if self.words.lang() == &Primal {
                 return feedback;
             } else if let Some(illegal) = feedback
                 .iter()
@@ -228,7 +189,7 @@ impl<'a> Wordle<'a> {
 
     fn allowed(&self) -> Vec<&Guess> {
         self.words
-            .guesses
+            .guesses()
             .iter()
             .filter(|guess| !self.guessed.contains(guess))
             .collect()
@@ -268,11 +229,11 @@ impl<'a> HintsBySecretByGuess<'a> {
     pub fn of(words: &'a Words) -> Self {
         HintsBySecretByGuess {
             by_secret_by_guess: words
-                .guesses
+                .guesses()
                 .par_iter()
                 .map(|guess| {
                     let hint_value_by_secret = words
-                        .secrets
+                        .secrets()
                         .iter()
                         .map(|secret| (secret, guess.calculate_hint(secret).value()))
                         .collect::<HashMap<&Secret, HintValue>>();
@@ -290,11 +251,11 @@ impl<'a> SolutionsByHintByGuess<'a> {
     pub fn of(words: &'a Words, hsg: &'a HintsBySecretByGuess) -> Self {
         SolutionsByHintByGuess {
             by_hint_by_guess: words
-                .guesses
+                .guesses()
                 .par_iter()
                 .map(|guess| {
                     let mut solutions_by_hint: HashMap<HintValue, Solutions> = HashMap::new();
-                    for secret in &words.secrets {
+                    for secret in words.secrets() {
                         solutions_by_hint
                             .entry(hsg.by_secret_by_guess[guess][secret])
                             .or_default()
@@ -318,11 +279,11 @@ impl<'a> SolutionsBySecretByGuess<'a> {
     ) -> Self {
         SolutionsBySecretByGuess {
             by_secret_by_guess: words
-                .guesses
+                .guesses()
                 .par_iter()
                 .map(|guess| {
                     let mut solutions_by_secret: HashMap<&Secret, &Solutions> = HashMap::new();
-                    for secret in words.secrets.iter() {
+                    for secret in words.secrets().iter() {
                         let hint = &hsg.by_secret_by_guess[guess][secret];
                         let solutions = &shg.by_hint_by_guess[guess][hint];
                         solutions_by_secret.insert(secret, solutions);
@@ -707,7 +668,7 @@ fn trivial_turn_sum<'a>(
 ) -> Vec<(&'a Guess, usize)> {
     assert!(secrets.len() <= 2);
     let first = secrets.iter().next().unwrap();
-    let first = words.guesses.iter().find(|g| g == first).unwrap();
+    let first = words.guesses().iter().find(|g| g == first).unwrap();
 
     let this_turn = guessed.len() + 1;
     return if secrets.len() == 1 {
@@ -723,7 +684,7 @@ fn trivial_turn_sum<'a>(
         vec![(first, this_turn)]
     } else {
         let second = secrets.iter().nth(1).unwrap();
-        let second = words.guesses.iter().find(|g| g == second).unwrap();
+        let second = words.guesses().iter().find(|g| g == second).unwrap();
         let next_turn = this_turn + 1;
         let sum = this_turn + next_turn;
         // With two remaining solutions there is no better strategy than choosing either,
@@ -771,10 +732,10 @@ fn fewest_remaining_solutions<'a>(
     guessed: &[&Guess],
     cache: &Cache,
 ) -> Vec<(&'a Guess, f64)> {
-    let is_first_turn = solutions.len() == words.secrets.len();
+    let is_first_turn = solutions.len() == words.secrets().len();
     let len = solutions.len() as f64;
     let mut scores: Vec<(&Guess, f64)> = words
-        .guesses
+        .guesses()
         .par_iter()
         .filter(|guess| !guessed.contains(guess))
         .map(|guess| {
@@ -1076,15 +1037,6 @@ fn high_variety_words<'a>(
         .collect()
 }
 
-trait ToWord {
-    fn to_word(&self) -> Word;
-}
-impl<S: AsRef<str>> ToWord for S {
-    fn to_word(&self) -> Word {
-        self.as_ref().trim().chars().collect()
-    }
-}
-
 trait CalcHintValue {
     fn value(&self) -> HintValue;
 }
@@ -1286,41 +1238,6 @@ impl<'a> Cache<'a> {
             hints,
             secret_solutions,
         }
-    }
-}
-
-#[derive(Copy, Clone, PartialEq)]
-pub enum Language {
-    English,
-    German,
-    NYTimes,
-    Primal,
-}
-impl TryFrom<&str> for Language {
-    type Error = String;
-
-    fn try_from(lang: &str) -> Result<Self, Self::Error> {
-        match lang.to_ascii_lowercase().as_str() {
-            "english" => Ok(English),
-            "nytimes" => Ok(NYTimes),
-            "primal" => Ok(Primal),
-            "german" | "deutsch" => Ok(German),
-            _ => Err(format!("Unknown language '{}'", lang)),
-        }
-    }
-}
-impl Display for Language {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                English => "English",
-                German => "German",
-                NYTimes => "NYTimes",
-                Primal => "Primal",
-            }
-        )
     }
 }
 
