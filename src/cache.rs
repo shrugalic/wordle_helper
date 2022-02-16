@@ -62,7 +62,6 @@ impl<'a> HintsBySecretByGuess<'a> {
                 .map(|guess| {
                     let hint_value_by_secret = words
                         .secrets()
-                        .iter()
                         .map(|secret| (secret, guess.calculate_hint(secret).value()))
                         .collect::<HashMap<&Secret, HintValue>>();
                     (guess, hint_value_by_secret)
@@ -127,7 +126,7 @@ impl<'a> SolutionsBySecretByGuess<'a> {
                 .par_iter()
                 .map(|guess| {
                     let mut solutions_by_secret: HashMap<&Secret, &Solutions> = HashMap::new();
-                    for secret in words.secrets().iter() {
+                    for secret in words.secrets() {
                         let hint = &hsg.by_secret_by_guess[guess][secret];
                         let solutions = &shg.by_hint_by_guess[guess][hint];
                         solutions_by_secret.insert(secret, solutions);

@@ -33,7 +33,7 @@ pub struct Wordle<'a> {
 }
 impl<'a> Wordle<'a> {
     pub fn with(words: &'a Words, cache: &'a Cache) -> Self {
-        let solutions = words.secrets().iter().collect();
+        let solutions = words.secrets().collect();
         Wordle {
             words,
             solutions,
@@ -705,7 +705,7 @@ fn fewest_remaining_solutions<'a>(
     guessed: &[&Guess],
     cache: &Cache,
 ) -> Vec<(&'a Guess, f64)> {
-    let is_first_turn = solutions.len() == words.secrets().len();
+    let is_first_turn = solutions.len() == words.secrets().count();
     let len = solutions.len() as f64;
     let mut scores: Vec<(&Guess, f64)> = words
         .guesses()
@@ -1234,7 +1234,6 @@ pub fn autoplay_and_print_stats_with_language<S: TryToPickWord + Sync>(
 
     let mut secrets: Vec<_> = words
         .secrets()
-        .iter()
         // .filter(|w| w.to_string().eq("'rowdy'"))
         .collect();
     secrets.sort_unstable();

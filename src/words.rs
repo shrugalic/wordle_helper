@@ -11,35 +11,40 @@ pub type Secret = Word;
 
 pub struct Words {
     lang: Language,
-    guesses: Vec<Guess>,
-    secrets: HashSet<Secret>,
+    secret_count: usize,
+    words: Vec<Word>,
 }
 impl Words {
     pub fn new(lang: Language) -> Self {
+        let secrets: Vec<Secret> = Words::from_str(SOLUTIONS[lang as usize]).collect();
         Words {
             lang,
-            secrets: Words::from_str(SOLUTIONS[lang as usize]).collect(),
-            guesses: Words::from_str(GUESSES[lang as usize]).collect(),
+            secret_count: secrets.len(),
+            words: secrets
+                .into_iter()
+                .chain(Words::from_str(GUESSES[lang as usize]))
+                .collect(),
         }
     }
+    #[cfg(test)]
     pub fn with(lang: Language, guesses: Vec<Guess>, secrets: HashSet<Secret>) -> Self {
         Words {
             lang,
-            guesses,
-            secrets,
+            secret_count: secrets.len(),
+            words: secrets.into_iter().chain(guesses.into_iter()).collect(),
         }
     }
     fn from_str(txt: &str) -> Map<Lines<'_>, fn(&'_ str) -> Word> {
-        txt.lines().map(|w| w.to_word())
+        txt.trim().lines().map(|w| w.to_word())
     }
     pub(crate) fn lang(&self) -> &Language {
         &self.lang
     }
     pub(crate) fn guesses(&self) -> &Vec<Guess> {
-        &self.guesses
+        &self.words
     }
-    pub fn secrets(&self) -> &HashSet<Secret> {
-        &self.secrets
+    pub fn secrets(&self) -> impl Iterator<Item = &Word> {
+        self.words.iter().take(self.secret_count)
     }
 }
 
@@ -88,10 +93,10 @@ impl<S: AsRef<str>> ToWord for S {
 }
 
 const GUESSES: [&str; 4] = [
-    include_str!("../data/word_lists/original/combined.txt"),
-    include_str!("../data/word_lists/german/combined.txt"),
-    include_str!("../data/word_lists/ny_times/combined.txt"),
-    include_str!("../data/word_lists/primal/combined.txt"),
+    include_str!("../data/word_lists/original/extras.txt"),
+    include_str!("../data/word_lists/german/extras.txt"),
+    include_str!("../data/word_lists/ny_times/extras.txt"),
+    include_str!("../data/word_lists/primal/extras.txt"),
 ];
 const SOLUTIONS: [&str; 4] = [
     include_str!("../data/word_lists/original/solutions.txt"),
