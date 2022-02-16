@@ -2,6 +2,7 @@ use std::collections::HashSet;
 use std::fmt::{Display, Formatter};
 use std::iter::Map;
 use std::str::Lines;
+
 use Language::*;
 
 pub type Word = Vec<char>;
@@ -19,6 +20,13 @@ impl Words {
             lang,
             secrets: Words::from_str(SOLUTIONS[lang as usize]).collect(),
             guesses: Words::from_str(GUESSES[lang as usize]).collect(),
+        }
+    }
+    pub fn with(lang: Language, guesses: Vec<Guess>, secrets: HashSet<Secret>) -> Self {
+        Words {
+            lang,
+            guesses,
+            secrets,
         }
     }
     fn from_str(txt: &str) -> Map<Lines<'_>, fn(&'_ str) -> Word> {

@@ -1,6 +1,9 @@
 use std::collections::BTreeMap;
 use std::time::{Duration, Instant};
 
+use crate::cache::{Cache, HintsBySecretByGuess, SolutionsByHintByGuess};
+use crate::words::Language;
+
 use super::*;
 
 #[ignore] // ~30s for all guesses, ~6s for solutions only
@@ -16,7 +19,7 @@ fn compare_best_word_strategies() {
     // 13461.31 nares, 13684.70 aeros, 13771.28 rates, 13951.64 arles, 13972.96 serai
     let variances = variance_of_remaining_words(&words);
     println!("Best (lowest) variance:\n{}", variances.to_string(5));
-    assert_eq!(variances.len(), words.guesses.len());
+    assert_eq!(variances.len(), words.guesses().len());
 
     // panic!(); // ~2s
 
@@ -31,7 +34,7 @@ fn compare_best_word_strategies() {
         "Best (lowest) expected remaining solution count:\n{}",
         remaining.to_string(5)
     );
-    assert_eq!(remaining.len(), words.guesses.len());
+    assert_eq!(remaining.len(), words.guesses().len());
 
     // panic!(); // ~5s
 
@@ -45,13 +48,13 @@ fn compare_best_word_strategies() {
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let cache = Cache::new(&words, &hsg, &shg);
-    let solutions = words.secrets.iter().collect();
+    let solutions = words.secrets().iter().collect();
     let totals = fewest_remaining_solutions(&words, &solutions, &Vec::new(), &cache);
     println!(
         "Best (lowest) average remaining solution count:\n{}",
         totals.to_string(5)
     );
-    assert_eq!(totals.len(), words.guesses.len());
+    assert_eq!(totals.len(), words.guesses().len());
 
     // panic!(); // ~8s
     println!("\ndifferences between fewest total and expected remaining:");
@@ -127,12 +130,12 @@ fn compare_best_word_strategies() {
 
 // Previously used method, slightly less stable than lowest_total_number_of_remaining_solutions
 fn variance_of_remaining_words(words: &Words) -> Vec<(&Guess, f64)> {
-    let average = words.secrets.len() as f64 / 243.0;
+    let average = words.secrets().len() as f64 / 243.0;
     let mut scores: Vec<_> = words
-        .guesses
+        .guesses()
         .par_iter()
         .map(|guess| {
-            let count_by_hint = count_by_hint(guess, &words.secrets);
+            let count_by_hint = count_by_hint(guess, words.secrets());
             let variance = count_by_hint
                 .into_iter()
                 .map(|count| (count as f64 - average).powf(2.0))
@@ -147,12 +150,12 @@ fn variance_of_remaining_words(words: &Words) -> Vec<(&Guess, f64)> {
 
 // Previously used method
 fn expected_remaining_solution_counts(words: &Words) -> Vec<(&Guess, f64)> {
-    let total_solutions = words.secrets.len() as f64;
+    let total_solutions = words.secrets().len() as f64;
     let mut scores: Vec<_> = words
-        .guesses
+        .guesses()
         .par_iter()
         .map(|guess| {
-            let count_by_hint = count_by_hint(guess, &words.secrets);
+            let count_by_hint = count_by_hint(guess, words.secrets());
             let expected_remaining_word_count = count_by_hint
                 .into_iter()
                 .map(|count| count.pow(2))
@@ -185,7 +188,7 @@ fn test_print_full_guess_tree() {
 }
 fn print_full_guess_tree(lang: Language) {
     let words = Words::new(lang);
-    let secrets: Solutions = words.secrets.iter().collect();
+    let secrets: Solutions = words.secrets().iter().collect();
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let cache = Cache::new(&words, &hsg, &shg);
@@ -209,13 +212,13 @@ fn print_partial_guess_tree() {
     let guess1 = "roate".to_word(); // hint "🟨⬛⬛⬛🟨"
     let guess2 = "feued".to_word(); // hint "⬛⬛⬛🟩⬛"
 
-    let secrets1 = &cache.secret_solutions.by_secret_by_guess[&guess1][&secret];
+    let secrets1 = cache.solutions_by(&guess1, &secret);
     println!(
         "{} roate secrets {}",
         secrets1.len(),
         secrets1.sorted_string()
     );
-    let secrets2 = &cache.secret_solutions.by_secret_by_guess[&guess2][&secret];
+    let secrets2 = cache.solutions_by(&guess2, &secret);
     println!(
         "{} feued secrets {}",
         secrets2.len(),
@@ -248,10 +251,11 @@ fn explore_tree(words: &Words, secrets: &Solutions, guessed: &[&Word], cache: &C
     let mut guessed = guessed.to_vec();
     guessed.push(&guess);
 
-    let mut pairs: Vec<_> = cache.hint_solutions.by_hint_by_guess[&guess]
+    let mut pairs: Vec<_> = cache
+        .solutions_by_hint_for(&guess)
         .iter()
         .map(|(hint, solutions)| (hint, solutions.intersect(secrets)))
-        .filter(|(_, solutions)| !solutions.is_empty())
+        .filter(|(_hint, solutions)| !solutions.is_empty())
         .collect();
     pairs.sort_unstable_by(|(v1, s1), (v2, s2)| match s1.len().cmp(&s2.len()) {
         Ordering::Equal => v1.cmp(v2), // lower hint-value (more unknown) first
@@ -302,7 +306,7 @@ fn test_trivial_turn_sums() {
     let guessed = &vec![];
 
     // if there's only one secret left, its score is 1
-    let first = words.secrets.iter().next().unwrap();
+    let first = words.secrets().iter().next().unwrap();
     let secrets1: &Solutions = &[first].into_iter().collect();
     let picks = secrets1.len();
     let scores = turn_sums(&words, secrets1, guessed, &cache, picks, true);
@@ -312,7 +316,7 @@ fn test_trivial_turn_sums() {
 
     // With 2 secrets left, their score (turn sum) is 3
     let guessed = &vec![];
-    let second = words.secrets.iter().nth(1).unwrap();
+    let second = words.secrets().iter().nth(1).unwrap();
     let secrets2: &Solutions = &[first, second].into_iter().collect();
     let picks = secrets2.len();
     let scores = turn_sums(&words, secrets2, guessed, &cache, picks, true);
@@ -333,7 +337,7 @@ fn test_very_small_turn_sums() {
 
     let log = true;
     let count = 4;
-    let secrets = &words.secrets.iter().take(count).collect();
+    let secrets = &words.secrets().iter().take(count).collect();
     let scores = turn_sums(&words, secrets, guessed, &cache, secrets.len(), log);
     let (_, min) = scores.first().unwrap();
     let count = scores.iter().filter(|(_, s)| s == min).count();
@@ -362,7 +366,7 @@ fn test_small_turn_sums() {
     let log = true;
     let count = 500;
     let picks = 5;
-    let secrets: &Solutions = &words.secrets.iter().take(count).collect();
+    let secrets: &Solutions = &words.secrets().iter().take(count).collect();
     if log {
         println!("\n{} secrets = {}", secrets.len(), secrets.sorted_string());
     }
@@ -395,8 +399,29 @@ fn test_small_turn_sums() {
 //      8122 'raile', 8123 'roate', 8125 'tares', 8134 'soare', 8141 'saner', 8143 'raine',
 //      8144 'orate', 8145 'artel', 8147 'raise', 8151 'alert', 8153 'taler', 8156 'arose',
 //      8163 'alter', 8164 'irate', 8169 'ratel', 8178 'ariel', 8179 'arise', 8182 'later',
-//      8201 'lares', 8202 'arles', 8232 'aesir', 8234 'oater', 8246 'realo', 8274 'reais' (63min)
-// #[ignore]
+//      8201 'lares', 8202 'arles', 8232 'aesir', 8234 'oater', 8246 'realo', 8274 'reais'
+//      (63min)
+//  50: 8043 'slate', 8053 'reast', 8055 'trace', 8066 'salet', 8071 'crate', 8073 'carle',
+//      8074 'slane', 8081 'carte', 8096 'stare', 8107 'carse', 8110 'taser', 8114 'snare',
+//      8116 'roate', 8117 'toile', 8121 'raile', 8124 'tares', 8130 'soare', 8136 'antre',
+//      8138 'orate', 8139 'alert', 8139 'raine', 8139 'saner', 8141 'strae', 8142 'artel',
+//      8143 'taler', 8144 'raise', 8146 'seral', 8147 'saine', 8148 'coate', 8152 'arose',
+//      8160 'alter', 8164 'irate', 8164 'ratel', 8176 'arise', 8177 'ariel', 8178 'later',
+//      8178 'rates', 8193 'reals', 8198 'arles', 8201 'lares', 8203 'urate', 8210 'laser',
+//      8211 'rales', 8222 'stoae', 8229 'aesir', 8230 'oater', 8236 'realo', 8243 'terai',
+//      8274 'reais', 8278 'serai' (5h 20min)
+//  60: 8043 'slate', 8052 'reast', 8054 'trace', 8059 'salet', 8068 'carle', 8070 'crate',
+//      8074 'slane', 8081 'carte', 8084 'stale', 8088 'caret', 8096 'stare', 8107 'carse',
+//      8108 'taser', 8114 'snare', 8115 'toile', 8116 'roate', 8121 'raile', 8122 'sorel',
+//      8122 'tares', 8128 'liane', 8128 'soare', 8129 'resat', 8135 'alert', 8136 'antre',
+//      8137 'orate', 8139 'raine', 8139 'saner', 8139 'tears', 8140 'artel', 8141 'strae',
+//      8143 'taler', 8144 'raise', 8145 'coate', 8145 'seral', 8146 'saine', 8152 'arose',
+//      8155 'alter', 8156 'slier', 8159 'ratel', 8162 'irate', 8167 'tales', 8174 'ariel',
+//      8174 'rates', 8175 'arise', 8176 'later', 8192 'reals', 8198 'arles', 8199 'lares',
+//      8201 'urate', 8209 'laser', 8209 'rales', 8222 'stoae', 8229 'aesir', 8229 'oater',
+//      8231 'alure', 8236 'realo', 8243 'terai', 8268 'aeros', 8274 'reais', 8278 'serai'
+//      (10h 49min)
+#[ignore]
 #[test]
 fn test_medium_turn_sums() {
     let lang = English;
@@ -424,7 +449,7 @@ fn test_tree_depth() {
 // ( 2×(23+11) + 3×(11+795+216) + 4×(216+974+30) + 5×(30+9) ) / 2315 = 3.546
 fn tree_depth(lang: Language) {
     let words = Words::new(lang);
-    let secrets: Solutions = words.secrets.iter().collect();
+    let secrets: Solutions = words.secrets().iter().collect();
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let cache = Cache::new(&words, &hsg, &shg);
@@ -465,7 +490,8 @@ fn count_by_attempts<'a>(
 
             let mut counts_by_attempts: BTreeMap<Attempt, Count> = BTreeMap::new();
 
-            for solutions in cache.hint_solutions.by_hint_by_guess[&guess]
+            for solutions in cache
+                .solutions_by_hint_for(guess)
                 .values()
                 .map(|solutions| solutions.intersect(secrets))
                 .filter(|solutions| !solutions.is_empty())
@@ -521,7 +547,7 @@ fn count_solutions_by_hint_by_guess() {
     let solutions = SolutionsByHintByGuess::of(&words, &hsg);
     assert_eq!(
         solutions
-            .by_hint_by_guess
+            .by_hint_by_guess()
             .iter()
             .map(|(_, s)| s.len())
             .sum::<usize>(),
@@ -549,13 +575,13 @@ fn does_hint_cache_help_part_1_without_cache() {
 
     let sum_with_cache = |words: &Words| -> usize {
         words
-            .guesses
+            .guesses()
             .par_iter()
             .map(|guess| {
                 words
-                    .secrets
+                    .secrets()
                     .iter()
-                    .map(|secret| hints.by_secret_by_guess[guess][secret] as usize)
+                    .map(|secret| hints.by_secret_by_guess()[guess][secret] as usize)
                     .sum::<usize>()
             })
             .sum()
@@ -563,13 +589,13 @@ fn does_hint_cache_help_part_1_without_cache() {
 
     let sum_without_cache = |words: &Words| -> usize {
         words
-            .guesses
+            .guesses()
             .par_iter()
             .map(|guess| {
                 words
-                    .secrets
+                    .secrets()
                     .iter()
-                    .map(|secret| hints.by_secret_by_guess[guess][secret] as usize)
+                    .map(|secret| hints.by_secret_by_guess()[guess][secret] as usize)
                     .sum::<usize>()
             })
             .sum()
@@ -607,18 +633,19 @@ fn count_solutions_by_secret_by_guess() {
     let words = Words::new(English);
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
-    let ssg = SolutionsBySecretByGuess::of(&words, &hsg, &shg);
+    let cache = Cache::new(&words, &hsg, &shg);
 
     assert_eq!(
-        ssg.by_secret_by_guess
+        cache
+            .solutions_by_secret_by_guess()
             .iter()
-            .map(|(_, s)| s.len())
+            .map(|(_guess, s)| s.len())
             .sum::<usize>(),
-        words.secrets.len() * words.guesses.len() // 2_315 * 12_972 = 30_030_180 = 2315 * 12972 = 30030180
+        words.secrets().len() * words.guesses().len() // 2_315 * 12_972 = 30_030_180 = 2315 * 12972 = 30030180
     );
 }
 
-#[ignore] // ~3s
+// #[ignore] // ~3s
 #[test]
 // Top 5: 60.42 'roate', 61.00 'raise', 61.33 'raile', 62.30 'soare', 63.73 'arise'
 fn find_optimal_first_word_english() {
@@ -627,21 +654,13 @@ fn find_optimal_first_word_english() {
     let start = Instant::now();
     let hsg = HintsBySecretByGuess::of(&words);
     let elapsed = start.elapsed();
-    println!(
-        "{:?} to calc {} HintsBySecretByGuess",
-        elapsed,
-        hsg.by_secret_by_guess.len()
-    );
+    println!("{:?} to calc {} HintsBySecretByGuess", elapsed, hsg.len());
     let start = Instant::now();
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let elapsed = start.elapsed();
-    println!(
-        "{:?} to calc {} SolutionsByHintByGuess",
-        elapsed,
-        shg.by_hint_by_guess.len()
-    );
+    println!("{:?} to calc {} SolutionsByHintByGuess", elapsed, shg.len());
     let cache = Cache::new(&words, &hsg, &shg);
-    let solutions = words.secrets.iter().collect();
+    let solutions = words.secrets().iter().collect();
     let guessed = vec![];
     let scores = fewest_remaining_solutions(&words, &solutions, &guessed, &cache);
     println!("top 5 {}", scores.to_string(5));
@@ -649,7 +668,7 @@ fn find_optimal_first_word_english() {
     assert_eq!("roate".to_word(), optimal);
 }
 
-// #[ignore]
+#[ignore]
 #[test]
 fn try_using_collections_of_word_indices_instead_of_hashmaps_to_calc_first_guesses_with_fewest_remaining_solutions(
 ) {
@@ -660,7 +679,6 @@ fn try_using_collections_of_word_indices_instead_of_hashmaps_to_calc_first_guess
         .collect();
 
     let guesses: Vec<usize> = (0..words.len()).into_iter().collect();
-
     let start = Instant::now();
     let hint_by_secret_by_guess: Vec<Vec<HintValue>> = guesses
         .par_iter()
@@ -744,7 +762,7 @@ fn find_optimal_first_word_german() {
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let cache = Cache::new(&words, &hsg, &shg);
-    let solutions = words.secrets.iter().collect();
+    let solutions = words.secrets().iter().collect();
     let guessed = vec![];
     let scores = fewest_remaining_solutions(&words, &solutions, &guessed, &cache);
     println!("scores {}", scores.to_string(5));
@@ -817,7 +835,7 @@ fn find_optimal_word_combos() {
     let cache = Cache::new(&words, &hsg, &shg);
     let game = Wordle::with(&words, &cache);
 
-    let solutions = words.secrets.iter().collect();
+    let solutions = words.secrets().iter().collect();
     let guessed = vec![];
     let scores = fewest_remaining_solutions(&words, &solutions, &guessed, &cache);
     println!("Best 1. guesses: {}", scores.to_string(5));
@@ -875,7 +893,7 @@ fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Guess]) -> Vec<(&'g 
     let first = *guessed.iter().next().unwrap();
     let hsg = HintsBySecretByGuess::of(game.words);
     let shg = SolutionsByHintByGuess::of(game.words, &hsg);
-    let ssg = SolutionsBySecretByGuess::of(game.words, &hsg, &shg);
+    let cache = Cache::new(game.words, &hsg, &shg);
 
     let mut scores: Vec<_> = game
         .allowed()
@@ -887,15 +905,15 @@ fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Guess]) -> Vec<(&'g 
                 .solutions
                 .iter()
                 .map(|&secret| {
-                    let solutions1 = &ssg.by_secret_by_guess[first][secret];
-                    let solutions2 = &ssg.by_secret_by_guess[next][secret];
+                    let solutions1 = &cache.solutions_by(first, secret);
+                    let solutions2 = &cache.solutions_by(next, secret);
 
                     // apply first and next guess
                     let mut solutions: Solutions = solutions1.intersect(solutions2);
 
                     // Apply other previous guesses
                     for other in guessed.iter().skip(1).cloned() {
-                        let solutions3 = ssg.by_secret_by_guess[other][secret];
+                        let solutions3 = cache.solutions_by(other, secret);
                         solutions = solutions.intersect(solutions3);
                     }
                     solutions.len()
@@ -1194,7 +1212,7 @@ fn autoplay_most_frequent_characters_of_words() {
 // 2: 78, 3: 813, 4: 932, 5: 380, 6: 80, 7: 22, 8: 8, 9: 2
 fn autoplay_most_frequent_unused_characters() {
     let words = Words::new(English);
-    autoplay_and_print_stats(MostFrequentUnusedCharacters::new(&words.guesses));
+    autoplay_and_print_stats(MostFrequentUnusedCharacters::new(words.guesses()));
 }
 struct MostFrequentUnusedCharacters<'w> {
     combined_global_char_count_sums_by: HashMap<&'w Word, usize>,
@@ -1460,25 +1478,22 @@ fn test_calculate_hint() {
 #[ignore]
 #[test]
 fn lowest_total_number_of_remaining_solutions_only_counts_remaining_viable_solutions() {
+    let guesses: Vec<Guess> = ["fubar", "rural", "aurar", "goier", "urial"]
+        .iter()
+        .map(|w| w.to_word())
+        .collect();
     let secrets: HashSet<Secret> = ["augur", "briar", "friar", "lunar", "sugar"]
         .iter()
         .map(|w| w.to_word())
         .collect();
     let len = secrets.len() as f64;
-    let guesses: Vec<Guess> = ["fubar", "rural", "aurar", "goier", "urial"]
-        .iter()
-        .map(|w| w.to_word())
-        .collect();
-    let lang = English;
-    let mut words = Words::new(lang);
-    words.guesses = guesses;
-    words.secrets = secrets;
+    let words = Words::with(English, guesses, secrets);
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let cache = Cache::new(&words, &hsg, &shg);
 
-    let allowed = &words.guesses;
-    let solutions = words.secrets.iter().collect();
+    let allowed = words.guesses();
+    let solutions = words.secrets().iter().collect();
     let guessed = vec![];
     let scores = fewest_remaining_solutions(&words, &solutions, &guessed, &cache);
     // println!("scores {}", scores.to_string(5));

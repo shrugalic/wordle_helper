@@ -1,5 +1,5 @@
 use std::cmp::{Ordering, Reverse};
-use std::collections::{BTreeSet, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fmt::{Display, Formatter};
 use std::io;
 
@@ -7,8 +7,9 @@ use rayon::prelude::*;
 
 use Hint::*;
 
+use crate::cache::{Cache, HintsBySecretByGuess, SolutionsByHintByGuess};
 use crate::words::Language::*;
-use crate::words::{Guess, Secret, ToWord, Word, Words};
+use crate::words::{Guess, Language, Secret, ToWord, Word, Words};
 
 pub const MAX_ATTEMPTS: usize = 6;
 const AUTOPLAY_MAX_ATTEMPTS: usize = 10;
@@ -20,6 +21,7 @@ type Solutions<'a> = BTreeSet<&'a Secret>;
 pub type Attempt = usize;
 pub type Count = usize;
 
+pub mod cache;
 pub mod words;
 
 pub struct Wordle<'a> {
@@ -67,7 +69,7 @@ impl<'a> Wordle<'a> {
     }
 
     fn update_remaining_solutions(&mut self, guess: &Guess, hint: &HintValue) {
-        let solutions = &self.cache.hint_solutions.by_hint_by_guess[guess][hint];
+        let solutions = self.cache.solutions_by_hint_by_guess(guess, hint);
         self.solutions = self.solutions.intersect(solutions);
     }
 
@@ -77,7 +79,7 @@ impl<'a> Wordle<'a> {
 
         while self.guessed.len() < AUTOPLAY_MAX_ATTEMPTS {
             let guess: Guess = strategy.pick(self);
-            let hint = self.cache.hints.by_secret_by_guess[&guess][secret];
+            let hint = self.cache.hint_by_secret_by_guess(&guess, secret);
 
             self.print_state(&guess, secret, hint);
             self.guessed.push(guess.clone());
@@ -219,79 +221,6 @@ impl<'a> Wordle<'a> {
 
     fn guessed_chars(&self) -> HashSet<char> {
         self.guessed.iter().flatten().copied().collect()
-    }
-}
-
-pub struct HintsBySecretByGuess<'a> {
-    by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, HintValue>>,
-}
-impl<'a> HintsBySecretByGuess<'a> {
-    pub fn of(words: &'a Words) -> Self {
-        HintsBySecretByGuess {
-            by_secret_by_guess: words
-                .guesses()
-                .par_iter()
-                .map(|guess| {
-                    let hint_value_by_secret = words
-                        .secrets()
-                        .iter()
-                        .map(|secret| (secret, guess.calculate_hint(secret).value()))
-                        .collect::<HashMap<&Secret, HintValue>>();
-                    (guess, hint_value_by_secret)
-                })
-                .collect(),
-        }
-    }
-}
-
-pub struct SolutionsByHintByGuess<'a> {
-    by_hint_by_guess: HashMap<&'a Guess, HashMap<HintValue, Solutions<'a>>>,
-}
-impl<'a> SolutionsByHintByGuess<'a> {
-    pub fn of(words: &'a Words, hsg: &'a HintsBySecretByGuess) -> Self {
-        SolutionsByHintByGuess {
-            by_hint_by_guess: words
-                .guesses()
-                .par_iter()
-                .map(|guess| {
-                    let mut solutions_by_hint: HashMap<HintValue, Solutions> = HashMap::new();
-                    for secret in words.secrets() {
-                        solutions_by_hint
-                            .entry(hsg.by_secret_by_guess[guess][secret])
-                            .or_default()
-                            .insert(secret);
-                    }
-                    (guess, solutions_by_hint)
-                })
-                .collect(),
-        }
-    }
-}
-
-struct SolutionsBySecretByGuess<'a> {
-    by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, &'a Solutions<'a>>>,
-}
-impl<'a> SolutionsBySecretByGuess<'a> {
-    fn of(
-        words: &'a Words,
-        hsg: &'a HintsBySecretByGuess,
-        shg: &'a SolutionsByHintByGuess,
-    ) -> Self {
-        SolutionsBySecretByGuess {
-            by_secret_by_guess: words
-                .guesses()
-                .par_iter()
-                .map(|guess| {
-                    let mut solutions_by_secret: HashMap<&Secret, &Solutions> = HashMap::new();
-                    for secret in words.secrets().iter() {
-                        let hint = &hsg.by_secret_by_guess[guess][secret];
-                        let solutions = &shg.by_hint_by_guess[guess][hint];
-                        solutions_by_secret.insert(secret, solutions);
-                    }
-                    (guess, solutions_by_secret)
-                })
-                .collect(),
-        }
     }
 }
 
@@ -634,9 +563,9 @@ fn turn_sums<'a>(
         .map(|(i, (guess, _score))| {
             let mut guessed = guessed.to_vec();
             guessed.push(guess);
-            let solutions = &cache.hint_solutions.by_hint_by_guess[guess];
-            let sum: usize = solutions
-                .iter()
+            let sum: usize = cache
+                .solutions_by_hint_for(guess)
+                .values()
                 .map(|(_hint, solutions)| solutions.intersect(secrets))
                 .filter(|intersection| !intersection.is_empty())
                 .map(|intersection| {
@@ -743,9 +672,10 @@ fn fewest_remaining_solutions<'a>(
                 .iter()
                 .map(|&secret| {
                     if is_first_turn {
-                        cache.secret_solutions.by_secret_by_guess[guess][secret].len()
+                        cache.solutions_by(guess, secret).len()
                     } else {
-                        cache.secret_solutions.by_secret_by_guess[guess][secret]
+                        cache
+                            .solutions_by(guess, secret)
                             .intersection(solutions)
                             .count()
                     }
@@ -1221,26 +1151,6 @@ impl GetHint for &str {
     }
 }
 
-pub struct Cache<'a> {
-    hint_solutions: &'a SolutionsByHintByGuess<'a>,
-    hints: &'a HintsBySecretByGuess<'a>,
-    secret_solutions: SolutionsBySecretByGuess<'a>,
-}
-impl<'a> Cache<'a> {
-    pub fn new(
-        words: &'a Words,
-        hints: &'a HintsBySecretByGuess,
-        hint_solutions: &'a SolutionsByHintByGuess,
-    ) -> Self {
-        let secret_solutions = SolutionsBySecretByGuess::of(words, hints, hint_solutions);
-        Cache {
-            hint_solutions,
-            hints,
-            secret_solutions,
-        }
-    }
-}
-
 fn words_with_most_wanted_chars<'w>(
     wanted_chars: &HashSet<char>,
     guesses: Vec<&'w Word>,
@@ -1266,6 +1176,68 @@ trait Intersect {
 impl Intersect for Solutions<'_> {
     fn intersect(&self, other: &Self) -> Self {
         self.intersection(other).into_iter().cloned().collect()
+    }
+}
+
+pub fn autoplay_and_print_stats_with_language<S: TryToPickWord + Sync>(
+    strategy: S,
+    lang: Language,
+) {
+    let words = Words::new(lang);
+    let hsg = HintsBySecretByGuess::of(&words);
+    let shg = SolutionsByHintByGuess::of(&words, &hsg);
+    let cache = Cache::new(&words, &hsg, &shg);
+
+    let mut secrets: Vec<_> = words
+        .secrets()
+        .iter()
+        // .filter(|w| w.to_string().eq("'rowdy'"))
+        .collect();
+    secrets.sort_unstable();
+    let attempts: Vec<usize> = secrets
+        .iter()
+        .map(|secret| {
+            let mut game = Wordle::with(&words, &cache);
+            let strategy = ChainedStrategies::new(
+                vec![
+                    &FirstOfTwoOrFewerRemainingSolutions,
+                    &WordWithMostNewCharsFromRemainingSolutions,
+                    &strategy,
+                ],
+                PickFirstSolution,
+            );
+            game.autoplay(secret, strategy);
+            game.guessed.len()
+        })
+        .collect();
+    let mut count_by_attempts: BTreeMap<Attempt, Count> = BTreeMap::new();
+    for attempt in attempts {
+        *count_by_attempts.entry(attempt).or_default() += 1;
+    }
+    print_stats(count_by_attempts.iter());
+}
+
+fn print_stats<'a>(count_by_attempts: impl Iterator<Item = (&'a Attempt, &'a Count)>) {
+    let mut games = 0;
+    let mut attempts_sum = 0;
+    let mut failures = 0;
+    let mut descs = vec![];
+    for (attempts, count) in count_by_attempts {
+        games += count;
+        attempts_sum += attempts * count;
+        if attempts > &MAX_ATTEMPTS {
+            failures += count;
+        }
+        descs.push(format!("{}: {}", attempts, count));
+    }
+    let average = attempts_sum as f64 / games as f64;
+
+    print!("\n{:.3} average attempts; {}", average, descs.join(", "));
+    if failures > 0 {
+        let percent_failed = 100.0 * failures as f64 / games as f64;
+        println!("; {} ({:.2}%) failures", failures, percent_failed)
+    } else {
+        println!();
     }
 }
 
