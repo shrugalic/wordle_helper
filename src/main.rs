@@ -17,7 +17,7 @@ fn main() {
     }
     let lang = lang.unwrap_or(English);
     println!(
-        "Language: {}. Choices: English, NYTimes, German, Primal.",
+        "Language: {}. Choices: English, NYTimes, At, Ch, De, Uber, Primal.",
         lang
     );
     if args.len() > consumed_args {

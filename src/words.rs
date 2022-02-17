@@ -51,8 +51,11 @@ impl Words {
 #[derive(Copy, Clone, PartialEq)]
 pub enum Language {
     English,
-    German,
     NYTimes,
+    At,
+    Ch,
+    De,
+    Uber,
     Primal,
 }
 impl TryFrom<&str> for Language {
@@ -62,8 +65,11 @@ impl TryFrom<&str> for Language {
         match lang.to_ascii_lowercase().as_str() {
             "english" => Ok(English),
             "nytimes" => Ok(NYTimes),
+            "at" => Ok(At),
+            "ch" => Ok(Ch),
+            "de" => Ok(De),
+            "uber" => Ok(Uber),
             "primal" => Ok(Primal),
-            "german" | "deutsch" => Ok(German),
             _ => Err(format!("Unknown language '{}'", lang)),
         }
     }
@@ -75,8 +81,11 @@ impl Display for Language {
             "{}",
             match self {
                 English => "English",
-                German => "German",
                 NYTimes => "NYTimes",
+                At => "wordle.at",
+                Ch => "wordle-deutsch.ch",
+                De => "wördle.de",
+                Uber => "wordle.uber.space",
                 Primal => "Primal",
             }
         )
@@ -92,15 +101,21 @@ impl<S: AsRef<str>> ToWord for S {
     }
 }
 
-const GUESSES: [&str; 4] = [
+const GUESSES: [&str; 7] = [
     include_str!("../data/word_lists/original/extras.txt"),
-    include_str!("../data/word_lists/german/extras.txt"),
     include_str!("../data/word_lists/ny_times/extras.txt"),
+    include_str!("../data/word_lists/at/extras.txt"),
+    include_str!("../data/word_lists/ch/extras.txt"),
+    include_str!("../data/word_lists/de/extras.txt"),
+    include_str!("../data/word_lists/uber/extras.txt"),
     include_str!("../data/word_lists/primal/extras.txt"),
 ];
-const SOLUTIONS: [&str; 4] = [
+const SOLUTIONS: [&str; 7] = [
     include_str!("../data/word_lists/original/solutions.txt"),
-    include_str!("../data/word_lists/german/solutions.txt"),
     include_str!("../data/word_lists/ny_times/solutions.txt"),
+    include_str!("../data/word_lists/at/solutions.txt"),
+    include_str!("../data/word_lists/ch/solutions.txt"),
+    include_str!("../data/word_lists/de/solutions.txt"),
+    include_str!("../data/word_lists/uber/solutions.txt"),
     include_str!("../data/word_lists/primal/solutions.txt"),
 ];

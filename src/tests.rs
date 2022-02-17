@@ -421,6 +421,19 @@ fn test_small_turn_sums() {
 //      8201 'urate', 8209 'laser', 8209 'rales', 8222 'stoae', 8229 'aesir', 8229 'oater',
 //      8231 'alure', 8236 'realo', 8243 'terai', 8268 'aeros', 8274 'reais', 8278 'serai'
 //      (10h 49min)
+//  70: 8043 'slate', 8052 'reast', 8054 'trace', 8059 'salet', 8068 'carle', 8070 'crate',
+//      8074 'slane', 8079 'carte', 8082 'stale', 8088 'caret', 8094 'stare', 8104 'earst',
+//      8104 'taser', 8107 'carse', 8114 'snare', 8114 'toile', 8116 'roate', 8121 'raile',
+//      8122 'sorel', 8122 'tares', 8126 'earnt', 8128 'liane', 8128 'soare', 8129 'resat',
+//      8135 'alert', 8136 'antre', 8137 'orate', 8137 'raine', 8139 'saner', 8139 'tears',
+//      8140 'artel', 8141 'strae', 8143 'taler', 8144 'coate', 8144 'raise', 8144 'seral',
+//      8146 'saine', 8152 'arose', 8155 'alter', 8156 'slier', 8157 'saice', 8159 'ratel',
+//      8162 'irate', 8167 'tales', 8171 'rates', 8172 'aisle', 8173 'learn', 8174 'ariel',
+//      8175 'arise', 8176 'later', 8178 'litre', 8180 'paire', 8192 'reals', 8198 'arles',
+//      8198 'lares', 8201 'urate', 8208 'laser', 8209 'rales', 8220 'stoae', 8224 'lears',
+//      8228 'nares', 8229 'aesir', 8229 'oater', 8230 'alure', 8236 'realo', 8243 'terai',
+//      8247 'oriel', 8268 'aeros', 8274 'reais', 8278 'serai'
+//      (22h 6min)
 #[ignore]
 #[test]
 fn test_medium_turn_sums() {
@@ -431,8 +444,8 @@ fn test_medium_turn_sums() {
     let cache = Cache::new(&words, &hsg, &shg);
     let guessed = vec![];
 
-    let picks = 2;
-    let log = true;
+    let picks = 80;
+    let log = false;
     let count = 2315;
     let secrets: Solutions = words.secrets().take(count).collect();
     let scores = turn_sums(&words, &secrets, &guessed, &cache, picks, log);
@@ -643,7 +656,7 @@ fn count_solutions_by_secret_by_guess() {
     );
 }
 
-// #[ignore] // ~3s
+#[ignore] // ~3s
 #[test]
 // Top 5: 60.42 'roate', 61.00 'raise', 61.33 'raile', 62.30 'soare', 63.73 'arise'
 fn find_optimal_first_word_english() {
@@ -755,7 +768,7 @@ fn try_using_collections_of_word_indices_instead_of_hashmaps_to_calc_first_guess
 #[test]
 // Top 5: 31.30 'raine', 35.26 'taler', 36.21 'raten', 36.26 'laser', 36.63 'reale'
 fn find_optimal_first_word_german() {
-    let lang = German;
+    let lang = At;
     let words = Words::new(lang);
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
@@ -771,14 +784,35 @@ fn find_optimal_first_word_german() {
 // ~10s (i9) or ~13s (M1) or 6.5s (M1 Max) for 5 single German words
 // ~1min 51s (i9) or ~2min 21s (M1) or 67s (M1 Max) for 5 single English words
 //
-// Deutsch:
+// At:
 // Best 1. guesses: 31.30 'raine', 35.26 'taler', 36.21 'raten', 36.26 'laser', 36.63 'reale'
 // Best 2. guesses after 1. 'raine': 3.25 'holst', 3.32 'kults', 3.34 'lotus', 3.39 'stuhl', 3.52 'buhlt'
 // Best 3. guesses after 1. 'raine' and 2. 'holst': 1.40 'dumpf', 1.43 'umgab', 1.46 'umweg', 1.49 'bekam', 1.50 'bezug'
 // Best 4. guesses after 1. 'raine' and 2. 'holst' and 3. 'dumpf': 1.06 'biwak', 1.08 'abweg', 1.09 'bezog', 1.09 'bezug', 1.09 'beeck'
 // Best 5. guesses after 1. 'raine' and 2. 'holst' and 3. 'dumpf' and 4. 'biwak': 1.01 'legen', 1.01 'leger', 1.01 'engen', 1.01 'enzen', 1.01 'genen'
 //
-// English
+// Ch:
+// Best 1. guesses: 54.627 'tarne', 57.669 'raine', 59.246 'taler', 60.238 'altre', 61.313 'raten'
+// Best 2. guesses after 1. 'tarne': 5.791 'bilds', 5.857 'selig', 5.911 'kilos', 5.925 'kulis', 5.946 'beils'
+// Best 3. guesses after 1. 'tarne' and 2. 'bilds': 1.883 'umzog', 1.914 'keuch', 1.916 'hekto', 1.918 'humor', 1.951 'hugos'
+// Best 4. guesses after 1. 'tarne' and 2. 'bilds' and 3. 'umzog': 1.185 'kehle', 1.189 'kehre', 1.190 'hecke', 1.198 'hüpft', 1.200 'heckt'
+// Best 5. guesses after 1. 'tarne' and 2. 'bilds' and 3. 'umzog' and 4. 'kehle': 1.052 'prüft', 1.053 'hüpft', 1.053 'rümpf', 1.055 'äpfel', 1.059 'prüfe'
+//
+// De:
+// Best 1. guesses: 41.094 'artel', 41.104 'sarte', 41.231 'taler', 41.231 'taler', 42.726 'alter'
+// Best 2. guesses after 1. 'artel': 4.550 'minsk', 4.821 'bison', 4.821 'bison', 4.854 'minos', 4.863 'minus'
+// Best 3. guesses after 1. 'artel' and 2. 'minsk': 1.478 'behuf', 1.547 'bewog', 1.563 'beuge', 1.583 'tough', 1.599 'bezug'
+// Best 4. guesses after 1. 'artel' and 2. 'minsk' and 3. 'behuf': 1.087 'epode', 1.095 'ponge', 1.102 'geode', 1.102 'geode', 1.104 'dispo'
+// Best 5. guesses after 1. 'artel' and 2. 'minsk' and 3. 'behuf' and 4. 'epode': 1.016 'zwang', 1.016 'zwang', 1.020 'zweig', 1.020 'zweig', 1.020 'zwerg'
+//
+// Uber:
+// Best 1. guesses: 30.230 'senar', 31.443 'taler', 31.770 'artel', 32.099 'raten', 32.191 'sarte'
+// Best 2. guesses after 1. 'senar': 3.282 'light', 3.389 'futil', 3.452 'litho', 3.505 'multi', 3.591 'tulio'
+// Best 3. guesses after 1. 'senar' and 2. 'light': 1.327 'dumpf', 1.327 'kumpf', 1.366 'borke', 1.370 'kombi', 1.376 'krume'
+// Best 4. guesses after 1. 'senar' and 2. 'light' and 3. 'dumpf': 1.050 'borke', 1.050 'kerbe', 1.050 'klebe', 1.052 'bowle', 1.054 'kerwe'
+// Best 5. guesses after 1. 'senar' and 2. 'light' and 3. 'dumpf' and 4. 'borke': 1.011 'zween', 1.013 'twist', 1.013 'watte', 1.013 'weite', 1.015 'tweed'
+//
+// English (original / NY times):
 // Best 1. guesses: 60.42 'roate', 61.00 'raise', 61.33 'raile', 62.30 'soare', 63.73 'arise'
 // Best 2. guesses after 1. 'roate': 5.12 'linds', 5.16 'sling', 5.20 'clips', 5.29 'limns', 5.33 'blins'
 // Best 3. guesses after 1. 'roate' and 2. 'linds': 1.64 'chump', 1.69 'bumph', 1.78 'crump', 1.80 'clump', 1.80 'bumpy'
@@ -826,7 +860,7 @@ fn find_optimal_first_word_german() {
 #[ignore]
 #[test]
 fn find_optimal_word_combos() {
-    let lang = English;
+    let lang = NYTimes;
     let words = Words::new(lang);
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
@@ -946,7 +980,7 @@ fn autoplay_word_that_results_in_fewest_remaining_solutions() {
 #[test]
 // 3.36 average attempts; 2: 42, 3: 685, 4: 429, 5: 15
 fn autoplay_word_that_results_in_fewest_remaining_solutions_german() {
-    autoplay_and_print_stats_with_language(WordThatResultsInFewestRemainingSolutions, German);
+    autoplay_and_print_stats_with_language(WordThatResultsInFewestRemainingSolutions, At);
 }
 
 #[ignore]
@@ -955,7 +989,7 @@ fn autoplay_word_that_results_in_fewest_remaining_solutions_german() {
 // 2: 41, 3: 530, 4: 502, 5: 94, 6: 4
 fn autoplay_german_raine_holst_dumpf_biwak_legen() {
     let strategy = FixedGuessList::new(vec!["raine", "holst", "dumpf", "biwak", "legen"]);
-    autoplay_and_print_stats_with_language(strategy, German);
+    autoplay_and_print_stats_with_language(strategy, At);
 }
 
 #[ignore]
@@ -964,7 +998,7 @@ fn autoplay_german_raine_holst_dumpf_biwak_legen() {
 // 2: 41, 3: 530, 4: 502, 5: 94, 6: 4
 fn autoplay_german_raine_holst_dumpf_biwak() {
     let strategy = FixedGuessList::new(vec!["raine", "holst", "dumpf", "biwak"]);
-    autoplay_and_print_stats_with_language(strategy, German);
+    autoplay_and_print_stats_with_language(strategy, At);
 }
 
 #[ignore]
@@ -973,7 +1007,7 @@ fn autoplay_german_raine_holst_dumpf_biwak() {
 // 2: 82, 3: 649, 4: 610, 5: 229, 6: 70, 7: 6, 8: 3
 fn autoplay_german_tarne_helis_gudok_zamba_fiept() {
     let strategy = FixedGuessList::new(vec!["tarne", "helis", "gudok", "zamba", "fiept"]);
-    autoplay_and_print_stats_with_language(strategy, German);
+    autoplay_and_print_stats_with_language(strategy, At);
 }
 
 #[ignore]
@@ -982,7 +1016,7 @@ fn autoplay_german_tarne_helis_gudok_zamba_fiept() {
 // 2: 79, 3: 623, 4: 631, 5: 249, 6: 60, 7: 6, 8: 1
 fn autoplay_german_tarne_helis_gudok_zamba() {
     let strategy = FixedGuessList::new(vec!["tarne", "helis", "gudok", "zamba"]);
-    autoplay_and_print_stats_with_language(strategy, German);
+    autoplay_and_print_stats_with_language(strategy, At);
 }
 
 #[ignore]
