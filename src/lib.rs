@@ -9,25 +9,26 @@ use Hint::*;
 
 use crate::cache::{Cache, HintsBySecretByGuess, Solutions, SolutionsByHintByGuess};
 use crate::words::Language::*;
-use crate::words::{Guess, Language, Secret, ToWord, Word, Words};
+use crate::words::{Language, ToWord, Word, Words};
 
 pub const MAX_ATTEMPTS: usize = 6;
 const AUTOPLAY_MAX_ATTEMPTS: usize = 10;
 const ALL_POS: [usize; 5] = [0, 1, 2, 3, 4];
 
-type Feedback = Guess;
+type Feedback = Word;
 type HintValue = u8;
 pub type Attempt = usize;
 pub type Count = usize;
 
 pub mod cache;
+pub mod cache2;
 pub mod words;
 
 pub struct Wordle<'a> {
     words: &'a Words,
     solutions: Solutions<'a>,
     cache: &'a Cache<'a>,
-    pub guessed: Vec<Guess>,
+    pub guessed: Vec<Word>,
     print_output: bool,
 }
 impl<'a> Wordle<'a> {
@@ -67,17 +68,17 @@ impl<'a> Wordle<'a> {
         self.print_result();
     }
 
-    fn update_remaining_solutions(&mut self, guess: &Guess, hint: &HintValue) {
+    fn update_remaining_solutions(&mut self, guess: &Word, hint: &HintValue) {
         let solutions = self.cache.solutions_by_hint_by_guess(guess, hint);
         self.solutions = self.solutions.intersect(solutions);
     }
 
     #[allow(clippy::ptr_arg)] // to_string is implemented for Word but not &[char]
-    pub fn autoplay(&mut self, secret: &Secret, mut strategy: impl PickWord) {
+    pub fn autoplay(&mut self, secret: &Word, mut strategy: impl PickWord) {
         self.print_output = false;
 
         while self.guessed.len() < AUTOPLAY_MAX_ATTEMPTS {
-            let guess: Guess = strategy.pick(self);
+            let guess: Word = strategy.pick(self);
             let hint = self.cache.hint_by_secret_by_guess(&guess, secret);
 
             self.print_state(&guess, secret, hint);
@@ -104,7 +105,7 @@ impl<'a> Wordle<'a> {
         }
     }
 
-    fn print_state(&self, guess: &Guess, secret: &Secret, hint: HintValue) {
+    fn print_state(&self, guess: &Word, secret: &Word, hint: HintValue) {
         println!(
             "{:4} solutions left, {}. guess {}, hint {}, secret {}",
             self.solutions.len(),
@@ -124,7 +125,7 @@ impl<'a> Wordle<'a> {
         }
     }
 
-    fn ask_for_feedback(&mut self, guess: &[char]) -> Guess {
+    fn ask_for_feedback(&mut self, guess: &[char]) -> Word {
         loop {
             println!(
                 "Enter feedback using upper-case for correct and lower-case for wrong positions,\n\
@@ -165,7 +166,7 @@ impl<'a> Wordle<'a> {
                 .trim()
                 .chars()
                 .map(|c| c.to_ascii_lowercase())
-                .collect::<Guess>();
+                .collect::<Word>();
             if !self.allowed().iter().any(|word| word == &&guess) {
                 println!("This word is not allowed, please enter another one, or nothing to use the suggestion:")
             } else {
@@ -188,7 +189,7 @@ impl<'a> Wordle<'a> {
             .collect()
     }
 
-    fn allowed(&self) -> Vec<&Guess> {
+    fn allowed(&self) -> Vec<&Word> {
         self.words
             .guesses()
             .iter()
@@ -498,12 +499,12 @@ impl<'a, F: PickWord> PickWord for ChainedStrategies<'a, F> {
 }
 
 pub trait TryToPickWord {
-    fn pick(&self, game: &Wordle) -> Option<Guess>;
+    fn pick(&self, game: &Wordle) -> Option<Word>;
 }
 
 struct WordThatResultsInShortestGameApproximation;
 impl TryToPickWord for WordThatResultsInShortestGameApproximation {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         let guessed: Vec<_> = game.guessed.iter().collect();
         let picks = 10;
         let mut scores = turn_sums(
@@ -529,11 +530,11 @@ impl TryToPickWord for WordThatResultsInShortestGameApproximation {
 fn turn_sums<'a>(
     words: &'a Words,
     secrets: &'a Solutions<'a>,
-    guessed: &'a [&Guess],
+    guessed: &'a [&Word],
     cache: &'a Cache<'a>,
     picks: usize,
     log: bool,
-) -> Vec<(&'a Guess, usize)> {
+) -> Vec<(&'a Word, usize)> {
     if secrets.len() <= 2 {
         return trivial_turn_sum(words, secrets, guessed, log);
     } else if guessed.len() >= 6 {
@@ -541,7 +542,7 @@ fn turn_sums<'a>(
     }
     let best = fewest_remaining_solutions(words, secrets, guessed, cache);
     let mut sum_by_solutions_cache: HashMap<Solutions, usize> = HashMap::new();
-    let mut scores: Vec<(&Guess, usize)> = best
+    let mut scores: Vec<(&Word, usize)> = best
         .into_iter()
         .enumerate()
         .take(picks) // only the best ${picks} guesses
@@ -635,9 +636,9 @@ fn turn_sums<'a>(
 fn trivial_turn_sum<'a>(
     words: &'a Words,
     secrets: &Solutions,
-    guessed: &[&Guess],
+    guessed: &[&Word],
     log: bool,
-) -> Vec<(&'a Guess, usize)> {
+) -> Vec<(&'a Word, usize)> {
     assert!(secrets.len() <= 2);
     let first = secrets.iter().next().unwrap();
     let first = words.guesses().iter().find(|g| g == first).unwrap();
@@ -678,7 +679,7 @@ fn trivial_turn_sum<'a>(
 
 struct WordThatResultsInFewestRemainingSolutions;
 impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         // Use this for first guess, because the more complicated
         // methods are too slow with all possible solutions
         if !game.guessed.is_empty() {
@@ -693,7 +694,7 @@ impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
     }
 }
 
-fn fewest_remaining_solutions_for_game<'a>(game: &'a Wordle) -> Vec<(&'a Guess, f64)> {
+fn fewest_remaining_solutions_for_game<'a>(game: &'a Wordle) -> Vec<(&'a Word, f64)> {
     let guessed: Vec<_> = game.guessed.iter().collect();
     fewest_remaining_solutions(game.words, &game.solutions, &guessed, game.cache)
 }
@@ -701,12 +702,12 @@ fn fewest_remaining_solutions_for_game<'a>(game: &'a Wordle) -> Vec<(&'a Guess, 
 fn fewest_remaining_solutions<'a>(
     words: &'a Words,
     solutions: &Solutions,
-    guessed: &[&Guess],
+    guessed: &[&Word],
     cache: &Cache,
-) -> Vec<(&'a Guess, f64)> {
+) -> Vec<(&'a Word, f64)> {
     let is_first_turn = solutions.len() == words.secrets().count();
     let len = solutions.len() as f64;
-    let mut scores: Vec<(&Guess, f64)> = words
+    let mut scores: Vec<(&Word, f64)> = words
         .guesses()
         .par_iter()
         .filter(|guess| !guessed.contains(guess))
@@ -733,7 +734,7 @@ fn fewest_remaining_solutions<'a>(
 
 struct MostFrequentGlobalCharacter;
 impl TryToPickWord for MostFrequentGlobalCharacter {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         let positions = &game.open_positions();
         let freq = game.solutions.global_character_counts_in(positions);
 
@@ -756,7 +757,7 @@ impl TryToPickWord for MostFrequentGlobalCharacter {
 }
 struct MostFrequentGlobalCharacterHighVarietyWord;
 impl TryToPickWord for MostFrequentGlobalCharacterHighVarietyWord {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         let positions = &game.open_positions();
         let high_variety_words = game.solutions.high_variety_words(positions);
         if high_variety_words.is_empty() {
@@ -784,25 +785,25 @@ impl TryToPickWord for MostFrequentGlobalCharacterHighVarietyWord {
 }
 
 pub struct FixedGuessList {
-    guesses: Vec<Guess>,
+    guesses: Vec<Word>,
 }
 impl FixedGuessList {
     pub fn new<S: AsRef<str>>(guesses: Vec<S>) -> Self {
-        let guesses: Vec<Guess> = guesses.into_iter().map(|w| w.as_ref().to_word()).collect();
+        let guesses: Vec<Word> = guesses.into_iter().map(|w| w.as_ref().to_word()).collect();
         println!("Fixed guesses {}\n", guesses.to_string());
         FixedGuessList { guesses }
     }
 }
 
 impl TryToPickWord for FixedGuessList {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         self.guesses.get(game.guessed.len()).cloned()
     }
 }
 
 struct MostFrequentCharactersOfRemainingWords;
 impl TryToPickWord for MostFrequentCharactersOfRemainingWords {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         let remaining_words_with_unique_new_chars: Vec<_> = game
             .allowed()
             .iter()
@@ -832,7 +833,7 @@ impl TryToPickWord for MostFrequentCharactersOfRemainingWords {
 
 pub struct FirstOfTwoOrFewerRemainingSolutions;
 impl TryToPickWord for FirstOfTwoOrFewerRemainingSolutions {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         if game.solutions.len() <= 2 {
             game.solutions.iter().next().copied().cloned()
         } else {
@@ -843,7 +844,7 @@ impl TryToPickWord for FirstOfTwoOrFewerRemainingSolutions {
 
 pub struct WordWithMostNewCharsFromRemainingSolutions;
 impl TryToPickWord for WordWithMostNewCharsFromRemainingSolutions {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         let wanted_char_count = game.wanted_chars().len();
         if !(1..=5).contains(&wanted_char_count) {
             return None;
@@ -863,7 +864,7 @@ impl TryToPickWord for WordWithMostNewCharsFromRemainingSolutions {
 
 struct MostFrequentCharacterPerPos;
 impl TryToPickWord for MostFrequentCharacterPerPos {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         let positions = &game.open_positions();
         let counts = game.solutions.character_counts_per_position_in(positions);
 
@@ -884,7 +885,7 @@ impl TryToPickWord for MostFrequentCharacterPerPos {
 
 struct MostFrequentCharacterPerPosHighVarietyWord;
 impl TryToPickWord for MostFrequentCharacterPerPosHighVarietyWord {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         let positions = &game.open_positions();
         let high_variety_words = game.solutions.high_variety_words(positions);
         if high_variety_words.is_empty() {
@@ -908,7 +909,7 @@ impl TryToPickWord for MostFrequentCharacterPerPosHighVarietyWord {
 
 struct MatchingMostOtherWordsInAtLeastOneOpenPosition;
 impl TryToPickWord for MatchingMostOtherWordsInAtLeastOneOpenPosition {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         let positions = &game.open_positions();
         // for each word, find out how many other words it matches in any open position
         let mut scores: Vec<_> = game
@@ -953,7 +954,7 @@ impl TryToPickWord for MatchingMostOtherWordsInAtLeastOneOpenPosition {
 }
 struct MatchingMostOtherWordsInAtLeastOneOpenPositionHighVarietyWord;
 impl TryToPickWord for MatchingMostOtherWordsInAtLeastOneOpenPositionHighVarietyWord {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         let positions = &game.open_positions();
         let high_variety_words = game.solutions.high_variety_words(positions);
         if high_variety_words.is_empty() {

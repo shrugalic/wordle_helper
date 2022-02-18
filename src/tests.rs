@@ -2,7 +2,8 @@ use std::collections::BTreeMap;
 use std::time::{Duration, Instant};
 
 use crate::cache::{Cache, HintsBySecretByGuess, SolutionsByHintByGuess};
-use crate::words::{Language, WordIdx};
+use crate::cache2::{Cache2, WordIndex};
+use crate::words::Language;
 
 use super::*;
 
@@ -129,7 +130,7 @@ fn compare_best_word_strategies() {
 }
 
 // Previously used method, slightly less stable than lowest_total_number_of_remaining_solutions
-fn variance_of_remaining_words(words: &Words) -> Vec<(&Guess, f64)> {
+fn variance_of_remaining_words(words: &Words) -> Vec<(&Word, f64)> {
     let average = words.secrets().count() as f64 / 243.0;
     let mut scores: Vec<_> = words
         .guesses()
@@ -149,7 +150,7 @@ fn variance_of_remaining_words(words: &Words) -> Vec<(&Guess, f64)> {
 }
 
 // Previously used method
-fn expected_remaining_solution_counts(words: &Words) -> Vec<(&Guess, f64)> {
+fn expected_remaining_solution_counts(words: &Words) -> Vec<(&Word, f64)> {
     let total_solutions = words.secrets().count() as f64;
     let mut scores: Vec<_> = words
         .guesses()
@@ -170,8 +171,8 @@ fn expected_remaining_solution_counts(words: &Words) -> Vec<(&Guess, f64)> {
 
 // Allow because determine_hints expects &Guess not &[char]
 fn count_by_hint<'a>(
-    #[allow(clippy::ptr_arg)] guess: &Guess,
-    solutions: impl Iterator<Item = &'a Secret>,
+    #[allow(clippy::ptr_arg)] guess: &Word,
+    solutions: impl Iterator<Item = &'a Word>,
 ) -> [usize; 243] {
     let mut count_by_hint = [0; 243];
     for solution in solutions {
@@ -266,7 +267,7 @@ fn explore_tree(words: &Words, secrets: &Solutions, guessed: &[&Word], cache: &C
         explore_tree(words, &secrets, &guessed, cache)
     }
 }
-fn print_info(guessed: &[&Guess], hint: HintValue, secrets: &Solutions) {
+fn print_info(guessed: &[&Word], hint: HintValue, secrets: &Solutions) {
     let turn = guessed.len();
     let indent = "\t".repeat(turn - 1);
     let guess = guessed.last().unwrap().to_string();
@@ -684,61 +685,19 @@ fn find_optimal_first_word_english() {
 fn try_using_collections_of_word_indices_instead_of_hashmaps_to_calc_first_guesses_with_fewest_remaining_solutions(
 ) {
     let words = Words::new(English);
-
-    let start = Instant::now();
-    let hint_by_secret_by_guess: Vec<Vec<HintValue>> = words
-        .guesses()
-        .par_iter()
-        .map(|guess| {
-            words
-                .secrets()
-                .map(|secret| guess.calculate_hint(secret).value())
-                .collect()
-        })
-        .collect();
-    let elapsed = start.elapsed();
-    println!(
-        "{:?} to calc {} hint_by_secret_by_guess",
-        elapsed,
-        hint_by_secret_by_guess.len()
-    );
-
-    let start = Instant::now();
-    let secrets_by_hint_by_guess: Vec<Vec<BTreeSet<usize>>> = words
-        .guesses()
-        .par_iter()
-        .enumerate()
-        .map(|(guess_idx, _guess)| {
-            let mut solutions_by_hint: Vec<BTreeSet<usize>> = vec![BTreeSet::new(); 243];
-            (0..2315).into_iter().for_each(|secret_idx| {
-                let hint = hint_by_secret_by_guess[guess_idx][secret_idx] as usize;
-                solutions_by_hint[hint].insert(secret_idx);
-            });
-            solutions_by_hint
-        })
-        .collect();
-    let elapsed = start.elapsed();
-    println!(
-        "{:?} to calc {} secrets_by_hint_by_guess",
-        elapsed,
-        secrets_by_hint_by_guess.len()
-    );
-
+    let cache = Cache2::with(&words);
     let start = Instant::now();
     let len = 2315_f64;
-    let mut scores: Vec<(WordIdx, f64)> = words
+    let mut scores: Vec<(WordIndex, f64)> = words
         .guesses()
         .par_iter()
         .enumerate()
         .map(|(guess_idx, _guess)| {
             let count: usize = (0..2315)
                 .into_iter()
-                .map(|secret_idx| {
-                    let hint = hint_by_secret_by_guess[guess_idx][secret_idx] as usize;
-                    secrets_by_hint_by_guess[guess_idx][hint].len()
-                })
+                .map(|secret_idx| cache.solutions(guess_idx, secret_idx).len())
                 .sum();
-            (guess_idx as WordIdx, count as f64 / len)
+            (guess_idx as WordIndex, count as f64 / len)
         })
         .collect();
     scores.sort_unstable_by(|(a_word, a_value), (b_word, b_value)| {
@@ -921,7 +880,7 @@ fn find_optimal_word_combos() {
     }
 }
 
-fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Guess]) -> Vec<(&'g Guess, f64)> {
+fn find_best_next_guesses<'g>(game: &'g Wordle, guessed: &[&Word]) -> Vec<(&'g Word, f64)> {
     let first = *guessed.iter().next().unwrap();
     let hsg = HintsBySecretByGuess::of(game.words);
     let shg = SolutionsByHintByGuess::of(game.words, &hsg);
@@ -1251,7 +1210,7 @@ struct MostFrequentUnusedCharacters<'w> {
 }
 impl<'w> MostFrequentUnusedCharacters<'w> {
     #[allow(clippy::ptr_arg)] // for global_character_counts_in defined for Vec<Guess> not &[Guess]
-    fn new(guesses: &'w Vec<Guess>) -> Self {
+    fn new(guesses: &'w Vec<Word>) -> Self {
         let global_count_by_char: HashMap<char, usize> =
             guesses.global_character_counts_in(&ALL_POS);
         let combined_global_char_count_sums_by: HashMap<_, usize> = guesses
@@ -1271,7 +1230,7 @@ impl<'w> MostFrequentUnusedCharacters<'w> {
     }
 }
 impl<'w> TryToPickWord for MostFrequentUnusedCharacters<'w> {
-    fn pick(&self, game: &Wordle) -> Option<Guess> {
+    fn pick(&self, game: &Wordle) -> Option<Word> {
         if game.solutions.len() < 10 {
             return None;
         };
@@ -1510,16 +1469,15 @@ fn test_calculate_hint() {
 #[ignore]
 #[test]
 fn lowest_total_number_of_remaining_solutions_only_counts_remaining_viable_solutions() {
-    let guesses: Vec<Guess> = ["fubar", "rural", "aurar", "goier", "urial"]
+    let guesses = ["fubar", "rural", "aurar", "goier", "urial"]
         .iter()
-        .map(|w| w.to_word())
-        .collect();
-    let secrets: HashSet<Secret> = ["augur", "briar", "friar", "lunar", "sugar"]
+        .map(|w| w.to_word());
+    let secrets: Vec<_> = ["augur", "briar", "friar", "lunar", "sugar"]
         .iter()
         .map(|w| w.to_word())
         .collect();
     let len = secrets.len() as f64;
-    let words = Words::with(English, guesses, secrets);
+    let words = Words::of(guesses, secrets, English);
     let hsg = HintsBySecretByGuess::of(&words);
     let shg = SolutionsByHintByGuess::of(&words, &hsg);
     let cache = Cache::new(&words, &hsg, &shg);

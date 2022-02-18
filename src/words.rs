@@ -1,39 +1,31 @@
-#[cfg(test)]
-use std::collections::HashSet;
 use std::fmt::{Display, Formatter};
 use std::iter::Map;
 use std::str::Lines;
 
 use Language::*;
 
+use crate::cache2::WordIndex;
+
 pub type Word = Vec<char>;
-pub type Guess = Word;
-pub type Secret = Word;
-pub type WordIdx = u16; // max 65'565 words
 
 pub struct Words {
     lang: Language,
-    secret_count: usize,
+    secret_cnt: usize,
     words: Vec<Word>,
 }
 impl Words {
     pub fn new(lang: Language) -> Self {
-        let secrets: Vec<Secret> = Words::from_str(SOLUTIONS[lang as usize]).collect();
-        Words {
-            lang,
-            secret_count: secrets.len(),
-            words: secrets
-                .into_iter()
-                .chain(Words::from_str(GUESSES[lang as usize]))
-                .collect(),
-        }
+        let guesses = Words::from_str(GUESSES[lang as usize]);
+        let secrets = Words::from_str(SOLUTIONS[lang as usize]).collect();
+        Self::of(guesses, secrets, lang)
     }
-    #[cfg(test)]
-    pub fn with(lang: Language, guesses: Vec<Guess>, secrets: HashSet<Secret>) -> Self {
+    pub fn of(guesses: impl Iterator<Item = Word>, secrets: Vec<Word>, lang: Language) -> Self {
+        let secret_cnt = secrets.len();
+        let words: Vec<Word> = secrets.into_iter().chain(guesses).collect();
         Words {
             lang,
-            secret_count: secrets.len(),
-            words: secrets.into_iter().chain(guesses.into_iter()).collect(),
+            secret_cnt,
+            words,
         }
     }
     fn from_str(txt: &str) -> Map<Lines<'_>, fn(&'_ str) -> Word> {
@@ -42,18 +34,17 @@ impl Words {
     pub(crate) fn lang(&self) -> &Language {
         &self.lang
     }
-    pub(crate) fn guesses(&self) -> &Vec<Guess> {
+    pub(crate) fn guesses(&self) -> &Vec<Word> {
         &self.words
     }
     pub fn secrets(&self) -> impl Iterator<Item = &Word> {
-        self.words.iter().take(self.secret_count)
+        self.words.iter().take(self.secret_cnt as usize)
     }
-    pub fn get(&self, idx: WordIdx) -> &Word {
+    pub fn get(&self, idx: WordIndex) -> &Word {
         &self.words[idx as usize]
     }
-    #[cfg(test)]
-    pub fn len(&self) -> usize {
-        self.words.len()
+    pub fn secret_count(&self) -> usize {
+        self.secret_cnt
     }
 }
 

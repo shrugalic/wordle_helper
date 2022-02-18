@@ -2,9 +2,9 @@ use std::collections::{BTreeSet, HashMap};
 
 use rayon::prelude::*;
 
-use crate::{CalcHintValue, GetHint, Guess, HintValue, Secret, Words};
+use crate::{CalcHintValue, GetHint, HintValue, Word, Words};
 
-pub type Solutions<'a> = BTreeSet<&'a Secret>;
+pub type Solutions<'a> = BTreeSet<&'a Word>;
 
 pub struct Cache<'a> {
     hint_solutions: &'a SolutionsByHintByGuess<'a>,
@@ -26,34 +26,31 @@ impl<'a> Cache<'a> {
     }
     pub(crate) fn solutions_by_hint_by_guess(
         &self,
-        guess: &Guess,
+        guess: &Word,
         hint: &HintValue,
     ) -> &Solutions<'a> {
         &self.hint_solutions.by_hint_by_guess[guess][hint]
     }
 
-    pub(crate) fn solutions_by_hint_for(
-        &self,
-        guess: &Guess,
-    ) -> &HashMap<HintValue, Solutions<'a>> {
+    pub(crate) fn solutions_by_hint_for(&self, guess: &Word) -> &HashMap<HintValue, Solutions<'a>> {
         &self.hint_solutions.by_hint_by_guess[guess]
     }
-    pub(crate) fn hint_by_secret_by_guess(&self, guess: &Guess, secret: &Secret) -> HintValue {
+    pub(crate) fn hint_by_secret_by_guess(&self, guess: &Word, secret: &Word) -> HintValue {
         self.hints.by_secret_by_guess[guess][secret]
     }
     #[cfg(test)]
     pub(crate) fn solutions_by_secret_by_guess(
         &self,
-    ) -> &HashMap<&'a Guess, HashMap<&'a Secret, &'a Solutions<'a>>> {
+    ) -> &HashMap<&'a Word, HashMap<&'a Word, &'a Solutions<'a>>> {
         &self.secret_solutions.by_secret_by_guess
     }
-    pub(crate) fn solutions_by(&self, guess: &Guess, secret: &Secret) -> &'a Solutions<'a> {
+    pub(crate) fn solutions_by(&self, guess: &Word, secret: &Word) -> &'a Solutions<'a> {
         self.secret_solutions.by_secret_by_guess[guess][secret]
     }
 }
 
 pub struct HintsBySecretByGuess<'a> {
-    by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, HintValue>>,
+    by_secret_by_guess: HashMap<&'a Word, HashMap<&'a Word, HintValue>>,
 }
 impl<'a> HintsBySecretByGuess<'a> {
     pub fn of(words: &'a Words) -> Self {
@@ -65,14 +62,14 @@ impl<'a> HintsBySecretByGuess<'a> {
                     let hint_value_by_secret = words
                         .secrets()
                         .map(|secret| (secret, guess.calculate_hint(secret).value()))
-                        .collect::<HashMap<&Secret, HintValue>>();
+                        .collect::<HashMap<&Word, HintValue>>();
                     (guess, hint_value_by_secret)
                 })
                 .collect(),
         }
     }
     #[cfg(test)]
-    pub fn by_secret_by_guess(&self) -> &HashMap<&'a Guess, HashMap<&'a Secret, HintValue>> {
+    pub fn by_secret_by_guess(&self) -> &HashMap<&'a Word, HashMap<&'a Word, HintValue>> {
         &self.by_secret_by_guess
     }
     #[cfg(test)]
@@ -82,7 +79,7 @@ impl<'a> HintsBySecretByGuess<'a> {
 }
 
 pub struct SolutionsByHintByGuess<'a> {
-    by_hint_by_guess: HashMap<&'a Guess, HashMap<HintValue, Solutions<'a>>>,
+    by_hint_by_guess: HashMap<&'a Word, HashMap<HintValue, Solutions<'a>>>,
 }
 impl<'a> SolutionsByHintByGuess<'a> {
     pub fn of(words: &'a Words, hsg: &'a HintsBySecretByGuess) -> Self {
@@ -104,7 +101,7 @@ impl<'a> SolutionsByHintByGuess<'a> {
         }
     }
     #[cfg(test)]
-    pub fn by_hint_by_guess(&self) -> &HashMap<&'a Guess, HashMap<HintValue, Solutions<'a>>> {
+    pub fn by_hint_by_guess(&self) -> &HashMap<&'a Word, HashMap<HintValue, Solutions<'a>>> {
         &self.by_hint_by_guess
     }
     #[cfg(test)]
@@ -114,7 +111,7 @@ impl<'a> SolutionsByHintByGuess<'a> {
 }
 
 pub struct SolutionsBySecretByGuess<'a> {
-    by_secret_by_guess: HashMap<&'a Guess, HashMap<&'a Secret, &'a Solutions<'a>>>,
+    by_secret_by_guess: HashMap<&'a Word, HashMap<&'a Word, &'a Solutions<'a>>>,
 }
 impl<'a> SolutionsBySecretByGuess<'a> {
     pub(crate) fn of(
@@ -127,7 +124,7 @@ impl<'a> SolutionsBySecretByGuess<'a> {
                 .guesses()
                 .par_iter()
                 .map(|guess| {
-                    let mut solutions_by_secret: HashMap<&Secret, &Solutions> = HashMap::new();
+                    let mut solutions_by_secret: HashMap<&Word, &Solutions> = HashMap::new();
                     for secret in words.secrets() {
                         let hint = &hsg.by_secret_by_guess[guess][secret];
                         let solutions = &shg.by_hint_by_guess[guess][hint];
