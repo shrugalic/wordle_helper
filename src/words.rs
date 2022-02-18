@@ -1,3 +1,4 @@
+#[cfg(test)]
 use std::collections::HashSet;
 use std::fmt::{Display, Formatter};
 use std::iter::Map;
@@ -8,6 +9,7 @@ use Language::*;
 pub type Word = Vec<char>;
 pub type Guess = Word;
 pub type Secret = Word;
+pub type WordIdx = u16; // max 65'565 words
 
 pub struct Words {
     lang: Language,
@@ -45,6 +47,13 @@ impl Words {
     }
     pub fn secrets(&self) -> impl Iterator<Item = &Word> {
         self.words.iter().take(self.secret_count)
+    }
+    pub fn get(&self, idx: WordIdx) -> &Word {
+        &self.words[idx as usize]
+    }
+    #[cfg(test)]
+    pub fn len(&self) -> usize {
+        self.words.len()
     }
 }
 

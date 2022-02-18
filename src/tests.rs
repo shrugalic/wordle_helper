@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 use std::time::{Duration, Instant};
 
 use crate::cache::{Cache, HintsBySecretByGuess, SolutionsByHintByGuess};
-use crate::words::Language;
+use crate::words::{Language, WordIdx};
 
 use super::*;
 
@@ -683,20 +683,16 @@ fn find_optimal_first_word_english() {
 #[test]
 fn try_using_collections_of_word_indices_instead_of_hashmaps_to_calc_first_guesses_with_fewest_remaining_solutions(
 ) {
-    let words: Vec<Guess> = include_str!("../data/word_lists/original/solutions.txt")
-        .lines()
-        .chain(include_str!("../data/word_lists/original/extras.txt").lines())
-        .map(|w| w.to_word())
-        .collect();
+    let words = Words::new(English);
 
-    let guesses: Vec<usize> = (0..words.len()).into_iter().collect();
     let start = Instant::now();
-    let hint_by_secret_by_guess: Vec<Vec<HintValue>> = guesses
+    let hint_by_secret_by_guess: Vec<Vec<HintValue>> = words
+        .guesses()
         .par_iter()
-        .map(|&guess_idx| {
-            (0..2315)
-                .into_iter()
-                .map(|secret_idx| words[guess_idx].calculate_hint(&words[secret_idx]).value())
+        .map(|guess| {
+            words
+                .secrets()
+                .map(|secret| guess.calculate_hint(secret).value())
                 .collect()
         })
         .collect();
@@ -708,9 +704,11 @@ fn try_using_collections_of_word_indices_instead_of_hashmaps_to_calc_first_guess
     );
 
     let start = Instant::now();
-    let secrets_by_hint_by_guess: Vec<Vec<BTreeSet<usize>>> = guesses
+    let secrets_by_hint_by_guess: Vec<Vec<BTreeSet<usize>>> = words
+        .guesses()
         .par_iter()
-        .map(|&guess_idx| {
+        .enumerate()
+        .map(|(guess_idx, _guess)| {
             let mut solutions_by_hint: Vec<BTreeSet<usize>> = vec![BTreeSet::new(); 243];
             (0..2315).into_iter().for_each(|secret_idx| {
                 let hint = hint_by_secret_by_guess[guess_idx][secret_idx] as usize;
@@ -728,9 +726,11 @@ fn try_using_collections_of_word_indices_instead_of_hashmaps_to_calc_first_guess
 
     let start = Instant::now();
     let len = 2315_f64;
-    let mut scores: Vec<(usize, f64)> = guesses
+    let mut scores: Vec<(WordIdx, f64)> = words
+        .guesses()
         .par_iter()
-        .map(|&guess_idx| {
+        .enumerate()
+        .map(|(guess_idx, _guess)| {
             let count: usize = (0..2315)
                 .into_iter()
                 .map(|secret_idx| {
@@ -738,7 +738,7 @@ fn try_using_collections_of_word_indices_instead_of_hashmaps_to_calc_first_guess
                     secrets_by_hint_by_guess[guess_idx][hint].len()
                 })
                 .sum();
-            (guess_idx, count as f64 / len)
+            (guess_idx as WordIdx, count as f64 / len)
         })
         .collect();
     scores.sort_unstable_by(|(a_word, a_value), (b_word, b_value)| {
@@ -755,12 +755,12 @@ fn try_using_collections_of_word_indices_instead_of_hashmaps_to_calc_first_guess
         scores
             .iter()
             .take(5)
-            .map(|&(idx, value)| format!("{:.3} {}", value, words[idx].to_string()))
+            .map(|&(idx, value)| format!("{:.3} {}", value, words.get(idx).to_string()))
             .collect::<Vec<_>>()
             .join(", ")
     );
 
-    let optimal = words[(scores.first().unwrap().0)].clone();
+    let optimal = words.get(scores.first().unwrap().0).clone();
     assert_eq!("roate".to_word(), optimal);
 }
 

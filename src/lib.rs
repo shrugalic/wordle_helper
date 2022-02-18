@@ -7,7 +7,7 @@ use rayon::prelude::*;
 
 use Hint::*;
 
-use crate::cache::{Cache, HintsBySecretByGuess, SolutionsByHintByGuess};
+use crate::cache::{Cache, HintsBySecretByGuess, Solutions, SolutionsByHintByGuess};
 use crate::words::Language::*;
 use crate::words::{Guess, Language, Secret, ToWord, Word, Words};
 
@@ -17,7 +17,6 @@ const ALL_POS: [usize; 5] = [0, 1, 2, 3, 4];
 
 type Feedback = Guess;
 type HintValue = u8;
-type Solutions<'a> = BTreeSet<&'a Secret>;
 pub type Attempt = usize;
 pub type Count = usize;
 

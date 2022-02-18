@@ -1,8 +1,10 @@
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 
 use rayon::prelude::*;
 
-use crate::{CalcHintValue, GetHint, Guess, HintValue, Secret, Solutions, Words};
+use crate::{CalcHintValue, GetHint, Guess, HintValue, Secret, Words};
+
+pub type Solutions<'a> = BTreeSet<&'a Secret>;
 
 pub struct Cache<'a> {
     hint_solutions: &'a SolutionsByHintByGuess<'a>,
