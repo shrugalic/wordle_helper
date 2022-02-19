@@ -4,7 +4,8 @@ use std::str::Lines;
 
 use Language::*;
 
-use crate::cache2::WordIndex;
+use crate::cache::WordIndex;
+use crate::{SolutionsIndex, WordAsCharVec};
 
 pub type Word = Vec<char>;
 
@@ -37,14 +38,51 @@ impl Words {
     pub(crate) fn guesses(&self) -> &Vec<Word> {
         &self.words
     }
+    pub(crate) fn guess_indices(&self) -> Vec<WordIndex> {
+        (0..self.words.len() as WordIndex).into_iter().collect()
+    }
     pub fn secrets(&self) -> impl Iterator<Item = &Word> {
         self.words.iter().take(self.secret_cnt as usize)
     }
     pub fn get(&self, idx: WordIndex) -> &Word {
         &self.words[idx as usize]
     }
-    pub fn secret_count(&self) -> usize {
-        self.secret_cnt
+    pub fn get_string(&self, idx: WordIndex) -> String {
+        self.words[idx as usize].to_string()
+    }
+    pub fn index_of(&self, wanted: &Word) -> WordIndex {
+        self.words.iter().position(|word| wanted.eq(word)).unwrap() as WordIndex
+    }
+    pub fn secret_count(&self) -> WordIndex {
+        self.secret_cnt as WordIndex
+    }
+    pub fn secret_indices(&self) -> SolutionsIndex {
+        (0..self.secret_cnt as WordIndex).into_iter().collect()
+    }
+    pub fn scores_to_string<Score: PartialOrd + Display>(
+        &self,
+        scores: &[(WordIndex, Score)],
+        count: usize,
+    ) -> String {
+        scores
+            .iter()
+            .take(count)
+            .map(|(idx, score)| format!("{:.3} {}", score, self.get(*idx).to_string()))
+            .collect::<Vec<_>>()
+            .join(", ")
+    }
+    pub fn indices_to_words<'a>(&self, indices: impl Iterator<Item = &'a WordIndex>) -> Vec<Word> {
+        indices.map(|i| self.get(*i).to_vec()).collect()
+    }
+
+    pub fn indices_to_string<'a>(&self, indices: impl Iterator<Item = &'a WordIndex>) -> String {
+        let mut words: Vec<_> = self
+            .indices_to_words(indices)
+            .into_iter()
+            .map(|w| w.to_string())
+            .collect();
+        words.sort_unstable();
+        words.join(", ")
     }
 }
 

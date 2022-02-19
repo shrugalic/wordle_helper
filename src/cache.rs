@@ -1,138 +1,69 @@
-use std::collections::{BTreeSet, HashMap};
+use std::collections::BTreeSet;
 
 use rayon::prelude::*;
 
-use crate::{CalcHintValue, GetHint, HintValue, Word, Words};
+use crate::{CalcHintValue, GetHint, Words};
 
-pub type Solutions<'a> = BTreeSet<&'a Word>;
+pub type WordIndex = u16; // max 65'565 words
+pub type SolutionsIndex = BTreeSet<WordIndex>;
+pub type HintValue = u8;
 
-pub struct Cache<'a> {
-    hint_solutions: &'a SolutionsByHintByGuess<'a>,
-    hints: &'a HintsBySecretByGuess<'a>,
-    secret_solutions: SolutionsBySecretByGuess<'a>,
+pub struct Cache {
+    hint_by_secret_by_guess: Vec<Vec<HintValue>>,
+    solutions_by_hint_by_guess: Vec<Vec<BTreeSet<WordIndex>>>,
 }
-impl<'a> Cache<'a> {
-    pub fn new(
-        words: &'a Words,
-        hints: &'a HintsBySecretByGuess,
-        hint_solutions: &'a SolutionsByHintByGuess,
-    ) -> Self {
-        let secret_solutions = SolutionsBySecretByGuess::of(words, hints, hint_solutions);
+impl Cache {
+    pub fn new(words: &Words) -> Self {
+        let hints_by_secret_by_guess = hint_by_secret_idx_by_guess_idx(words);
+        let solutions_by_hint_by_guess =
+            solution_indices_by_hint_by_guess_idx(words, &hints_by_secret_by_guess);
         Cache {
-            hint_solutions,
-            hints,
-            secret_solutions,
+            hint_by_secret_by_guess: hints_by_secret_by_guess,
+            solutions_by_hint_by_guess,
         }
     }
-    pub(crate) fn solutions_by_hint_by_guess(
-        &self,
-        guess: &Word,
-        hint: &HintValue,
-    ) -> &Solutions<'a> {
-        &self.hint_solutions.by_hint_by_guess[guess][hint]
+    pub fn hint(&self, g: WordIndex, s: WordIndex) -> HintValue {
+        self.hint_by_secret_by_guess[g as usize][s as usize]
     }
-
-    pub(crate) fn solutions_by_hint_for(&self, guess: &Word) -> &HashMap<HintValue, Solutions<'a>> {
-        &self.hint_solutions.by_hint_by_guess[guess]
+    pub fn solutions(&self, g: WordIndex, s: WordIndex) -> &BTreeSet<WordIndex> {
+        let hint = self.hint_by_secret_by_guess[g as usize][s as usize];
+        self.solutions_by(g, hint)
     }
-    pub(crate) fn hint_by_secret_by_guess(&self, guess: &Word, secret: &Word) -> HintValue {
-        self.hints.by_secret_by_guess[guess][secret]
+    pub fn solutions_by(&self, g: WordIndex, hint: HintValue) -> &BTreeSet<WordIndex> {
+        &self.solutions_by_hint_by_guess[g as usize][hint as usize]
     }
-    #[cfg(test)]
-    pub(crate) fn solutions_by_secret_by_guess(
-        &self,
-    ) -> &HashMap<&'a Word, HashMap<&'a Word, &'a Solutions<'a>>> {
-        &self.secret_solutions.by_secret_by_guess
-    }
-    pub(crate) fn solutions_by(&self, guess: &Word, secret: &Word) -> &'a Solutions<'a> {
-        self.secret_solutions.by_secret_by_guess[guess][secret]
+    pub fn solutions_by_hint_for(&self, g: WordIndex) -> &Vec<BTreeSet<WordIndex>> {
+        &self.solutions_by_hint_by_guess[g as usize]
     }
 }
 
-pub struct HintsBySecretByGuess<'a> {
-    by_secret_by_guess: HashMap<&'a Word, HashMap<&'a Word, HintValue>>,
-}
-impl<'a> HintsBySecretByGuess<'a> {
-    pub fn of(words: &'a Words) -> Self {
-        HintsBySecretByGuess {
-            by_secret_by_guess: words
-                .guesses()
-                .par_iter()
-                .map(|guess| {
-                    let hint_value_by_secret = words
-                        .secrets()
-                        .map(|secret| (secret, guess.calculate_hint(secret).value()))
-                        .collect::<HashMap<&Word, HintValue>>();
-                    (guess, hint_value_by_secret)
-                })
-                .collect(),
-        }
-    }
-    #[cfg(test)]
-    pub fn by_secret_by_guess(&self) -> &HashMap<&'a Word, HashMap<&'a Word, HintValue>> {
-        &self.by_secret_by_guess
-    }
-    #[cfg(test)]
-    pub fn len(&self) -> usize {
-        self.by_secret_by_guess.len()
-    }
+fn hint_by_secret_idx_by_guess_idx(words: &Words) -> Vec<Vec<HintValue>> {
+    words
+        .guesses()
+        .into_par_iter()
+        .map(|guess| {
+            words
+                .secrets()
+                .map(|secret| guess.calculate_hint(secret).value())
+                .collect()
+        })
+        .collect()
 }
 
-pub struct SolutionsByHintByGuess<'a> {
-    by_hint_by_guess: HashMap<&'a Word, HashMap<HintValue, Solutions<'a>>>,
-}
-impl<'a> SolutionsByHintByGuess<'a> {
-    pub fn of(words: &'a Words, hsg: &'a HintsBySecretByGuess) -> Self {
-        SolutionsByHintByGuess {
-            by_hint_by_guess: words
-                .guesses()
-                .par_iter()
-                .map(|guess| {
-                    let mut solutions_by_hint: HashMap<HintValue, Solutions> = HashMap::new();
-                    for secret in words.secrets() {
-                        solutions_by_hint
-                            .entry(hsg.by_secret_by_guess[guess][secret])
-                            .or_default()
-                            .insert(secret);
-                    }
-                    (guess, solutions_by_hint)
-                })
-                .collect(),
-        }
-    }
-    #[cfg(test)]
-    pub fn by_hint_by_guess(&self) -> &HashMap<&'a Word, HashMap<HintValue, Solutions<'a>>> {
-        &self.by_hint_by_guess
-    }
-    #[cfg(test)]
-    pub fn len(&self) -> usize {
-        self.by_hint_by_guess.len()
-    }
-}
-
-pub struct SolutionsBySecretByGuess<'a> {
-    by_secret_by_guess: HashMap<&'a Word, HashMap<&'a Word, &'a Solutions<'a>>>,
-}
-impl<'a> SolutionsBySecretByGuess<'a> {
-    pub(crate) fn of(
-        words: &'a Words,
-        hsg: &'a HintsBySecretByGuess,
-        shg: &'a SolutionsByHintByGuess,
-    ) -> Self {
-        SolutionsBySecretByGuess {
-            by_secret_by_guess: words
-                .guesses()
-                .par_iter()
-                .map(|guess| {
-                    let mut solutions_by_secret: HashMap<&Word, &Solutions> = HashMap::new();
-                    for secret in words.secrets() {
-                        let hint = &hsg.by_secret_by_guess[guess][secret];
-                        let solutions = &shg.by_hint_by_guess[guess][hint];
-                        solutions_by_secret.insert(secret, solutions);
-                    }
-                    (guess, solutions_by_secret)
-                })
-                .collect(),
-        }
-    }
+fn solution_indices_by_hint_by_guess_idx(
+    words: &Words,
+    hint_by_secret_by_guess: &[Vec<HintValue>],
+) -> Vec<Vec<BTreeSet<WordIndex>>> {
+    words
+        .guess_indices()
+        .into_par_iter()
+        .map(|guess_idx| {
+            let mut solutions_by_hint: Vec<BTreeSet<WordIndex>> = vec![BTreeSet::new(); 243];
+            for secret_idx in words.secret_indices() {
+                let hint = hint_by_secret_by_guess[guess_idx as usize][secret_idx as usize];
+                solutions_by_hint[hint as usize].insert(secret_idx as WordIndex);
+            }
+            solutions_by_hint
+        })
+        .collect()
 }

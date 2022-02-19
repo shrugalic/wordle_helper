@@ -25,152 +25,152 @@
 1. guess 'raine' + hint 🟩🟩⬛⬛🟨 matches 'raser', use it as 2. guess.
 1. guess 'raine' + hint 🟩🟩🟨⬛⬛ matches 'radio', use it as 2. guess.
 1. guess 'raine' + hint ⬛⬛⬛🟩⬛ matches 'blond' and 'pfund'. Pick one at random to win by the 3. guess.
-1. guess 'raine' + hint ⬛⬛🟩🟩⬛ matches 'flink' and 'blind'. Pick one at random to win by the 3. guess.
+1. guess 'raine' + hint ⬛⬛🟩🟩⬛ matches 'blind' and 'flink'. Pick one at random to win by the 3. guess.
 1. guess 'raine' + hint ⬛⬛🟩🟩🟩 matches 'deine' and 'leine'. Pick one at random to win by the 3. guess.
 1. guess 'raine' + hint ⬛🟨⬛🟨🟩 matches 'gnade' and 'knabe'. Pick one at random to win by the 3. guess.
-1. guess 'raine' + hint ⬛🟩⬛🟩⬛ matches 'sauna' and 'fauna'. Pick one at random to win by the 3. guess.
+1. guess 'raine' + hint ⬛🟩⬛🟩⬛ matches 'fauna' and 'sauna'. Pick one at random to win by the 3. guess.
 1. guess 'raine' + hint ⬛🟩🟨⬛🟨 matches 'dabei' and 'datei'. Pick one at random to win by the 3. guess.
 1. guess 'raine' + hint ⬛🟩🟩⬛🟩 matches 'saite' and 'waise'. Pick one at random to win by the 3. guess.
 1. guess 'raine' + hint 🟨⬛⬛🟨⬛ matches 'sporn' and 'thron'. Pick one at random to win by the 3. guess.
-1. guess 'raine' + hint 🟨⬛⬛🟨🟩 matches 'genre' and 'ernte'. Pick one at random to win by the 3. guess.
-1. guess 'raine' + hint 🟨⬛🟩🟨⬛ matches 'zwirn' and 'stirn'. Pick one at random to win by the 3. guess.
-1. guess 'raine' + hint 🟨🟨⬛🟨🟨 matches 'heran' and 'anker'. Pick one at random to win by the 3. guess.
-1. guess 'raine' + hint 🟨🟩🟨⬛⬛ matches 'tarif' and 'fakir'. Pick one at random to win by the 3. guess.
-1. guess 'raine' + hint 🟩⬛⬛⬛⬛ matches 'rumpf' and 'rotor'. Pick one at random to win by the 3. guess.
+1. guess 'raine' + hint 🟨⬛⬛🟨🟩 matches 'ernte' and 'genre'. Pick one at random to win by the 3. guess.
+1. guess 'raine' + hint 🟨⬛🟩🟨⬛ matches 'stirn' and 'zwirn'. Pick one at random to win by the 3. guess.
+1. guess 'raine' + hint 🟨🟨⬛🟨🟨 matches 'anker' and 'heran'. Pick one at random to win by the 3. guess.
+1. guess 'raine' + hint 🟨🟩🟨⬛⬛ matches 'fakir' and 'tarif'. Pick one at random to win by the 3. guess.
+1. guess 'raine' + hint 🟩⬛⬛⬛⬛ matches 'rotor' and 'rumpf'. Pick one at random to win by the 3. guess.
 1. guess 'raine' + hint 🟩⬛⬛🟨🟩 matches 'rente' and 'runde'. Pick one at random to win by the 3. guess.
-1. guess 'raine' + hint 🟩🟩⬛🟨🟨 matches 'raten' and 'rasen'. Pick one at random to win by the 3. guess.
+1. guess 'raine' + hint 🟩🟩⬛🟨🟨 matches 'rasen' and 'raten'. Pick one at random to win by the 3. guess.
 1. guess 'raine' + hint ⬛⬛⬛🟩🟨 matches 3 secrets 'duenn', 'elend', 'fuenf'.
-	2. guess 'aalen' + hint ⬛⬛⬛🟨🟨 matches 'fuenf', use it as 3. guess.
-	2. guess 'aalen' + hint ⬛⬛⬛🟨🟩 matches 'duenn', use it as 3. guess.
-	2. guess 'aalen' + hint ⬛⬛🟨🟨🟨 matches 'elend', use it as 3. guess.
+	2. guess 'duenn' + hint ⬛🟩🟩🟩⬛ matches 'fuenf', use it as 3. guess.
+	2. guess 'duenn' + hint 🟨⬛🟩🟩⬛ matches 'elend', use it as 3. guess.
+	2. guess 'duenn' + hint 🟩🟩🟩🟩🟩 matches 'duenn', solved as 2. guess!
 1. guess 'raine' + hint ⬛🟨⬛🟩🟨 matches 3 secrets 'abend', 'agent', 'jeans'.
-	2. guess 'abart' + hint ⬛⬛🟩⬛⬛ matches 'jeans', use it as 3. guess.
-	2. guess 'abart' + hint 🟩⬛⬛⬛🟩 matches 'agent', use it as 3. guess.
-	2. guess 'abart' + hint 🟩🟩⬛⬛⬛ matches 'abend', use it as 3. guess.
+	2. guess 'abend' + hint 🟨⬛🟨🟩⬛ matches 'jeans', use it as 3. guess.
+	2. guess 'abend' + hint 🟩⬛🟩🟩⬛ matches 'agent', use it as 3. guess.
+	2. guess 'abend' + hint 🟩🟩🟩🟩🟩 matches 'abend', solved as 2. guess!
 1. guess 'raine' + hint ⬛🟨🟨⬛🟨 matches 3 secrets 'abtei', 'diaet', 'ideal'.
-	2. guess 'aalen' + hint 🟨⬛⬛🟩⬛ matches 'diaet', use it as 3. guess.
-	2. guess 'aalen' + hint 🟨⬛🟨🟨⬛ matches 'ideal', use it as 3. guess.
-	2. guess 'aalen' + hint 🟩⬛⬛🟩⬛ matches 'abtei', use it as 3. guess.
+	2. guess 'abtei' + hint 🟨⬛⬛🟨🟨 matches 'ideal', use it as 3. guess.
+	2. guess 'abtei' + hint 🟨⬛🟨🟩🟨 matches 'diaet', use it as 3. guess.
+	2. guess 'abtei' + hint 🟩🟩🟩🟩🟩 matches 'abtei', solved as 2. guess!
 1. guess 'raine' + hint ⬛🟩🟨🟨⬛ matches 3 secrets 'dahin', 'kamin', 'panik'.
-	2. guess 'abkam' + hint 🟨⬛⬛⬛⬛ matches 'dahin', use it as 3. guess.
-	2. guess 'abkam' + hint 🟨⬛🟨⬛⬛ matches 'panik', use it as 3. guess.
-	2. guess 'abkam' + hint 🟨⬛🟨⬛🟨 matches 'kamin', use it as 3. guess.
+	2. guess 'dahin' + hint ⬛🟩⬛🟩🟨 matches 'panik', use it as 3. guess.
+	2. guess 'dahin' + hint ⬛🟩⬛🟩🟩 matches 'kamin', use it as 3. guess.
+	2. guess 'dahin' + hint 🟩🟩🟩🟩🟩 matches 'dahin', solved as 2. guess!
 1. guess 'raine' + hint 🟨⬛⬛🟩⬛ matches 3 secrets 'front', 'grund', 'prunk'.
-	2. guess 'abzug' + hint ⬛⬛⬛⬛⬛ matches 'front', use it as 3. guess.
-	2. guess 'abzug' + hint ⬛⬛⬛🟨⬛ matches 'prunk', use it as 3. guess.
-	2. guess 'abzug' + hint ⬛⬛⬛🟨🟨 matches 'grund', use it as 3. guess.
+	2. guess 'grund' + hint ⬛🟩⬛🟩⬛ matches 'front', use it as 3. guess.
+	2. guess 'grund' + hint ⬛🟩🟩🟩⬛ matches 'prunk', use it as 3. guess.
+	2. guess 'grund' + hint 🟩🟩🟩🟩🟩 matches 'grund', solved as 2. guess!
 1. guess 'raine' + hint 🟩⬛🟨⬛⬛ matches 3 secrets 'ritus', 'rosig', 'ruhig'.
-	2. guess 'aasee' + hint ⬛⬛⬛⬛⬛ matches 'ruhig', use it as 3. guess.
-	2. guess 'aasee' + hint ⬛⬛🟨⬛⬛ matches 'ritus', use it as 3. guess.
-	2. guess 'aasee' + hint ⬛⬛🟩⬛⬛ matches 'rosig', use it as 3. guess.
+	2. guess 'ritus' + hint 🟩🟨⬛⬛🟨 matches 'rosig', use it as 3. guess.
+	2. guess 'ritus' + hint 🟩🟨⬛🟨⬛ matches 'ruhig', use it as 3. guess.
+	2. guess 'ritus' + hint 🟩🟩🟩🟩🟩 matches 'ritus', solved as 2. guess!
 1. guess 'raine' + hint 🟩⬛🟩⬛🟩 matches 3 secrets 'reife', 'reihe', 'reise'.
 	2. guess 'achse' + hint ⬛⬛⬛⬛🟩 matches 'reife', use it as 3. guess.
 	2. guess 'achse' + hint ⬛⬛⬛🟩🟩 matches 'reise', use it as 3. guess.
 	2. guess 'achse' + hint ⬛⬛🟨⬛🟩 matches 'reihe', use it as 3. guess.
 1. guess 'raine' + hint ⬛⬛🟩🟨⬛ matches 4 secrets 'knick', 'kniff', 'spion', 'union'.
-	2. guess 'akkus' + hint ⬛⬛⬛⬛🟨 matches 'spion', use it as 3. guess.
-	2. guess 'akkus' + hint ⬛⬛⬛🟨⬛ matches 'union', use it as 3. guess.
-	2. guess 'akkus' + hint ⬛🟨⬛⬛⬛ matches 'kniff', use it as 3. guess.
-	2. guess 'akkus' + hint ⬛🟨🟨⬛⬛ matches 'knick', use it as 3. guess.
+	2. guess 'knick' + hint ⬛🟨🟩⬛⬛ matches 'spion', use it as 3. guess.
+	2. guess 'knick' + hint ⬛🟩🟩⬛⬛ matches 'union', use it as 3. guess.
+	2. guess 'knick' + hint 🟩🟩🟩⬛⬛ matches 'kniff', use it as 3. guess.
+	2. guess 'knick' + hint 🟩🟩🟩🟩🟩 matches 'knick', solved as 2. guess!
 1. guess 'raine' + hint 🟨⬛⬛🟩🟩 matches 4 secrets 'ferne', 'gerne', 'krone', 'vorne'.
-	2. guess 'adolf' + hint ⬛⬛⬛⬛⬛ matches 'gerne', use it as 3. guess.
-	2. guess 'adolf' + hint ⬛⬛⬛⬛🟨 matches 'ferne', use it as 3. guess.
-	2. guess 'adolf' + hint ⬛⬛🟨⬛⬛ matches 'vorne', use it as 3. guess.
-	2. guess 'adolf' + hint ⬛⬛🟩⬛⬛ matches 'krone', use it as 3. guess.
+	2. guess 'ferne' + hint ⬛⬛🟨🟩🟩 matches 'krone', use it as 3. guess.
+	2. guess 'ferne' + hint ⬛⬛🟩🟩🟩 matches 'vorne', use it as 3. guess.
+	2. guess 'ferne' + hint ⬛🟩🟩🟩🟩 matches 'gerne', use it as 3. guess.
+	2. guess 'ferne' + hint 🟩🟩🟩🟩🟩 matches 'ferne', solved as 2. guess!
 1. guess 'raine' + hint 🟨⬛🟨🟨🟨 matches 4 secrets 'einer', 'erbin', 'irden', 'irren'.
-	2. guess 'adler' + hint ⬛⬛⬛🟨🟨 matches 'erbin', use it as 3. guess.
-	2. guess 'adler' + hint ⬛⬛⬛🟩🟨 matches 'irren', use it as 3. guess.
-	2. guess 'adler' + hint ⬛⬛⬛🟩🟩 matches 'einer', use it as 3. guess.
-	2. guess 'adler' + hint ⬛🟨⬛🟩🟨 matches 'irden', use it as 3. guess.
+	2. guess 'irden' + hint 🟨🟨⬛🟩🟨 matches 'einer', use it as 3. guess.
+	2. guess 'irden' + hint 🟨🟩⬛🟨🟩 matches 'erbin', use it as 3. guess.
+	2. guess 'irden' + hint 🟩🟩⬛🟩🟩 matches 'irren', use it as 3. guess.
+	2. guess 'irden' + hint 🟩🟩🟩🟩🟩 matches 'irden', solved as 2. guess!
 1. guess 'raine' + hint 🟨⬛🟩⬛🟩 matches 4 secrets 'brise', 'brite', 'krise', 'prise'.
-	2. guess 'aspik' + hint ⬛⬛⬛🟨⬛ matches 'brite', use it as 3. guess.
-	2. guess 'aspik' + hint ⬛🟨⬛🟨⬛ matches 'brise', use it as 3. guess.
-	2. guess 'aspik' + hint ⬛🟨⬛🟨🟨 matches 'krise', use it as 3. guess.
-	2. guess 'aspik' + hint ⬛🟨🟨🟨⬛ matches 'prise', use it as 3. guess.
+	2. guess 'krebs' + hint ⬛🟩🟨⬛🟨 matches 'prise', use it as 3. guess.
+	2. guess 'krebs' + hint ⬛🟩🟨🟨⬛ matches 'brite', use it as 3. guess.
+	2. guess 'krebs' + hint ⬛🟩🟨🟨🟨 matches 'brise', use it as 3. guess.
+	2. guess 'krebs' + hint 🟩🟩🟨⬛🟨 matches 'krise', use it as 3. guess.
 1. guess 'raine' + hint 🟨🟩⬛🟨⬛ matches 4 secrets 'baron', 'daran', 'natur', 'waran'.
-	2. guess 'adria' + hint 🟨⬛🟨⬛⬛ matches 'natur', use it as 3. guess.
-	2. guess 'adria' + hint 🟨⬛🟩⬛⬛ matches 'baron', use it as 3. guess.
-	2. guess 'adria' + hint 🟨⬛🟩⬛🟨 matches 'waran', use it as 3. guess.
-	2. guess 'adria' + hint 🟨🟨🟩⬛🟨 matches 'daran', use it as 3. guess.
+	2. guess 'daran' + hint ⬛🟩🟨⬛🟨 matches 'natur', use it as 3. guess.
+	2. guess 'daran' + hint ⬛🟩🟩⬛🟩 matches 'baron', use it as 3. guess.
+	2. guess 'daran' + hint ⬛🟩🟩🟩🟩 matches 'waran', use it as 3. guess.
+	2. guess 'daran' + hint 🟩🟩🟩🟩🟩 matches 'daran', solved as 2. guess!
 1. guess 'raine' + hint ⬛⬛🟨🟩🟩 matches 5 secrets 'biene', 'finne', 'ikone', 'miene', 'zinne'.
-	2. guess 'bonze' + hint ⬛⬛🟨⬛🟩 matches 'miene', use it as 3. guess.
-	2. guess 'bonze' + hint ⬛⬛🟩⬛🟩 matches 'finne', use it as 3. guess.
-	2. guess 'bonze' + hint ⬛⬛🟩🟨🟩 matches 'zinne', use it as 3. guess.
-	2. guess 'bonze' + hint ⬛🟨🟨⬛🟩 matches 'ikone', use it as 3. guess.
-	2. guess 'bonze' + hint 🟩⬛🟨⬛🟩 matches 'biene', use it as 3. guess.
+	2. guess 'ekzem' + hint 🟨⬛⬛⬛⬛ matches 'finne', use it as 3. guess.
+	2. guess 'ekzem' + hint 🟨⬛⬛🟨⬛ matches 'biene', use it as 3. guess.
+	2. guess 'ekzem' + hint 🟨⬛⬛🟨🟨 matches 'miene', use it as 3. guess.
+	2. guess 'ekzem' + hint 🟨⬛🟨⬛⬛ matches 'zinne', use it as 3. guess.
+	2. guess 'ekzem' + hint 🟨🟩⬛⬛⬛ matches 'ikone', use it as 3. guess.
 1. guess 'raine' + hint ⬛🟨🟨🟨⬛ matches 5 secrets 'alpin', 'antik', 'hinab', 'infam', 'titan'.
-	2. guess 'abart' + hint 🟨⬛⬛⬛⬛ matches 'infam', use it as 3. guess.
-	2. guess 'abart' + hint 🟨⬛⬛⬛🟨 matches 'titan', use it as 3. guess.
-	2. guess 'abart' + hint 🟨🟨⬛⬛⬛ matches 'hinab', use it as 3. guess.
-	2. guess 'abart' + hint 🟩⬛⬛⬛⬛ matches 'alpin', use it as 3. guess.
-	2. guess 'abart' + hint 🟩⬛⬛⬛🟨 matches 'antik', use it as 3. guess.
+	2. guess 'antik' + hint 🟨🟨⬛🟨⬛ matches 'hinab', use it as 3. guess.
+	2. guess 'antik' + hint 🟨🟨🟩🟨⬛ matches 'titan', use it as 3. guess.
+	2. guess 'antik' + hint 🟨🟩⬛🟨⬛ matches 'infam', use it as 3. guess.
+	2. guess 'antik' + hint 🟩🟨⬛🟩⬛ matches 'alpin', use it as 3. guess.
+	2. guess 'antik' + hint 🟩🟩🟩🟩🟩 matches 'antik', solved as 2. guess!
 1. guess 'raine' + hint ⬛🟩🟨⬛⬛ matches 5 secrets 'basis', 'damit', 'dativ', 'fazit', 'labil'.
-	2. guess 'adelt' + hint 🟨⬛⬛⬛⬛ matches 'basis', use it as 3. guess.
-	2. guess 'adelt' + hint 🟨⬛⬛⬛🟩 matches 'fazit', use it as 3. guess.
-	2. guess 'adelt' + hint 🟨⬛⬛🟨⬛ matches 'labil', use it as 3. guess.
-	2. guess 'adelt' + hint 🟨🟨⬛⬛🟨 matches 'dativ', use it as 3. guess.
-	2. guess 'adelt' + hint 🟨🟨⬛⬛🟩 matches 'damit', use it as 3. guess.
+	2. guess 'dunst' + hint ⬛⬛⬛⬛⬛ matches 'labil', use it as 3. guess.
+	2. guess 'dunst' + hint ⬛⬛⬛⬛🟩 matches 'fazit', use it as 3. guess.
+	2. guess 'dunst' + hint ⬛⬛⬛🟨⬛ matches 'basis', use it as 3. guess.
+	2. guess 'dunst' + hint 🟩⬛⬛⬛🟨 matches 'dativ', use it as 3. guess.
+	2. guess 'dunst' + hint 🟩⬛⬛⬛🟩 matches 'damit', use it as 3. guess.
 1. guess 'raine' + hint 🟨🟨⬛⬛🟩 matches 5 secrets 'aehre', 'armee', 'braue', 'frage', 'trage'.
-	2. guess 'abart' + hint ⬛⬛🟩🟨⬛ matches 'frage', use it as 3. guess.
-	2. guess 'abart' + hint ⬛⬛🟩🟨🟨 matches 'trage', use it as 3. guess.
-	2. guess 'abart' + hint ⬛🟨🟩🟨⬛ matches 'braue', use it as 3. guess.
-	2. guess 'abart' + hint 🟩⬛⬛🟨⬛ matches 'armee', use it as 3. guess.
-	2. guess 'abart' + hint 🟩⬛⬛🟩⬛ matches 'aehre', use it as 3. guess.
+	2. guess 'frage' + hint ⬛🟨🟨⬛🟩 matches 'aehre', use it as 3. guess.
+	2. guess 'frage' + hint ⬛🟩🟨⬛🟩 matches 'armee', use it as 3. guess.
+	2. guess 'frage' + hint ⬛🟩🟩⬛🟩 matches 'braue', use it as 3. guess.
+	2. guess 'frage' + hint ⬛🟩🟩🟩🟩 matches 'trage', use it as 3. guess.
+	2. guess 'frage' + hint 🟩🟩🟩🟩🟩 matches 'frage', solved as 2. guess!
 1. guess 'raine' + hint 🟨🟨⬛🟩⬛ matches 5 secrets 'brand', 'drang', 'krank', 'kranz', 'trank'.
-	2. guess 'batik' + hint ⬛🟨⬛⬛⬛ matches 'drang', use it as 3. guess.
-	2. guess 'batik' + hint ⬛🟨⬛⬛🟨 matches 'kranz', use it as 3. guess.
-	2. guess 'batik' + hint ⬛🟨⬛⬛🟩 matches 'krank', use it as 3. guess.
-	2. guess 'batik' + hint ⬛🟨🟨⬛🟩 matches 'trank', use it as 3. guess.
-	2. guess 'batik' + hint 🟩🟨⬛⬛⬛ matches 'brand', use it as 3. guess.
+	2. guess 'gotik' + hint ⬛⬛⬛⬛⬛ matches 'brand', use it as 3. guess.
+	2. guess 'gotik' + hint ⬛⬛⬛⬛🟨 matches 'kranz', use it as 3. guess.
+	2. guess 'gotik' + hint ⬛⬛⬛⬛🟩 matches 'krank', use it as 3. guess.
+	2. guess 'gotik' + hint ⬛⬛🟨⬛🟩 matches 'trank', use it as 3. guess.
+	2. guess 'gotik' + hint 🟨⬛⬛⬛⬛ matches 'drang', use it as 3. guess.
 1. guess 'raine' + hint 🟩⬛⬛🟨🟨 matches 5 secrets 'reden', 'regen', 'roden', 'rufen', 'ruhen'.
-	2. guess 'dehne' + hint ⬛🟨⬛🟨⬛ matches 'rufen', use it as 3. guess.
-	2. guess 'dehne' + hint ⬛🟨🟩🟨⬛ matches 'ruhen', use it as 3. guess.
-	2. guess 'dehne' + hint ⬛🟩⬛🟨🟨 matches 'regen', use it as 3. guess.
-	2. guess 'dehne' + hint 🟨🟨⬛🟨⬛ matches 'roden', use it as 3. guess.
-	2. guess 'dehne' + hint 🟨🟩⬛🟨🟨 matches 'reden', use it as 3. guess.
+	2. guess 'deich' + hint ⬛🟨⬛⬛⬛ matches 'rufen', use it as 3. guess.
+	2. guess 'deich' + hint ⬛🟨⬛⬛🟨 matches 'ruhen', use it as 3. guess.
+	2. guess 'deich' + hint ⬛🟩⬛⬛⬛ matches 'regen', use it as 3. guess.
+	2. guess 'deich' + hint 🟨🟨⬛⬛⬛ matches 'roden', use it as 3. guess.
+	2. guess 'deich' + hint 🟨🟩⬛⬛⬛ matches 'reden', use it as 3. guess.
 1. guess 'raine' + hint 🟩🟩⬛⬛⬛ matches 5 secrets 'radar', 'radau', 'rasch', 'rasur', 'rauch'.
-	2. guess 'adult' + hint 🟨⬛⬛⬛⬛ matches 'rasch', use it as 3. guess.
-	2. guess 'adult' + hint 🟨⬛🟨⬛⬛ matches 'rasur', use it as 3. guess.
-	2. guess 'adult' + hint 🟨⬛🟩⬛⬛ matches 'rauch', use it as 3. guess.
-	2. guess 'adult' + hint 🟨🟨⬛⬛⬛ matches 'radar', use it as 3. guess.
-	2. guess 'adult' + hint 🟨🟨🟨⬛⬛ matches 'radau', use it as 3. guess.
+	2. guess 'basar' + hint ⬛🟩⬛⬛🟨 matches 'rauch', use it as 3. guess.
+	2. guess 'basar' + hint ⬛🟩⬛🟩🟨 matches 'radau', use it as 3. guess.
+	2. guess 'basar' + hint ⬛🟩⬛🟩🟩 matches 'radar', use it as 3. guess.
+	2. guess 'basar' + hint ⬛🟩🟩⬛🟨 matches 'rasch', use it as 3. guess.
+	2. guess 'basar' + hint ⬛🟩🟩⬛🟩 matches 'rasur', use it as 3. guess.
 1. guess 'raine' + hint ⬛🟨⬛🟩⬛ matches 6 secrets, for example 'blank'.
-	2. guess 'balzt' + hint ⬛🟨⬛⬛⬛ matches 'pfand', use it as 3. guess.
-	2. guess 'balzt' + hint ⬛🟨⬛⬛🟨 matches 'stand', use it as 3. guess.
-	2. guess 'balzt' + hint ⬛🟨⬛🟨⬛ matches 'zwang', use it as 3. guess.
-	2. guess 'balzt' + hint ⬛🟨🟨⬛⬛ matches 'klang', use it as 3. guess.
-	2. guess 'balzt' + hint ⬛🟨🟨🟨⬛ matches 'glanz', use it as 3. guess.
-	2. guess 'balzt' + hint 🟩🟨🟨⬛⬛ matches 'blank', use it as 3. guess.
-1. guess 'raine' + hint ⬛🟨🟩⬛⬛ matches 6 secrets, for example 'axiom'.
-	2. guess 'abbas' + hint 🟨⬛⬛⬛⬛ matches 'klima', use it as 3. guess.
-	2. guess 'abbas' + hint 🟩⬛⬛⬛⬛ matches 'axiom', use it as 3. guess.
-	2. guess 'abbas' + hint 🟩⬛⬛🟩⬛ matches 'axial', use it as 3. guess.
-	2. guess 'abbas' + hint 🟩⬛⬛🟩🟨 matches 'asiat', use it as 3. guess.
-	2. guess 'abbas' + hint 🟩⬛⬛🟩🟩 matches 'alias', use it as 3. guess.
-	2. guess 'abbas' + hint 🟩🟨⬛⬛⬛ matches 'alibi', use it as 3. guess.
+	2. guess 'blitz' + hint ⬛⬛⬛⬛⬛ matches 'pfand', use it as 3. guess.
+	2. guess 'blitz' + hint ⬛⬛⬛⬛🟨 matches 'zwang', use it as 3. guess.
+	2. guess 'blitz' + hint ⬛⬛⬛🟨⬛ matches 'stand', use it as 3. guess.
+	2. guess 'blitz' + hint ⬛🟩⬛⬛⬛ matches 'klang', use it as 3. guess.
+	2. guess 'blitz' + hint ⬛🟩⬛⬛🟩 matches 'glanz', use it as 3. guess.
+	2. guess 'blitz' + hint 🟩🟩⬛⬛⬛ matches 'blank', use it as 3. guess.
+1. guess 'raine' + hint ⬛🟨🟩⬛⬛ matches 6 secrets, for example 'alias'.
+	2. guess 'alias' + hint 🟨🟩🟩⬛⬛ matches 'klima', use it as 3. guess.
+	2. guess 'alias' + hint 🟩⬛🟩⬛⬛ matches 'axiom', use it as 3. guess.
+	2. guess 'alias' + hint 🟩⬛🟩🟩🟨 matches 'asiat', use it as 3. guess.
+	2. guess 'alias' + hint 🟩🟨🟩🟩⬛ matches 'axial', use it as 3. guess.
+	2. guess 'alias' + hint 🟩🟩🟩⬛⬛ matches 'alibi', use it as 3. guess.
+	2. guess 'alias' + hint 🟩🟩🟩🟩🟩 matches 'alias', solved as 2. guess!
 1. guess 'raine' + hint 🟨⬛🟨⬛🟩 matches 6 secrets, for example 'birke'.
-	2. guess 'aspik' + hint ⬛⬛⬛🟨⬛ matches 'hirte', use it as 3. guess.
-	2. guess 'aspik' + hint ⬛⬛⬛🟨🟨 matches 'birke', use it as 3. guess.
-	2. guess 'aspik' + hint ⬛⬛⬛🟩⬛ matches 'orgie', use it as 3. guess.
-	2. guess 'aspik' + hint ⬛⬛⬛🟩🟨 matches 'kurie', use it as 3. guess.
-	2. guess 'aspik' + hint ⬛🟨⬛🟨⬛ matches 'hirse', use it as 3. guess.
-	2. guess 'aspik' + hint ⬛🟨⬛🟩⬛ matches 'serie', use it as 3. guess.
-1. guess 'raine' + hint 🟩⬛⬛⬛🟨 matches 6 secrets, for example 'rodel'.
-	2. guess 'adolf' + hint ⬛⬛⬛⬛⬛ matches 'recht', use it as 3. guess.
-	2. guess 'adolf' + hint ⬛⬛⬛🟨⬛ matches 'regel', use it as 3. guess.
-	2. guess 'adolf' + hint ⬛⬛⬛🟩⬛ matches 'reell', use it as 3. guess.
-	2. guess 'adolf' + hint ⬛🟨⬛⬛⬛ matches 'ruder', use it as 3. guess.
-	2. guess 'adolf' + hint ⬛🟨⬛🟨⬛ matches 'rudel', use it as 3. guess.
-	2. guess 'adolf' + hint ⬛🟨🟨🟨⬛ matches 'rodel', use it as 3. guess.
-1. guess 'raine' + hint 🟨⬛🟨⬛⬛ matches 7 secrets, for example 'lyrik'.
-	2. guess 'alois' + hint ⬛⬛⬛🟨⬛ matches 'figur', use it as 3. guess.
-	2. guess 'alois' + hint ⬛⬛⬛🟨🟨 matches 'sirup', use it as 3. guess.
-	2. guess 'alois' + hint ⬛⬛⬛🟨🟩 matches 'virus', use it as 3. guess.
-	2. guess 'alois' + hint ⬛⬛⬛🟩⬛ matches 'irrig', use it as 3. guess.
-	2. guess 'alois' + hint ⬛⬛🟨🟩⬛ matches 'orbit', use it as 3. guess.
-	2. guess 'alois' + hint ⬛⬛🟩🟨⬛ matches 'profi', use it as 3. guess.
-	2. guess 'alois' + hint ⬛🟨⬛🟩⬛ matches 'lyrik', use it as 3. guess.
-1. guess 'raine' + hint 🟨⬛🟩⬛🟨 matches 7 secrets, for example 'feier'.
+	2. guess 'hirse' + hint ⬛🟨🟨⬛🟩 matches 'orgie', use it as 3. guess.
+	2. guess 'hirse' + hint ⬛🟨🟩⬛🟩 matches 'kurie', use it as 3. guess.
+	2. guess 'hirse' + hint ⬛🟨🟩🟨🟩 matches 'serie', use it as 3. guess.
+	2. guess 'hirse' + hint ⬛🟩🟩⬛🟩 matches 'birke', use it as 3. guess.
+	2. guess 'hirse' + hint 🟩🟩🟩⬛🟩 matches 'hirte', use it as 3. guess.
+	2. guess 'hirse' + hint 🟩🟩🟩🟩🟩 matches 'hirse', solved as 2. guess!
+1. guess 'raine' + hint 🟩⬛⬛⬛🟨 matches 6 secrets, for example 'recht'.
+	2. guess 'rodel' + hint 🟩⬛⬛🟨⬛ matches 'recht', use it as 3. guess.
+	2. guess 'rodel' + hint 🟩⬛⬛🟨🟩 matches 'reell', use it as 3. guess.
+	2. guess 'rodel' + hint 🟩⬛⬛🟩🟩 matches 'regel', use it as 3. guess.
+	2. guess 'rodel' + hint 🟩⬛🟩🟩⬛ matches 'ruder', use it as 3. guess.
+	2. guess 'rodel' + hint 🟩⬛🟩🟩🟩 matches 'rudel', use it as 3. guess.
+	2. guess 'rodel' + hint 🟩🟩🟩🟩🟩 matches 'rodel', solved as 2. guess!
+1. guess 'raine' + hint 🟨⬛🟨⬛⬛ matches 7 secrets, for example 'figur'.
+	2. guess 'april' + hint ⬛⬛🟨🟨⬛ matches 'figur', use it as 3. guess.
+	2. guess 'april' + hint ⬛⬛🟨🟩⬛ matches 'orbit', use it as 3. guess.
+	2. guess 'april' + hint ⬛⬛🟩🟨⬛ matches 'virus', use it as 3. guess.
+	2. guess 'april' + hint ⬛⬛🟩🟩⬛ matches 'irrig', use it as 3. guess.
+	2. guess 'april' + hint ⬛⬛🟩🟩🟨 matches 'lyrik', use it as 3. guess.
+	2. guess 'april' + hint ⬛🟨🟨🟨⬛ matches 'profi', use it as 3. guess.
+	2. guess 'april' + hint ⬛🟨🟩🟨⬛ matches 'sirup', use it as 3. guess.
+1. guess 'raine' + hint 🟨⬛🟩⬛🟨 matches 7 secrets, for example 'brief'.
 	2. guess 'belag' + hint ⬛🟨⬛⬛⬛ matches 'stier', use it as 3. guess.
 	2. guess 'belag' + hint ⬛🟨⬛⬛🟩 matches 'krieg', use it as 3. guess.
 	2. guess 'belag' + hint ⬛🟩⬛⬛⬛ matches 'feier', use it as 3. guess.
@@ -179,22 +179,22 @@
 	2. guess 'belag' + hint 🟨🟨⬛⬛⬛ matches 'trieb', use it as 3. guess.
 	2. guess 'belag' + hint 🟩🟨⬛⬛⬛ matches 'brief', use it as 3. guess.
 1. guess 'raine' + hint 🟨🟨⬛⬛🟨 matches 7 secrets, for example 'acker'.
-	2. guess 'achat' + hint ⬛⬛🟨🟩⬛ matches 'herab', use it as 3. guess.
-	2. guess 'achat' + hint 🟨⬛⬛⬛⬛ matches 'zebra', use it as 3. guess.
-	2. guess 'achat' + hint 🟨⬛⬛⬛🟨 matches 'extra', use it as 3. guess.
-	2. guess 'achat' + hint 🟩⬛⬛⬛⬛ matches 'adler', use it as 3. guess.
-	2. guess 'achat' + hint 🟩⬛⬛⬛🟨 matches 'alter', use it as 3. guess.
-	2. guess 'achat' + hint 🟩⬛⬛🟩⬛ matches 'areal', use it as 3. guess.
-	2. guess 'achat' + hint 🟩🟩⬛⬛⬛ matches 'acker', use it as 3. guess.
-1. guess 'raine' + hint 🟩⬛🟨⬛🟩 matches 7 secrets, for example 'riege'.
-	2. guess 'liest' + hint ⬛🟨🟨⬛⬛ matches 'regie', use it as 3. guess.
-	2. guess 'liest' + hint ⬛🟩🟨⬛⬛ matches 'rippe', use it as 3. guess.
-	2. guess 'liest' + hint ⬛🟩🟨⬛🟨 matches 'ritze', use it as 3. guess.
-	2. guess 'liest' + hint ⬛🟩🟨🟨⬛ matches 'rispe', use it as 3. guess.
-	2. guess 'liest' + hint ⬛🟩🟩⬛⬛ matches 'riege', use it as 3. guess.
-	2. guess 'liest' + hint ⬛🟩🟩🟩⬛ matches 'riese', use it as 3. guess.
-	2. guess 'liest' + hint 🟨🟩🟨⬛⬛ matches 'rille', use it as 3. guess.
-1. guess 'raine' + hint 🟩🟩⬛⬛🟩 matches 7 secrets, for example 'rappe'.
+	2. guess 'altar' + hint ⬛⬛⬛🟩🟨 matches 'herab', use it as 3. guess.
+	2. guess 'altar' + hint 🟨⬛⬛⬛🟨 matches 'zebra', use it as 3. guess.
+	2. guess 'altar' + hint 🟨⬛🟩⬛🟨 matches 'extra', use it as 3. guess.
+	2. guess 'altar' + hint 🟩⬛⬛⬛🟩 matches 'acker', use it as 3. guess.
+	2. guess 'altar' + hint 🟩🟨⬛⬛🟩 matches 'adler', use it as 3. guess.
+	2. guess 'altar' + hint 🟩🟨⬛🟩🟨 matches 'areal', use it as 3. guess.
+	2. guess 'altar' + hint 🟩🟩🟩⬛🟩 matches 'alter', use it as 3. guess.
+1. guess 'raine' + hint 🟩⬛🟨⬛🟩 matches 7 secrets, for example 'regie'.
+	2. guess 'steil' + hint ⬛⬛🟨🟨⬛ matches 'rippe', use it as 3. guess.
+	2. guess 'steil' + hint ⬛⬛🟨🟨🟨 matches 'rille', use it as 3. guess.
+	2. guess 'steil' + hint ⬛⬛🟨🟩⬛ matches 'regie', use it as 3. guess.
+	2. guess 'steil' + hint ⬛⬛🟩🟨⬛ matches 'riege', use it as 3. guess.
+	2. guess 'steil' + hint ⬛🟨🟨🟨⬛ matches 'ritze', use it as 3. guess.
+	2. guess 'steil' + hint 🟨⬛🟨🟨⬛ matches 'rispe', use it as 3. guess.
+	2. guess 'steil' + hint 🟨⬛🟩🟨⬛ matches 'riese', use it as 3. guess.
+1. guess 'raine' + hint 🟩🟩⬛⬛🟩 matches 7 secrets, for example 'rache'.
 	2. guess 'typus' + hint ⬛⬛⬛⬛⬛ matches 'rache', use it as 3. guess.
 	2. guess 'typus' + hint ⬛⬛⬛⬛🟨 matches 'rasse', use it as 3. guess.
 	2. guess 'typus' + hint ⬛⬛🟨⬛⬛ matches 'rampe', use it as 3. guess.
@@ -202,7 +202,7 @@
 	2. guess 'typus' + hint ⬛⬛🟩⬛⬛ matches 'rappe', use it as 3. guess.
 	2. guess 'typus' + hint 🟨⬛⬛⬛⬛ matches 'ratte', use it as 3. guess.
 	2. guess 'typus' + hint 🟨⬛⬛🟨⬛ matches 'raute', use it as 3. guess.
-1. guess 'raine' + hint ⬛🟨🟨⬛⬛ matches 8 secrets, for example 'pizza'.
+1. guess 'raine' + hint ⬛🟨🟨⬛⬛ matches 8 secrets, for example 'aktiv'.
 	2. guess 'atlas' + hint ⬛⬛⬛🟩⬛ matches 'biwak', use it as 3. guess.
 	2. guess 'atlas' + hint ⬛🟨⬛🟩⬛ matches 'zitat', use it as 3. guess.
 	2. guess 'atlas' + hint ⬛🟨🟨🟩⬛ matches 'vital', use it as 3. guess.
@@ -211,14 +211,14 @@
 	2. guess 'atlas' + hint 🟨⬛🟨⬛⬛ matches 'viola', use it as 3. guess.
 	2. guess 'atlas' + hint 🟨⬛🟩⬛⬛ matches 'villa', use it as 3. guess.
 	2. guess 'atlas' + hint 🟩🟨⬛⬛⬛ matches 'aktiv', use it as 3. guess.
-1. guess 'raine' + hint ⬛🟩⬛🟩🟩 matches 8 secrets, for example 'laune'.
-	2. guess 'funkt' + hint ⬛⬛🟨⬛⬛ matches 'sahne', use it as 3. guess.
-	2. guess 'funkt' + hint ⬛⬛🟩⬛🟨 matches 'tanne', use it as 3. guess.
-	2. guess 'funkt' + hint ⬛⬛🟩🟨⬛ matches 'kanne', use it as 3. guess.
-	2. guess 'funkt' + hint 🟩⬛🟨⬛⬛ matches 'fahne', use it as 3. guess.
-	2. guess 'funkt' + hint ⬛⬛🟩⬛⬛ matches 'wanne' and 'panne'. Pick one at random to win by the 4. guess.
-	2. guess 'funkt' + hint ⬛🟨🟨⬛⬛ matches 'laune' and 'daune'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint 🟨🟨🟨⬛⬛ matches 8 secrets, for example 'vikar'.
+1. guess 'raine' + hint ⬛🟩⬛🟩🟩 matches 8 secrets, for example 'daune'.
+	2. guess 'kunst' + hint ⬛⬛🟨⬛⬛ matches 'fahne', use it as 3. guess.
+	2. guess 'kunst' + hint ⬛⬛🟨🟨⬛ matches 'sahne', use it as 3. guess.
+	2. guess 'kunst' + hint ⬛⬛🟩⬛🟨 matches 'tanne', use it as 3. guess.
+	2. guess 'kunst' + hint 🟩⬛🟩⬛⬛ matches 'kanne', use it as 3. guess.
+	2. guess 'kunst' + hint ⬛⬛🟩⬛⬛ matches 'panne' and 'wanne'. Pick one at random to win by the 4. guess.
+	2. guess 'kunst' + hint ⬛🟨🟨⬛⬛ matches 'daune' and 'laune'. Pick one at random to win by the 4. guess.
+1. guess 'raine' + hint 🟨🟨🟨⬛⬛ matches 8 secrets, for example 'april'.
 	2. guess 'aktiv' + hint 🟨⬛⬛🟨⬛ matches 'firma', use it as 3. guess.
 	2. guess 'aktiv' + hint 🟨⬛⬛🟨🟨 matches 'viral', use it as 3. guess.
 	2. guess 'aktiv' + hint 🟨⬛⬛🟩⬛ matches 'flair', use it as 3. guess.
@@ -227,7 +227,7 @@
 	2. guess 'aktiv' + hint 🟨🟨⬛🟨🟨 matches 'vikar', use it as 3. guess.
 	2. guess 'aktiv' + hint 🟩⬛⬛🟩⬛ matches 'april', use it as 3. guess.
 	2. guess 'aktiv' + hint 🟩⬛🟩🟩⬛ matches 'artig', use it as 3. guess.
-1. guess 'raine' + hint 🟩⬛⬛⬛🟩 matches 8 secrets, for example 'russe'.
+1. guess 'raine' + hint 🟩⬛⬛⬛🟩 matches 8 secrets, for example 'robbe'.
 	2. guess 'beuge' + hint ⬛⬛⬛⬛🟩 matches 'rolle', use it as 3. guess.
 	2. guess 'beuge' + hint ⬛⬛🟨⬛🟩 matches 'russe', use it as 3. guess.
 	2. guess 'beuge' + hint ⬛⬛🟩⬛🟩 matches 'route', use it as 3. guess.
@@ -236,15 +236,15 @@
 	2. guess 'beuge' + hint ⬛🟨🟨🟩🟩 matches 'ruege', use it as 3. guess.
 	2. guess 'beuge' + hint 🟨⬛⬛⬛🟩 matches 'robbe', use it as 3. guess.
 	2. guess 'beuge' + hint 🟨🟨🟨⬛🟩 matches 'ruebe', use it as 3. guess.
-1. guess 'raine' + hint ⬛🟩⬛⬛🟨 matches 9 secrets, for example 'kamel'.
-	2. guess 'fakte' + hint ⬛🟩⬛🟨🟨 matches 'tadel', use it as 3. guess.
-	2. guess 'fakte' + hint ⬛🟩🟩⬛🟨 matches 'makel', use it as 3. guess.
-	2. guess 'fakte' + hint ⬛🟩🟩🟨🟨 matches 'paket', use it as 3. guess.
-	2. guess 'fakte' + hint 🟨🟩⬛🟨🟨 matches 'tafel', use it as 3. guess.
-	2. guess 'fakte' + hint 🟩🟩⬛⬛🟨 matches 'fabel', use it as 3. guess.
-	2. guess 'fakte' + hint ⬛🟩⬛⬛🟨 matches 'hagel' and 'gabel'. Pick one at random to win by the 4. guess.
-	2. guess 'fakte' + hint ⬛🟩🟨⬛🟨 matches 'kabel' and 'kamel'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint ⬛🟨⬛⬛🟩 matches 10 secrets, for example 'phase'.
+1. guess 'raine' + hint ⬛🟩⬛⬛🟨 matches 9 secrets, for example 'fabel'.
+	2. guess 'kluft' + hint ⬛🟨⬛⬛🟨 matches 'tadel', use it as 3. guess.
+	2. guess 'kluft' + hint ⬛🟨⬛🟨⬛ matches 'fabel', use it as 3. guess.
+	2. guess 'kluft' + hint ⬛🟨⬛🟨🟨 matches 'tafel', use it as 3. guess.
+	2. guess 'kluft' + hint 🟨⬛⬛⬛🟩 matches 'paket', use it as 3. guess.
+	2. guess 'kluft' + hint 🟨🟨⬛⬛⬛ matches 'makel', use it as 3. guess.
+	2. guess 'kluft' + hint ⬛🟨⬛⬛⬛ matches 'gabel' and 'hagel'. Pick one at random to win by the 4. guess.
+	2. guess 'kluft' + hint 🟩🟨⬛⬛⬛ matches 'kabel' and 'kamel'. Pick one at random to win by the 4. guess.
+1. guess 'raine' + hint ⬛🟨⬛⬛🟩 matches 10 secrets, for example 'achse'.
 	2. guess 'pulse' + hint ⬛⬛⬛⬛🟩 matches 'etage', use it as 3. guess.
 	2. guess 'pulse' + hint ⬛⬛⬛🟨🟩 matches 'asche', use it as 3. guess.
 	2. guess 'pulse' + hint ⬛⬛⬛🟩🟩 matches 'achse', use it as 3. guess.
@@ -256,34 +256,34 @@
 	2. guess 'pulse' + hint 🟩⬛⬛🟩🟩 matches 'phase', use it as 3. guess.
 	2. guess 'pulse' + hint 🟩⬛🟨⬛🟩 matches 'plage', use it as 3. guess.
 1. guess 'raine' + hint ⬛🟨⬛🟨🟨 matches 10 secrets, for example 'aesen'.
-	2. guess 'gehst' + hint ⬛🟨⬛⬛🟨 matches 'atmen', use it as 3. guess.
-	2. guess 'gehst' + hint ⬛🟨🟨⬛⬛ matches 'ahnen', use it as 3. guess.
-	2. guess 'gehst' + hint ⬛🟩⬛⬛⬛ matches 'dekan', use it as 3. guess.
-	2. guess 'gehst' + hint ⬛🟩⬛🟨⬛ matches 'aesen', use it as 3. guess.
-	2. guess 'gehst' + hint ⬛🟩⬛🟨🟩 matches 'senat', use it as 3. guess.
-	2. guess 'gehst' + hint ⬛🟩⬛🟩⬛ matches 'mensa', use it as 3. guess.
-	2. guess 'gehst' + hint 🟨🟨⬛⬛⬛ matches 'angel', use it as 3. guess.
-	2. guess 'gehst' + hint 🟩🟩⬛⬛⬛ matches 'genau', use it as 3. guess.
-	2. guess 'gehst' + hint ⬛🟨⬛⬛⬛ matches 'alpen' and 'ozean'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint 🟨⬛🟩⬛⬛ matches 10 secrets, for example 'tritt'.
-	2. guess 'folgt' + hint ⬛⬛⬛⬛⬛ matches 'krimi', use it as 3. guess.
-	2. guess 'folgt' + hint ⬛⬛⬛⬛🟨 matches 'trick', use it as 3. guess.
-	2. guess 'folgt' + hint ⬛⬛⬛🟨⬛ matches 'grimm', use it as 3. guess.
-	2. guess 'folgt' + hint ⬛⬛🟨🟨⬛ matches 'grill', use it as 3. guess.
-	2. guess 'folgt' + hint 🟨⬛⬛🟨⬛ matches 'griff', use it as 3. guess.
-	2. guess 'folgt' + hint 🟩⬛⬛⬛🟩 matches 'frist', use it as 3. guess.
-	2. guess 'folgt' + hint ⬛⬛⬛⬛🟩 matches 'tritt' and 'trist'. Pick one at random to win by the 4. guess.
-	2. guess 'folgt' + hint ⬛⬛🟨⬛⬛ matches 'drill' and 'quirl'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint 🟨🟩⬛⬛⬛ matches 10 secrets, for example 'warum'.
-	2. guess 'malta' + hint ⬛🟩⬛⬛⬛ matches 'davor', use it as 3. guess.
-	2. guess 'malta' + hint ⬛🟩⬛⬛🟨 matches 'basar', use it as 3. guess.
-	2. guess 'malta' + hint ⬛🟩⬛🟨⬛ matches 'fahrt', use it as 3. guess.
-	2. guess 'malta' + hint ⬛🟩⬛🟨🟨 matches 'parat', use it as 3. guess.
-	2. guess 'malta' + hint ⬛🟩⬛🟩⬛ matches 'party', use it as 3. guess.
-	2. guess 'malta' + hint ⬛🟩🟨⬛⬛ matches 'labor', use it as 3. guess.
-	2. guess 'malta' + hint 🟩🟩⬛⬛⬛ matches 'major', use it as 3. guess.
-	2. guess 'malta' + hint 🟩🟩⬛🟨⬛ matches 'markt', use it as 3. guess.
-	2. guess 'malta' + hint 🟨🟩⬛⬛⬛ matches 'warum' and 'darum'. Pick one at random to win by the 4. guess.
+	2. guess 'genau' + hint ⬛🟨🟨🟩⬛ matches 'ozean', use it as 3. guess.
+	2. guess 'genau' + hint ⬛🟨🟩🟨⬛ matches 'ahnen', use it as 3. guess.
+	2. guess 'genau' + hint ⬛🟩🟨🟨⬛ matches 'aesen', use it as 3. guess.
+	2. guess 'genau' + hint ⬛🟩🟨🟩⬛ matches 'dekan', use it as 3. guess.
+	2. guess 'genau' + hint ⬛🟩🟩🟨⬛ matches 'mensa', use it as 3. guess.
+	2. guess 'genau' + hint ⬛🟩🟩🟩⬛ matches 'senat', use it as 3. guess.
+	2. guess 'genau' + hint 🟨🟨🟨🟨⬛ matches 'angel', use it as 3. guess.
+	2. guess 'genau' + hint 🟩🟩🟩🟩🟩 matches 'genau', solved as 2. guess!
+	2. guess 'genau' + hint ⬛🟨🟨🟨⬛ matches 'alpen' and 'atmen'. Pick one at random to win by the 4. guess.
+1. guess 'raine' + hint 🟨⬛🟩⬛⬛ matches 10 secrets, for example 'drill'.
+	2. guess 'glatt' + hint ⬛⬛⬛⬛⬛ matches 'krimi', use it as 3. guess.
+	2. guess 'glatt' + hint ⬛⬛⬛⬛🟩 matches 'frist', use it as 3. guess.
+	2. guess 'glatt' + hint ⬛⬛⬛🟨⬛ matches 'trick', use it as 3. guess.
+	2. guess 'glatt' + hint ⬛⬛⬛🟨🟩 matches 'trist', use it as 3. guess.
+	2. guess 'glatt' + hint ⬛⬛⬛🟩🟩 matches 'tritt', use it as 3. guess.
+	2. guess 'glatt' + hint 🟩🟨⬛⬛⬛ matches 'grill', use it as 3. guess.
+	2. guess 'glatt' + hint ⬛🟨⬛⬛⬛ matches 'drill' and 'quirl'. Pick one at random to win by the 4. guess.
+	2. guess 'glatt' + hint 🟩⬛⬛⬛⬛ matches 'griff' and 'grimm'. Pick one at random to win by the 4. guess.
+1. guess 'raine' + hint 🟨🟩⬛⬛⬛ matches 10 secrets, for example 'basar'.
+	2. guess 'moral' + hint ⬛⬛🟨🟨⬛ matches 'fahrt', use it as 3. guess.
+	2. guess 'moral' + hint ⬛⬛🟨🟩⬛ matches 'basar', use it as 3. guess.
+	2. guess 'moral' + hint ⬛⬛🟩🟨⬛ matches 'party', use it as 3. guess.
+	2. guess 'moral' + hint ⬛⬛🟩🟩⬛ matches 'parat', use it as 3. guess.
+	2. guess 'moral' + hint ⬛🟨🟨🟨⬛ matches 'davor', use it as 3. guess.
+	2. guess 'moral' + hint ⬛🟨🟨🟨🟨 matches 'labor', use it as 3. guess.
+	2. guess 'moral' + hint 🟩⬛🟩🟨⬛ matches 'markt', use it as 3. guess.
+	2. guess 'moral' + hint 🟩🟨🟨🟨⬛ matches 'major', use it as 3. guess.
+	2. guess 'moral' + hint 🟨⬛🟩🟨⬛ matches 'darum' and 'warum'. Pick one at random to win by the 4. guess.
 1. guess 'raine' + hint ⬛⬛🟩⬛⬛ matches 11 secrets, for example 'blick'.
 	2. guess 'blatt' + hint ⬛⬛⬛⬛⬛ matches 'opium', use it as 3. guess.
 	2. guess 'blatt' + hint ⬛⬛⬛🟨⬛ matches 'stich', use it as 3. guess.
@@ -294,8 +294,8 @@
 	2. guess 'blatt' + hint ⬛🟩⬛⬛⬛ matches 'klick', use it as 3. guess.
 	2. guess 'blatt' + hint 🟩🟩⬛⬛⬛ matches 'blick', use it as 3. guess.
 	2. guess 'blatt' + hint 🟩🟩⬛🟩⬛ matches 'blitz', use it as 3. guess.
-	2. guess 'blatt' + hint ⬛⬛⬛⬛🟩 matches 'zwist' and 'idiot'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint ⬛🟨⬛🟨⬛ matches 11 secrets, for example 'anzug'.
+	2. guess 'blatt' + hint ⬛⬛⬛⬛🟩 matches 'idiot' and 'zwist'. Pick one at random to win by the 4. guess.
+1. guess 'raine' + hint ⬛🟨⬛🟨⬛ matches 11 secrets, for example 'abtun'.
 	2. guess 'angst' + hint 🟨🟨⬛⬛⬛ matches 'human', use it as 3. guess.
 	2. guess 'angst' + hint 🟨🟨⬛⬛🟩 matches 'monat', use it as 3. guess.
 	2. guess 'angst' + hint 🟨🟩⬛🟩🟩 matches 'knast', use it as 3. guess.
@@ -304,77 +304,77 @@
 	2. guess 'angst' + hint 🟩🟩⬛⬛🟨 matches 'antun', use it as 3. guess.
 	2. guess 'angst' + hint 🟩🟩⬛⬛🟩 matches 'anmut', use it as 3. guess.
 	2. guess 'angst' + hint 🟩🟩🟨⬛⬛ matches 'anzug', use it as 3. guess.
-	2. guess 'angst' + hint 🟩🟩🟩🟩🟩 matches 'angst', use it as 3. guess.
-	2. guess 'angst' + hint 🟨🟩⬛⬛⬛ matches 'knapp' and 'knall'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint ⬛🟩⬛🟨🟩 matches 11 secrets, for example 'kante'.
+	2. guess 'angst' + hint 🟩🟩🟩🟩🟩 matches 'angst', solved as 2. guess!
+	2. guess 'angst' + hint 🟨🟩⬛⬛⬛ matches 'knall' and 'knapp'. Pick one at random to win by the 4. guess.
+1. guess 'raine' + hint ⬛🟩⬛🟨🟩 matches 11 secrets, for example 'bande'.
 	2. guess 'balzt' + hint ⬛🟩⬛🟨⬛ matches 'zange', use it as 3. guess.
 	2. guess 'balzt' + hint ⬛🟩⬛🟩⬛ matches 'wanze', use it as 3. guess.
 	2. guess 'balzt' + hint ⬛🟩🟨⬛⬛ matches 'lange', use it as 3. guess.
 	2. guess 'balzt' + hint ⬛🟩🟨🟩⬛ matches 'lanze', use it as 3. guess.
 	2. guess 'balzt' + hint ⬛🟩⬛⬛🟨 matches 'kante' and 'tante'. Pick one at random to win by the 4. guess.
-	2. guess 'balzt' + hint 🟩🟩⬛⬛⬛ matches 'bange' and 'bande'. Pick one at random to win by the 4. guess.
+	2. guess 'balzt' + hint 🟩🟩⬛⬛⬛ matches 'bande' and 'bange'. Pick one at random to win by the 4. guess.
 	2. guess 'balzt' + hint ⬛🟩⬛⬛⬛ matches 3 secrets 'danke', 'naehe', 'wange'.
-		3. guess 'abend' + hint 🟨⬛🟨🟨⬛ matches 'wange', use it as 4. guess.
-		3. guess 'abend' + hint 🟨⬛🟨🟨🟨 matches 'danke', use it as 4. guess.
-		3. guess 'abend' + hint 🟨⬛🟩🟨⬛ matches 'naehe', use it as 4. guess.
-1. guess 'raine' + hint 🟨🟨⬛🟨⬛ matches 11 secrets, for example 'braun'.
-	2. guess 'koran' + hint ⬛⬛🟨🟨🟨 matches 'unart', use it as 3. guess.
-	2. guess 'koran' + hint ⬛⬛🟨🟨🟩 matches 'braun', use it as 3. guess.
-	2. guess 'koran' + hint ⬛⬛🟨🟩🟩 matches 'urban', use it as 3. guess.
-	2. guess 'koran' + hint ⬛⬛🟩🟨🟨 matches 'anruf', use it as 3. guess.
-	2. guess 'koran' + hint ⬛⬛🟩🟩🟨 matches 'unrat', use it as 3. guess.
-	2. guess 'koran' + hint ⬛🟨🟨🟨🟩 matches 'ahorn', use it as 3. guess.
-	2. guess 'koran' + hint ⬛🟨🟨🟩🟩 matches 'organ', use it as 3. guess.
-	2. guess 'koran' + hint ⬛🟩🟨🟩🟨 matches 'notar', use it as 3. guess.
-	2. guess 'koran' + hint 🟨🟨🟨🟩🟩 matches 'orkan', use it as 3. guess.
-	2. guess 'koran' + hint ⬛🟩🟩🟩🟩 matches 'voran' and 'woran'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint ⬛⬛🟨🟨⬛ matches 12 secrets, for example 'honig'.
-	2. guess 'donut' + hint ⬛⬛🟨⬛🟨 matches 'intim', use it as 3. guess.
-	2. guess 'donut' + hint ⬛⬛🟨⬛🟩 matches 'nicht', use it as 3. guess.
-	2. guess 'donut' + hint ⬛⬛🟨🟩⬛ matches 'immun', use it as 3. guess.
-	2. guess 'donut' + hint ⬛⬛🟩🟨⬛ matches 'hinzu', use it as 3. guess.
-	2. guess 'donut' + hint ⬛⬛🟩🟩⬛ matches 'minus', use it as 3. guess.
-	2. guess 'donut' + hint ⬛🟨🟨⬛⬛ matches 'bison', use it as 3. guess.
-	2. guess 'donut' + hint ⬛🟩🟨⬛⬛ matches 'wohin', use it as 3. guess.
-	2. guess 'donut' + hint ⬛🟩🟨⬛🟨 matches 'notiz', use it as 3. guess.
-	2. guess 'donut' + hint ⬛🟩🟩⬛⬛ matches 'honig', use it as 3. guess.
-	2. guess 'donut' + hint 🟨⬛🟨⬛⬛ matches 'indiz', use it as 3. guess.
-	2. guess 'donut' + hint ⬛⬛🟩⬛⬛ matches 'links' and 'innig'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint ⬛⬛🟨🟨🟩 matches 12 secrets, for example 'pinie'.
-	2. guess 'felds' + hint ⬛🟨⬛⬛🟨 matches 'nisse', use it as 3. guess.
-	2. guess 'felds' + hint ⬛🟨🟨⬛🟨 matches 'linse', use it as 3. guess.
-	2. guess 'felds' + hint ⬛🟨🟨🟩⬛ matches 'linde', use it as 3. guess.
-	2. guess 'felds' + hint ⬛🟩⬛⬛⬛ matches 'genie', use it as 3. guess.
-	2. guess 'felds' + hint 🟩🟨⬛⬛⬛ matches 'finte', use it as 3. guess.
-	2. guess 'felds' + hint ⬛🟨⬛🟩⬛ matches 'binde' and 'winde'. Pick one at random to win by the 4. guess.
-	2. guess 'felds' + hint ⬛🟨🟨⬛⬛ matches 'linie' and 'linke'. Pick one at random to win by the 4. guess.
-	2. guess 'felds' + hint ⬛🟨⬛⬛⬛ matches 3 secrets 'pinie', 'tinte', 'zinke'.
-		3. guess 'akten' + hint ⬛⬛⬛🟨🟨 matches 'pinie', use it as 4. guess.
-		3. guess 'akten' + hint ⬛⬛🟨🟨🟨 matches 'tinte', use it as 4. guess.
-		3. guess 'akten' + hint ⬛🟨⬛🟨🟨 matches 'zinke', use it as 4. guess.
-1. guess 'raine' + hint ⬛⬛🟩⬛🟨 matches 12 secrets, for example 'geist'.
-	2. guess 'etwas' + hint 🟨⬛⬛⬛🟨 matches 'spiel', use it as 3. guess.
-	2. guess 'etwas' + hint 🟨⬛⬛⬛🟩 matches 'vlies', use it as 3. guess.
-	2. guess 'etwas' + hint 🟨⬛🟨⬛⬛ matches 'weich', use it as 3. guess.
-	2. guess 'etwas' + hint 🟨🟨⬛⬛⬛ matches 'teich', use it as 3. guess.
-	2. guess 'etwas' + hint 🟨🟨⬛⬛🟩 matches 'teils', use it as 3. guess.
-	2. guess 'etwas' + hint 🟨🟨🟨⬛🟨 matches 'weist', use it as 3. guess.
-	2. guess 'etwas' + hint 🟨🟩⬛⬛🟨 matches 'stiel', use it as 3. guess.
-	2. guess 'etwas' + hint 🟩🟨⬛⬛⬛ matches 'edikt', use it as 3. guess.
-	2. guess 'etwas' + hint 🟨⬛⬛⬛⬛ matches 'glied' and 'deich'. Pick one at random to win by the 4. guess.
-	2. guess 'etwas' + hint 🟨🟨⬛⬛🟨 matches 'geist' and 'meist'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint 🟨⬛⬛🟨🟨 matches 12 secrets, for example 'orden'.
-	2. guess 'brots' + hint ⬛🟨⬛⬛⬛ matches 'ehren', use it as 3. guess.
-	2. guess 'brots' + hint ⬛🟨⬛⬛🟨 matches 'unser', use it as 3. guess.
-	2. guess 'brots' + hint ⬛🟨⬛🟨⬛ matches 'unter', use it as 3. guess.
-	2. guess 'brots' + hint ⬛🟨⬛🟨🟨 matches 'stern', use it as 3. guess.
-	2. guess 'brots' + hint ⬛🟨🟨🟨⬛ matches 'tenor', use it as 3. guess.
-	2. guess 'brots' + hint ⬛🟨🟩⬛⬛ matches 'enorm', use it as 3. guess.
-	2. guess 'brots' + hint ⬛🟩⬛🟨🟨 matches 'ernst', use it as 3. guess.
-	2. guess 'brots' + hint ⬛🟩🟨⬛⬛ matches 'orden', use it as 3. guess.
-	2. guess 'brots' + hint ⬛🟩🟨🟨⬛ matches 'orten', use it as 3. guess.
-	2. guess 'brots' + hint 🟨🟩⬛⬛⬛ matches 'erben', use it as 3. guess.
-	2. guess 'brots' + hint ⬛🟩⬛⬛⬛ matches 'gruen' and 'erden'. Pick one at random to win by the 4. guess.
+		3. guess 'danke' + hint ⬛🟩🟨⬛🟩 matches 'naehe', use it as 4. guess.
+		3. guess 'danke' + hint ⬛🟩🟩⬛🟩 matches 'wange', use it as 4. guess.
+		3. guess 'danke' + hint 🟩🟩🟩🟩🟩 matches 'danke', solved as 3. guess!
+1. guess 'raine' + hint 🟨🟨⬛🟨⬛ matches 11 secrets, for example 'ahorn'.
+	2. guess 'voran' + hint ⬛⬛🟨🟨🟨 matches 'unart', use it as 3. guess.
+	2. guess 'voran' + hint ⬛⬛🟨🟨🟩 matches 'braun', use it as 3. guess.
+	2. guess 'voran' + hint ⬛⬛🟨🟩🟩 matches 'urban', use it as 3. guess.
+	2. guess 'voran' + hint ⬛⬛🟩🟨🟨 matches 'anruf', use it as 3. guess.
+	2. guess 'voran' + hint ⬛⬛🟩🟩🟨 matches 'unrat', use it as 3. guess.
+	2. guess 'voran' + hint ⬛🟨🟨🟨🟩 matches 'ahorn', use it as 3. guess.
+	2. guess 'voran' + hint ⬛🟩🟨🟩🟨 matches 'notar', use it as 3. guess.
+	2. guess 'voran' + hint ⬛🟩🟩🟩🟩 matches 'woran', use it as 3. guess.
+	2. guess 'voran' + hint 🟩🟩🟩🟩🟩 matches 'voran', solved as 2. guess!
+	2. guess 'voran' + hint ⬛🟨🟨🟩🟩 matches 'organ' and 'orkan'. Pick one at random to win by the 4. guess.
+1. guess 'raine' + hint ⬛⬛🟨🟨⬛ matches 12 secrets, for example 'bison'.
+	2. guess 'hinzu' + hint ⬛🟨🟨⬛⬛ matches 'intim', use it as 3. guess.
+	2. guess 'hinzu' + hint ⬛🟨🟨⬛🟨 matches 'immun', use it as 3. guess.
+	2. guess 'hinzu' + hint ⬛🟨🟩⬛⬛ matches 'innig', use it as 3. guess.
+	2. guess 'hinzu' + hint ⬛🟩🟨⬛⬛ matches 'bison', use it as 3. guess.
+	2. guess 'hinzu' + hint ⬛🟩🟩⬛⬛ matches 'links', use it as 3. guess.
+	2. guess 'hinzu' + hint ⬛🟩🟩⬛🟨 matches 'minus', use it as 3. guess.
+	2. guess 'hinzu' + hint 🟨🟨🟨⬛⬛ matches 'wohin', use it as 3. guess.
+	2. guess 'hinzu' + hint 🟨🟩🟨⬛⬛ matches 'nicht', use it as 3. guess.
+	2. guess 'hinzu' + hint 🟩🟨🟩⬛⬛ matches 'honig', use it as 3. guess.
+	2. guess 'hinzu' + hint 🟩🟩🟩🟩🟩 matches 'hinzu', solved as 2. guess!
+	2. guess 'hinzu' + hint ⬛🟨🟨🟨⬛ matches 'indiz' and 'notiz'. Pick one at random to win by the 4. guess.
+1. guess 'raine' + hint ⬛⬛🟨🟨🟩 matches 12 secrets, for example 'binde'.
+	2. guess 'iltis' + hint ⬛⬛⬛🟩⬛ matches 'genie', use it as 3. guess.
+	2. guess 'iltis' + hint 🟨⬛⬛⬛🟨 matches 'nisse', use it as 3. guess.
+	2. guess 'iltis' + hint 🟨⬛⬛🟩⬛ matches 'pinie', use it as 3. guess.
+	2. guess 'iltis' + hint 🟨🟨⬛⬛🟨 matches 'linse', use it as 3. guess.
+	2. guess 'iltis' + hint 🟨🟨⬛🟩⬛ matches 'linie', use it as 3. guess.
+	2. guess 'iltis' + hint 🟨⬛🟨⬛⬛ matches 'finte' and 'tinte'. Pick one at random to win by the 4. guess.
+	2. guess 'iltis' + hint 🟨🟨⬛⬛⬛ matches 'linde' and 'linke'. Pick one at random to win by the 4. guess.
+	2. guess 'iltis' + hint 🟨⬛⬛⬛⬛ matches 3 secrets 'binde', 'winde', 'zinke'.
+		3. guess 'binde' + hint ⬛🟩🟩⬛🟩 matches 'zinke', use it as 4. guess.
+		3. guess 'binde' + hint ⬛🟩🟩🟩🟩 matches 'winde', use it as 4. guess.
+		3. guess 'binde' + hint 🟩🟩🟩🟩🟩 matches 'binde', solved as 3. guess!
+1. guess 'raine' + hint ⬛⬛🟩⬛🟨 matches 12 secrets, for example 'deich'.
+	2. guess 'weist' + hint ⬛🟨🟩⬛⬛ matches 'glied', use it as 3. guess.
+	2. guess 'weist' + hint ⬛🟨🟩⬛🟩 matches 'edikt', use it as 3. guess.
+	2. guess 'weist' + hint ⬛🟨🟩🟨🟨 matches 'stiel', use it as 3. guess.
+	2. guess 'weist' + hint ⬛🟩🟩⬛⬛ matches 'deich', use it as 3. guess.
+	2. guess 'weist' + hint ⬛🟩🟩⬛🟨 matches 'teich', use it as 3. guess.
+	2. guess 'weist' + hint ⬛🟩🟩🟨🟨 matches 'teils', use it as 3. guess.
+	2. guess 'weist' + hint 🟩🟩🟩⬛⬛ matches 'weich', use it as 3. guess.
+	2. guess 'weist' + hint 🟩🟩🟩🟩🟩 matches 'weist', solved as 2. guess!
+	2. guess 'weist' + hint ⬛🟨🟩🟨⬛ matches 'spiel' and 'vlies'. Pick one at random to win by the 4. guess.
+	2. guess 'weist' + hint ⬛🟩🟩🟩🟩 matches 'geist' and 'meist'. Pick one at random to win by the 4. guess.
+1. guess 'raine' + hint 🟨⬛⬛🟨🟨 matches 12 secrets, for example 'ehren'.
+	2. guess 'obhut' + hint ⬛⬛⬛⬛⬛ matches 'erden', use it as 3. guess.
+	2. guess 'obhut' + hint ⬛⬛⬛⬛🟨 matches 'stern', use it as 3. guess.
+	2. guess 'obhut' + hint ⬛⬛⬛⬛🟩 matches 'ernst', use it as 3. guess.
+	2. guess 'obhut' + hint ⬛⬛⬛🟨🟨 matches 'unter', use it as 3. guess.
+	2. guess 'obhut' + hint ⬛⬛🟨⬛⬛ matches 'ehren', use it as 3. guess.
+	2. guess 'obhut' + hint ⬛🟨⬛⬛⬛ matches 'erben', use it as 3. guess.
+	2. guess 'obhut' + hint 🟨⬛⬛⬛⬛ matches 'enorm', use it as 3. guess.
+	2. guess 'obhut' + hint 🟨⬛⬛⬛🟨 matches 'tenor', use it as 3. guess.
+	2. guess 'obhut' + hint 🟩⬛⬛⬛⬛ matches 'orden', use it as 3. guess.
+	2. guess 'obhut' + hint 🟩⬛⬛⬛🟨 matches 'orten', use it as 3. guess.
+	2. guess 'obhut' + hint ⬛⬛⬛🟨⬛ matches 'gruen' and 'unser'. Pick one at random to win by the 4. guess.
 1. guess 'raine' + hint ⬛⬛⬛🟩🟩 matches 13 secrets, for example 'bohne'.
 	2. guess 'hunts' + hint ⬛⬛🟨⬛⬛ matches 'ebene', use it as 3. guess.
 	2. guess 'hunts' + hint ⬛⬛🟨⬛🟨 matches 'szene', use it as 3. guess.
@@ -385,9 +385,9 @@
 	2. guess 'hunts' + hint 🟩⬛🟨⬛⬛ matches 'hymne', use it as 3. guess.
 	2. guess 'hunts' + hint 🟩⬛🟩⬛⬛ matches 'henne', use it as 3. guess.
 	2. guess 'hunts' + hint 🟩🟩🟨⬛⬛ matches 'huene', use it as 3. guess.
-	2. guess 'hunts' + hint ⬛⬛🟩⬛⬛ matches 'wonne' and 'nonne'. Pick one at random to win by the 4. guess.
+	2. guess 'hunts' + hint ⬛⬛🟩⬛⬛ matches 'nonne' and 'wonne'. Pick one at random to win by the 4. guess.
 	2. guess 'hunts' + hint 🟨⬛🟨⬛⬛ matches 'bohne' and 'lehne'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint ⬛🟨⬛⬛🟨 matches 14 secrets, for example 'assel'.
+1. guess 'raine' + hint ⬛🟨⬛⬛🟨 matches 14 secrets, for example 'ampel'.
 	2. guess 'edles' + hint ⬛⬛⬛🟩🟨 matches 'spaet', use it as 3. guess.
 	2. guess 'edles' + hint 🟨⬛⬛⬛⬛ matches 'thema', use it as 3. guess.
 	2. guess 'edles' + hint 🟨⬛⬛⬛🟨 matches 'sesam', use it as 3. guess.
@@ -398,9 +398,9 @@
 	2. guess 'edles' + hint 🟩⬛⬛⬛⬛ matches 'exakt', use it as 3. guess.
 	2. guess 'edles' + hint 🟩⬛⬛⬛🟩 matches 'etwas', use it as 3. guess.
 	2. guess 'edles' + hint 🟩⬛🟩⬛⬛ matches 'eklat', use it as 3. guess.
-	2. guess 'edles' + hint ⬛⬛🟨🟩⬛ matches 'apfel' and 'ampel'. Pick one at random to win by the 4. guess.
+	2. guess 'edles' + hint ⬛⬛🟨🟩⬛ matches 'ampel' and 'apfel'. Pick one at random to win by the 4. guess.
 	2. guess 'edles' + hint ⬛⬛🟨🟩🟨 matches 'amsel' and 'assel'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint 🟨⬛🟨⬛🟨 matches 14 secrets, for example 'wider'.
+1. guess 'raine' + hint 🟨⬛🟨⬛🟨 matches 14 secrets, for example 'biber'.
 	2. guess 'meter' + hint ⬛⬛🟨🟩🟩 matches 'tiger', use it as 3. guess.
 	2. guess 'meter' + hint ⬛⬛🟩🟩🟩 matches 'liter', use it as 3. guess.
 	2. guess 'meter' + hint ⬛🟨⬛🟩🟩 matches 'eifer', use it as 3. guess.
@@ -409,26 +409,26 @@
 	2. guess 'meter' + hint 🟨🟨⬛🟩🟩 matches 'eimer', use it as 3. guess.
 	2. guess 'meter' + hint 🟩⬛⬛🟩🟩 matches 'mixer', use it as 3. guess.
 	2. guess 'meter' + hint ⬛⬛⬛🟩🟩 matches 'biber' and 'wider'. Pick one at random to win by the 4. guess.
-	2. guess 'meter' + hint 🟨⬛⬛🟩🟩 matches 'immer' and 'imker'. Pick one at random to win by the 4. guess.
+	2. guess 'meter' + hint 🟨⬛⬛🟩🟩 matches 'imker' and 'immer'. Pick one at random to win by the 4. guess.
 	2. guess 'meter' + hint ⬛🟨⬛⬛🟨 matches 3 secrets 'greis', 'kreis', 'preis'.
 		3. guess 'agape' + hint ⬛⬛⬛⬛🟨 matches 'kreis', use it as 4. guess.
 		3. guess 'agape' + hint ⬛⬛⬛🟨🟨 matches 'preis', use it as 4. guess.
 		3. guess 'agape' + hint ⬛🟨⬛⬛🟨 matches 'greis', use it as 4. guess.
-1. guess 'raine' + hint 🟨🟩⬛⬛🟩 matches 14 secrets, for example 'warte'.
+1. guess 'raine' + hint 🟨🟩⬛⬛🟩 matches 14 secrets, for example 'bahre'.
 	2. guess 'backt' + hint ⬛🟩⬛🟨⬛ matches 'karre', use it as 3. guess.
 	2. guess 'backt' + hint ⬛🟩⬛🟨🟨 matches 'karte', use it as 3. guess.
 	2. guess 'backt' + hint ⬛🟩⬛🟩⬛ matches 'marke', use it as 3. guess.
 	2. guess 'backt' + hint ⬛🟩🟨⬛⬛ matches 'farce', use it as 3. guess.
 	2. guess 'backt' + hint 🟨🟩⬛⬛⬛ matches 'farbe', use it as 3. guess.
 	2. guess 'backt' + hint 🟩🟩⬛🟩⬛ matches 'barke', use it as 3. guess.
-	2. guess 'backt' + hint ⬛🟩⬛⬛🟨 matches 'warte' and 'parte'. Pick one at random to win by the 4. guess.
+	2. guess 'backt' + hint ⬛🟩⬛⬛🟨 matches 'parte' and 'warte'. Pick one at random to win by the 4. guess.
 	2. guess 'backt' + hint 🟩🟩⬛⬛⬛ matches 'bahre' and 'barde'. Pick one at random to win by the 4. guess.
 	2. guess 'backt' + hint ⬛🟩⬛⬛⬛ matches 4 secrets 'garde', 'harfe', 'larve', 'warze'.
-		3. guess 'adolf' + hint 🟨⬛⬛⬛⬛ matches 'warze', use it as 4. guess.
-		3. guess 'adolf' + hint 🟨⬛⬛⬛🟨 matches 'harfe', use it as 4. guess.
-		3. guess 'adolf' + hint 🟨⬛⬛🟨⬛ matches 'larve', use it as 4. guess.
-		3. guess 'adolf' + hint 🟨🟨⬛⬛⬛ matches 'garde', use it as 4. guess.
-1. guess 'raine' + hint ⬛🟩⬛🟨⬛ matches 15 secrets, for example 'mango'.
+		3. guess 'dohle' + hint ⬛⬛⬛⬛🟩 matches 'warze', use it as 4. guess.
+		3. guess 'dohle' + hint ⬛⬛⬛🟨🟩 matches 'larve', use it as 4. guess.
+		3. guess 'dohle' + hint ⬛⬛🟨⬛🟩 matches 'harfe', use it as 4. guess.
+		3. guess 'dohle' + hint 🟨⬛⬛⬛🟩 matches 'garde', use it as 4. guess.
+1. guess 'raine' + hint ⬛🟩⬛🟨⬛ matches 15 secrets, for example 'banal'.
 	2. guess 'linkt' + hint ⬛⬛🟨⬛🟨 matches 'satan', use it as 3. guess.
 	2. guess 'linkt' + hint ⬛⬛🟨⬛🟩 matches 'nacht', use it as 3. guess.
 	2. guess 'linkt' + hint ⬛⬛🟨🟩🟩 matches 'nackt', use it as 3. guess.
@@ -438,7 +438,7 @@
 	2. guess 'linkt' + hint ⬛⬛🟩🟩⬛ matches 'manko', use it as 3. guess.
 	2. guess 'linkt' + hint 🟨⬛🟩⬛⬛ matches 'banal', use it as 3. guess.
 	2. guess 'linkt' + hint 🟨⬛🟩🟨⬛ matches 'kanal', use it as 3. guess.
-	2. guess 'linkt' + hint ⬛⬛🟨⬛⬛ matches 'fasan' and 'davon'. Pick one at random to win by the 4. guess.
+	2. guess 'linkt' + hint ⬛⬛🟨⬛⬛ matches 'davon' and 'fasan'. Pick one at random to win by the 4. guess.
 	2. guess 'linkt' + hint ⬛⬛🟩⬛⬛ matches 'handy' and 'mango'. Pick one at random to win by the 4. guess.
 	2. guess 'linkt' + hint 🟨⬛🟨⬛⬛ matches 'nasal' and 'salon'. Pick one at random to win by the 4. guess.
 1. guess 'raine' + hint ⬛⬛⬛🟨🟩 matches 16 secrets, for example 'funke'.
@@ -448,12 +448,12 @@
 	2. guess 'felds' + hint ⬛🟩🟩⬛⬛ matches 'nelke', use it as 3. guess.
 	2. guess 'felds' + hint 🟨🟩⬛⬛⬛ matches 'neffe', use it as 3. guess.
 	2. guess 'felds' + hint 🟩🟨⬛⬛⬛ matches 'funke', use it as 3. guess.
-	2. guess 'felds' + hint ⬛🟨⬛⬛⬛ matches 'zunge' and 'junge'. Pick one at random to win by the 4. guess.
-	2. guess 'felds' + hint ⬛🟨⬛🟩⬛ matches 'wunde' and 'kunde'. Pick one at random to win by the 4. guess.
+	2. guess 'felds' + hint ⬛🟨⬛⬛⬛ matches 'junge' and 'zunge'. Pick one at random to win by the 4. guess.
+	2. guess 'felds' + hint ⬛🟨⬛🟩⬛ matches 'kunde' and 'wunde'. Pick one at random to win by the 4. guess.
 	2. guess 'felds' + hint ⬛🟨🟨⬛⬛ matches 'lunge' and 'lunte'. Pick one at random to win by the 4. guess.
-	2. guess 'felds' + hint ⬛🟩⬛⬛⬛ matches 'menue' and 'menge'. Pick one at random to win by the 4. guess.
+	2. guess 'felds' + hint ⬛🟩⬛⬛⬛ matches 'menge' and 'menue'. Pick one at random to win by the 4. guess.
 	2. guess 'felds' + hint ⬛🟩⬛⬛🟨 matches 'senke' and 'sense'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint ⬛⬛🟨🟨🟨 matches 16 secrets, for example 'indem'.
+1. guess 'raine' + hint ⬛⬛🟨🟨🟨 matches 16 secrets, for example 'eigen'.
 	2. guess 'minis' + hint ⬛⬛🟨🟩⬛ matches 'klein', use it as 3. guess.
 	2. guess 'minis' + hint ⬛⬛🟨🟩🟨 matches 'stein', use it as 3. guess.
 	2. guess 'minis' + hint ⬛⬛🟩🟩🟨 matches 'senil', use it as 3. guess.
@@ -466,9 +466,9 @@
 	2. guess 'minis' + hint ⬛🟩🟩🟩⬛ matches 'einig', use it as 3. guess.
 	2. guess 'minis' + hint 🟨🟨🟨⬛⬛ matches 'indem', use it as 3. guess.
 	2. guess 'minis' + hint 🟩🟩🟨⬛⬛ matches 'mixen', use it as 3. guess.
-	2. guess 'minis' + hint ⬛⬛🟩🟩⬛ matches 'zenit' and 'wenig'. Pick one at random to win by the 4. guess.
-	2. guess 'minis' + hint ⬛🟩🟨⬛⬛ matches 'eilen' and 'eigen'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint ⬛⬛⬛🟨⬛ matches 18 secrets, for example 'unmut'.
+	2. guess 'minis' + hint ⬛⬛🟩🟩⬛ matches 'wenig' and 'zenit'. Pick one at random to win by the 4. guess.
+	2. guess 'minis' + hint ⬛🟩🟨⬛⬛ matches 'eigen' and 'eilen'. Pick one at random to win by the 4. guess.
+1. guess 'raine' + hint ⬛⬛⬛🟨⬛ matches 18 secrets, for example 'bonus'.
 	2. guess 'guckt' + hint ⬛⬛⬛⬛🟩 matches 'sonst', use it as 3. guess.
 	2. guess 'guckt' + hint ⬛⬛⬛🟨⬛ matches 'knopf', use it as 3. guess.
 	2. guess 'guckt' + hint ⬛⬛⬛🟨🟨 matches 'konto', use it as 3. guess.
@@ -480,10 +480,10 @@
 	2. guess 'guckt' + hint 🟨🟨⬛⬛🟩 matches 'ungut', use it as 3. guess.
 	2. guess 'guckt' + hint 🟩🟩⬛⬛🟩 matches 'gunst', use it as 3. guess.
 	2. guess 'guckt' + hint ⬛⬛⬛⬛⬛ matches 'nylon' and 'wovon'. Pick one at random to win by the 4. guess.
-	2. guess 'guckt' + hint ⬛⬛🟨⬛⬛ matches 'schon' and 'clown'. Pick one at random to win by the 4. guess.
-	2. guess 'guckt' + hint ⬛🟨⬛⬛⬛ matches 'novum' and 'bonus'. Pick one at random to win by the 4. guess.
+	2. guess 'guckt' + hint ⬛⬛🟨⬛⬛ matches 'clown' and 'schon'. Pick one at random to win by the 4. guess.
+	2. guess 'guckt' + hint ⬛🟨⬛⬛⬛ matches 'bonus' and 'novum'. Pick one at random to win by the 4. guess.
 	2. guess 'guckt' + hint ⬛🟩⬛⬛🟩 matches 'dunst' and 'zunft'. Pick one at random to win by the 4. guess.
-1. guess 'raine' + hint 🟨🟩⬛⬛🟨 matches 20 secrets, for example 'vater'.
+1. guess 'raine' + hint 🟨🟩⬛⬛🟨 matches 20 secrets, for example 'bauer'.
 	2. guess 'kults' + hint ⬛⬛⬛⬛🟨 matches 'faser', use it as 3. guess.
 	2. guess 'kults' + hint ⬛⬛🟨⬛🟨 matches 'laser', use it as 3. guess.
 	2. guess 'kults' + hint ⬛⬛🟩⬛⬛ matches 'maler', use it as 3. guess.
@@ -498,12 +498,12 @@
 		3. guess 'abend' + hint 🟨⬛🟨⬛🟨 matches 'dauer', use it as 4. guess.
 		3. guess 'abend' + hint 🟨🟨🟨⬛⬛ matches 'bauer', use it as 4. guess.
 	2. guess 'kults' + hint ⬛⬛⬛⬛⬛ matches 5 secrets 'daher', 'hafer', 'hager', 'maerz', 'mager'.
-		3. guess 'dogma' + hint ⬛⬛⬛⬛🟨 matches 'hafer', use it as 4. guess.
-		3. guess 'dogma' + hint ⬛⬛⬛🟨🟨 matches 'maerz', use it as 4. guess.
-		3. guess 'dogma' + hint ⬛⬛🟩⬛🟨 matches 'hager', use it as 4. guess.
-		3. guess 'dogma' + hint ⬛⬛🟩🟨🟨 matches 'mager', use it as 4. guess.
-		3. guess 'dogma' + hint 🟩⬛⬛⬛🟨 matches 'daher', use it as 4. guess.
-1. guess 'raine' + hint ⬛⬛🟩⬛🟩 matches 23 secrets, for example 'weise'.
+		3. guess 'hafer' + hint ⬛🟩⬛🟨🟨 matches 'maerz', use it as 4. guess.
+		3. guess 'hafer' + hint ⬛🟩⬛🟩🟩 matches 'mager', use it as 4. guess.
+		3. guess 'hafer' + hint 🟨🟩⬛🟩🟩 matches 'daher', use it as 4. guess.
+		3. guess 'hafer' + hint 🟩🟩⬛🟩🟩 matches 'hager', use it as 4. guess.
+		3. guess 'hafer' + hint 🟩🟩🟩🟩🟩 matches 'hafer', solved as 3. guess!
+1. guess 'raine' + hint ⬛⬛🟩⬛🟩 matches 23 secrets, for example 'beide'.
 	2. guess 'flows' + hint ⬛⬛⬛🟨🟨 matches 'weise', use it as 3. guess.
 	2. guess 'flows' + hint ⬛🟨⬛⬛🟨 matches 'leise', use it as 3. guess.
 	2. guess 'flows' + hint ⬛🟨⬛🟨⬛ matches 'weile', use it as 3. guess.
@@ -513,49 +513,49 @@
 	2. guess 'flows' + hint 🟨⬛⬛⬛🟨 matches 'seife', use it as 3. guess.
 	2. guess 'flows' + hint 🟩⬛⬛⬛⬛ matches 'feige', use it as 3. guess.
 	2. guess 'flows' + hint 🟩🟨⬛⬛⬛ matches 'feile', use it as 3. guess.
-	2. guess 'flows' + hint ⬛🟨⬛⬛⬛ matches 'zeile' and 'meile'. Pick one at random to win by the 4. guess.
+	2. guess 'flows' + hint ⬛🟨⬛⬛⬛ matches 'meile' and 'zeile'. Pick one at random to win by the 4. guess.
 	2. guess 'flows' + hint ⬛⬛⬛🟨⬛ matches 3 secrets 'weide', 'weihe', 'weite'.
-		3. guess 'achat' + hint ⬛⬛⬛⬛⬛ matches 'weide', use it as 4. guess.
-		3. guess 'achat' + hint ⬛⬛⬛⬛🟨 matches 'weite', use it as 4. guess.
-		3. guess 'achat' + hint ⬛⬛🟨⬛⬛ matches 'weihe', use it as 4. guess.
+		3. guess 'bucht' + hint ⬛⬛⬛⬛⬛ matches 'weide', use it as 4. guess.
+		3. guess 'bucht' + hint ⬛⬛⬛⬛🟨 matches 'weite', use it as 4. guess.
+		3. guess 'bucht' + hint ⬛⬛⬛🟩⬛ matches 'weihe', use it as 4. guess.
 	2. guess 'flows' + hint ⬛⬛⬛⬛🟨 matches 4 secrets 'meise', 'seide', 'seite', 'suite'.
-		3. guess 'adult' + hint ⬛⬛⬛⬛⬛ matches 'meise', use it as 4. guess.
-		3. guess 'adult' + hint ⬛⬛⬛⬛🟨 matches 'seite', use it as 4. guess.
-		3. guess 'adult' + hint ⬛⬛🟨⬛🟨 matches 'suite', use it as 4. guess.
-		3. guess 'adult' + hint ⬛🟨⬛⬛⬛ matches 'seide', use it as 4. guess.
+		3. guess 'seide' + hint 🟨🟩🟩⬛🟩 matches 'meise', use it as 4. guess.
+		3. guess 'seide' + hint 🟩⬛🟩⬛🟩 matches 'suite', use it as 4. guess.
+		3. guess 'seide' + hint 🟩🟩🟩⬛🟩 matches 'seite', use it as 4. guess.
+		3. guess 'seide' + hint 🟩🟩🟩🟩🟩 matches 'seide', solved as 3. guess!
 	2. guess 'flows' + hint ⬛⬛⬛⬛⬛ matches 5 secrets 'beide', 'beige', 'beize', 'geige', 'heide'.
 		3. guess 'abzug' + hint ⬛⬛⬛⬛⬛ matches 'heide', use it as 4. guess.
 		3. guess 'abzug' + hint ⬛⬛⬛⬛🟨 matches 'geige', use it as 4. guess.
 		3. guess 'abzug' + hint ⬛🟨⬛⬛⬛ matches 'beide', use it as 4. guess.
 		3. guess 'abzug' + hint ⬛🟨⬛⬛🟨 matches 'beige', use it as 4. guess.
 		3. guess 'abzug' + hint ⬛🟨🟨⬛⬛ matches 'beize', use it as 4. guess.
-1. guess 'raine' + hint ⬛🟩⬛🟨🟨 matches 24 secrets, for example 'tagen'.
+1. guess 'raine' + hint ⬛🟩⬛🟨🟨 matches 24 secrets, for example 'baden'.
 	2. guess 'stuhl' + hint ⬛⬛🟩🟨⬛ matches 'hauen', use it as 3. guess.
 	2. guess 'stuhl' + hint ⬛🟨🟩⬛⬛ matches 'tauen', use it as 3. guess.
-	2. guess 'stuhl' + hint ⬛⬛🟩⬛⬛ matches 'kauen' and 'bauen'. Pick one at random to win by the 4. guess.
-	2. guess 'stuhl' + hint ⬛🟨⬛⬛⬛ matches 'waten' and 'tagen'. Pick one at random to win by the 4. guess.
+	2. guess 'stuhl' + hint ⬛⬛🟩⬛⬛ matches 'bauen' and 'kauen'. Pick one at random to win by the 4. guess.
+	2. guess 'stuhl' + hint ⬛🟨⬛⬛⬛ matches 'tagen' and 'waten'. Pick one at random to win by the 4. guess.
 	2. guess 'stuhl' + hint ⬛⬛⬛⬛🟨 matches 3 secrets 'laben', 'laden', 'malen'.
-		3. guess 'abend' + hint 🟨⬛🟨🟨⬛ matches 'malen', use it as 4. guess.
-		3. guess 'abend' + hint 🟨⬛🟨🟨🟨 matches 'laden', use it as 4. guess.
-		3. guess 'abend' + hint 🟨🟨🟨🟨⬛ matches 'laben', use it as 4. guess.
+		3. guess 'laben' + hint 🟨🟩⬛🟩🟩 matches 'malen', use it as 4. guess.
+		3. guess 'laben' + hint 🟩🟩⬛🟩🟩 matches 'laden', use it as 4. guess.
+		3. guess 'laben' + hint 🟩🟩🟩🟩🟩 matches 'laben', solved as 3. guess!
 	2. guess 'stuhl' + hint ⬛⬛⬛⬛🟩 matches 3 secrets 'nabel', 'nadel', 'nagel'.
 		3. guess 'abend' + hint 🟨⬛🟨🟨⬛ matches 'nagel', use it as 4. guess.
 		3. guess 'abend' + hint 🟨⬛🟨🟨🟨 matches 'nadel', use it as 4. guess.
 		3. guess 'abend' + hint 🟨🟨🟨🟨⬛ matches 'nabel', use it as 4. guess.
 	2. guess 'stuhl' + hint ⬛⬛⬛🟨⬛ matches 3 secrets 'haben', 'hafen', 'haken'.
-		3. guess 'abkam' + hint 🟨⬛⬛⬛⬛ matches 'hafen', use it as 4. guess.
-		3. guess 'abkam' + hint 🟨⬛🟩⬛⬛ matches 'haken', use it as 4. guess.
-		3. guess 'abkam' + hint 🟨🟨⬛⬛⬛ matches 'haben', use it as 4. guess.
+		3. guess 'abruf' + hint 🟨⬛⬛⬛⬛ matches 'haken', use it as 4. guess.
+		3. guess 'abruf' + hint 🟨⬛⬛⬛🟨 matches 'hafen', use it as 4. guess.
+		3. guess 'abruf' + hint 🟨🟨⬛⬛⬛ matches 'haben', use it as 4. guess.
 	2. guess 'stuhl' + hint 🟩⬛⬛⬛⬛ matches 3 secrets 'saeen', 'sagen', 'samen'.
 		3. guess 'agent' + hint 🟨⬛🟨🟨⬛ matches 'samen', use it as 4. guess.
 		3. guess 'agent' + hint 🟨⬛🟩🟨⬛ matches 'saeen', use it as 4. guess.
 		3. guess 'agent' + hint 🟨🟨🟨🟨⬛ matches 'sagen', use it as 4. guess.
-	2. guess 'stuhl' + hint ⬛⬛⬛⬛⬛ matches 6 secrets, for example 'wagen'.
-		3. guess 'jedem' + hint ⬛⬛⬛🟩🟨 matches 'magen', use it as 4. guess.
-		3. guess 'jedem' + hint 🟩⬛⬛🟩⬛ matches 'jagen', use it as 4. guess.
-		3. guess 'jedem' + hint ⬛⬛⬛🟩⬛ matches 'wagen' and 'nagen'. Pick one at random to win by the 5. guess.
-		3. guess 'jedem' + hint ⬛⬛🟩🟩⬛ matches 'faden' and 'baden'. Pick one at random to win by the 5. guess.
-1. guess 'raine' + hint ⬛⬛🟨⬛🟨 matches 25 secrets, for example 'pfeil'.
+	2. guess 'stuhl' + hint ⬛⬛⬛⬛⬛ matches 6 secrets, for example 'baden'.
+		3. guess 'umweg' + hint ⬛⬛🟨🟩🟨 matches 'wagen', use it as 4. guess.
+		3. guess 'umweg' + hint ⬛🟨⬛🟩🟨 matches 'magen', use it as 4. guess.
+		3. guess 'umweg' + hint ⬛⬛⬛🟩⬛ matches 'baden' and 'faden'. Pick one at random to win by the 5. guess.
+		3. guess 'umweg' + hint ⬛⬛⬛🟩🟨 matches 'jagen' and 'nagen'. Pick one at random to win by the 5. guess.
+1. guess 'raine' + hint ⬛⬛🟨⬛🟨 matches 25 secrets, for example 'bibel'.
 	2. guess 'liegt' + hint ⬛🟨🟨⬛⬛ matches 'wobei', use it as 3. guess.
 	2. guess 'liegt' + hint ⬛🟨🟨⬛🟨 matches 'ethik', use it as 3. guess.
 	2. guess 'liegt' + hint ⬛🟨🟩⬛🟨 matches 'steif', use it as 3. guess.
@@ -570,17 +570,17 @@
 	2. guess 'liegt' + hint 🟨🟩🟨🟨⬛ matches 'eilig', use it as 3. guess.
 	2. guess 'liegt' + hint 🟩🟨🟨🟨⬛ matches 'ledig', use it as 3. guess.
 	2. guess 'liegt' + hint 🟨🟨🟨🟨⬛ matches 'oelig' and 'selig'. Pick one at random to win by the 4. guess.
-	2. guess 'liegt' + hint 🟨🟨🟩⬛⬛ matches 'pfeil' and 'kleid'. Pick one at random to win by the 4. guess.
-	2. guess 'liegt' + hint 🟨🟩🟨⬛🟨 matches 'titel' and 'eitel'. Pick one at random to win by the 4. guess.
+	2. guess 'liegt' + hint 🟨🟨🟩⬛⬛ matches 'kleid' and 'pfeil'. Pick one at random to win by the 4. guess.
+	2. guess 'liegt' + hint 🟨🟩🟨⬛🟨 matches 'eitel' and 'titel'. Pick one at random to win by the 4. guess.
 	2. guess 'liegt' + hint ⬛🟨🟨🟨⬛ matches 3 secrets 'eckig', 'emsig', 'essig'.
-		3. guess 'abkam' + hint ⬛⬛⬛⬛⬛ matches 'essig', use it as 4. guess.
-		3. guess 'abkam' + hint ⬛⬛⬛⬛🟨 matches 'emsig', use it as 4. guess.
-		3. guess 'abkam' + hint ⬛⬛🟩⬛⬛ matches 'eckig', use it as 4. guess.
+		3. guess 'emsig' + hint 🟩⬛⬛🟩🟩 matches 'eckig', use it as 4. guess.
+		3. guess 'emsig' + hint 🟩⬛🟩🟩🟩 matches 'essig', use it as 4. guess.
+		3. guess 'emsig' + hint 🟩🟩🟩🟩🟩 matches 'emsig', solved as 3. guess!
 	2. guess 'liegt' + hint 🟨🟩🟨⬛⬛ matches 3 secrets 'bibel', 'fidel', 'pixel'.
 		3. guess 'abend' + hint ⬛⬛🟨⬛⬛ matches 'pixel', use it as 4. guess.
 		3. guess 'abend' + hint ⬛⬛🟨⬛🟨 matches 'fidel', use it as 4. guess.
 		3. guess 'abend' + hint ⬛🟨🟨⬛⬛ matches 'bibel', use it as 4. guess.
-1. guess 'raine' + hint 🟨⬛⬛⬛🟩 matches 27 secrets, for example 'erbse'.
+1. guess 'raine' + hint 🟨⬛⬛⬛🟩 matches 27 secrets, for example 'beere'.
 	2. guess 'bergs' + hint ⬛🟨🟨⬛🟨 matches 'erste', use it as 3. guess.
 	2. guess 'bergs' + hint ⬛🟨🟨🟩⬛ matches 'droge', use it as 3. guess.
 	2. guess 'bergs' + hint ⬛🟨🟩⬛🟨 matches 'sorte', use it as 3. guess.
@@ -593,49 +593,52 @@
 	2. guess 'bergs' + hint 🟨🟩🟩⬛⬛ matches 'kerbe', use it as 3. guess.
 	2. guess 'bergs' + hint 🟩🟩🟨⬛⬛ matches 'beere', use it as 3. guess.
 	2. guess 'bergs' + hint ⬛🟨🟨⬛⬛ matches 'quere' and 'treue'. Pick one at random to win by the 4. guess.
-	2. guess 'bergs' + hint 🟨🟨🟨⬛⬛ matches 'probe' and 'obere'. Pick one at random to win by the 4. guess.
-	2. guess 'bergs' + hint 🟩🟨🟩⬛⬛ matches 'borte' and 'borke'. Pick one at random to win by the 4. guess.
+	2. guess 'bergs' + hint 🟨🟨🟨⬛⬛ matches 'obere' and 'probe'. Pick one at random to win by the 4. guess.
+	2. guess 'bergs' + hint 🟩🟨🟩⬛⬛ matches 'borke' and 'borte'. Pick one at random to win by the 4. guess.
 	2. guess 'bergs' + hint ⬛🟩🟨⬛⬛ matches 3 secrets 'kehre', 'leere', 'lehre'.
-		3. guess 'abele' + hint ⬛⬛🟨⬛🟩 matches 'kehre', use it as 4. guess.
-		3. guess 'abele' + hint ⬛⬛🟨🟨🟩 matches 'lehre', use it as 4. guess.
-		3. guess 'abele' + hint ⬛⬛🟩🟨🟩 matches 'leere', use it as 4. guess.
+		3. guess 'kehre' + hint ⬛🟩⬛🟩🟩 matches 'leere', use it as 4. guess.
+		3. guess 'kehre' + hint ⬛🟩🟩🟩🟩 matches 'lehre', use it as 4. guess.
+		3. guess 'kehre' + hint 🟩🟩🟩🟩🟩 matches 'kehre', solved as 3. guess!
 	2. guess 'bergs' + hint ⬛🟩🟩⬛⬛ matches 3 secrets 'herde', 'kerze', 'perle'.
-		3. guess 'adeln' + hint ⬛⬛🟨⬛⬛ matches 'kerze', use it as 4. guess.
-		3. guess 'adeln' + hint ⬛⬛🟨🟩⬛ matches 'perle', use it as 4. guess.
-		3. guess 'adeln' + hint ⬛🟨🟨⬛⬛ matches 'herde', use it as 4. guess.
+		3. guess 'adler' + hint ⬛⬛⬛🟨🟨 matches 'kerze', use it as 4. guess.
+		3. guess 'adler' + hint ⬛⬛🟨🟨🟨 matches 'perle', use it as 4. guess.
+		3. guess 'adler' + hint ⬛🟨⬛🟨🟨 matches 'herde', use it as 4. guess.
 	2. guess 'bergs' + hint ⬛🟨🟩⬛⬛ matches 4 secrets 'horde', 'kurve', 'torte', 'worte'.
-		3. guess 'atout' + hint ⬛⬛⬛🟨⬛ matches 'kurve', use it as 4. guess.
-		3. guess 'atout' + hint ⬛⬛🟨⬛⬛ matches 'horde', use it as 4. guess.
-		3. guess 'atout' + hint ⬛🟨🟨⬛⬛ matches 'worte', use it as 4. guess.
-		3. guess 'atout' + hint ⬛🟨🟨⬛🟨 matches 'torte', use it as 4. guess.
-1. guess 'raine' + hint ⬛⬛🟨⬛⬛ matches 30 secrets, for example 'mutig'.
-	2. guess 'holst' + hint ⬛⬛⬛⬛🟨 matches 'mutig', use it as 3. guess.
-	2. guess 'holst' + hint ⬛⬛🟨⬛🟩 matches 'limit', use it as 3. guess.
-	2. guess 'holst' + hint ⬛⬛🟨🟨🟨 matches 'iltis', use it as 3. guess.
-	2. guess 'holst' + hint ⬛⬛🟩⬛⬛ matches 'miliz', use it as 3. guess.
-	2. guess 'holst' + hint ⬛🟨⬛⬛🟨 matches 'optik', use it as 3. guess.
-	2. guess 'holst' + hint ⬛🟨⬛🟨⬛ matches 'disco', use it as 3. guess.
-	2. guess 'holst' + hint ⬛🟨⬛🟩⬛ matches 'kiosk', use it as 3. guess.
-	2. guess 'holst' + hint ⬛🟨🟩⬛🟩 matches 'pilot', use it as 3. guess.
-	2. guess 'holst' + hint ⬛🟩⬛⬛⬛ matches 'komik', use it as 3. guess.
-	2. guess 'holst' + hint ⬛🟩⬛⬛🟩 matches 'womit', use it as 3. guess.
-	2. guess 'holst' + hint ⬛🟩⬛🟨⬛ matches 'dosis', use it as 3. guess.
-	2. guess 'holst' + hint ⬛🟩⬛🟨🟩 matches 'somit', use it as 3. guess.
-	2. guess 'holst' + hint 🟨⬛⬛🟨⬛ matches 'fisch', use it as 3. guess.
-	2. guess 'holst' + hint 🟨⬛⬛🟨🟨 matches 'tisch', use it as 3. guess.
-	2. guess 'holst' + hint 🟨⬛⬛🟨🟩 matches 'sicht', use it as 3. guess.
-	2. guess 'holst' + hint 🟨⬛🟨⬛🟩 matches 'licht', use it as 3. guess.
-	2. guess 'holst' + hint 🟨⬛🟩⬛⬛ matches 'milch', use it as 3. guess.
-	2. guess 'holst' + hint ⬛⬛⬛⬛⬛ matches 'gummi' and 'mimik'. Pick one at random to win by the 4. guess.
-	2. guess 'holst' + hint ⬛⬛⬛🟨⬛ matches 'musik' and 'visum'. Pick one at random to win by the 4. guess.
-	2. guess 'holst' + hint ⬛⬛🟨⬛⬛ matches 'ulkig' and 'zivil'. Pick one at random to win by the 4. guess.
-	2. guess 'holst' + hint ⬛🟩⬛⬛🟨 matches 'gotik' and 'motiv'. Pick one at random to win by the 4. guess.
-	2. guess 'holst' + hint ⬛🟩🟨⬛⬛ matches 'logik' and 'mobil'. Pick one at random to win by the 4. guess.
-	2. guess 'holst' + hint 🟨⬛⬛⬛🟩 matches 3 secrets 'dicht', 'gicht', 'wicht'.
-		3. guess 'abweg' + hint ⬛⬛⬛⬛⬛ matches 'dicht', use it as 4. guess.
-		3. guess 'abweg' + hint ⬛⬛⬛⬛🟨 matches 'gicht', use it as 4. guess.
-		3. guess 'abweg' + hint ⬛⬛🟨⬛⬛ matches 'wicht', use it as 4. guess.
-1. guess 'raine' + hint ⬛🟩⬛⬛⬛ matches 31 secrets, for example 'haupt'.
+		3. guess 'torte' + hint ⬛⬛🟩⬛🟩 matches 'kurve', use it as 4. guess.
+		3. guess 'torte' + hint ⬛🟩🟩⬛🟩 matches 'horde', use it as 4. guess.
+		3. guess 'torte' + hint ⬛🟩🟩🟩🟩 matches 'worte', use it as 4. guess.
+		3. guess 'torte' + hint 🟩🟩🟩🟩🟩 matches 'torte', solved as 3. guess!
+1. guess 'raine' + hint ⬛⬛🟨⬛⬛ matches 30 secrets, for example 'dicht'.
+	2. guess 'somit' + hint ⬛⬛🟨🟨⬛ matches 'milch', use it as 3. guess.
+	2. guess 'somit' + hint ⬛⬛🟨🟩⬛ matches 'miliz', use it as 3. guess.
+	2. guess 'somit' + hint ⬛⬛🟨🟩🟨 matches 'mutig', use it as 3. guess.
+	2. guess 'somit' + hint ⬛⬛🟩🟨⬛ matches 'gummi', use it as 3. guess.
+	2. guess 'somit' + hint ⬛⬛🟩🟩⬛ matches 'mimik', use it as 3. guess.
+	2. guess 'somit' + hint ⬛⬛🟩🟩🟩 matches 'limit', use it as 3. guess.
+	2. guess 'somit' + hint ⬛🟨⬛🟨🟩 matches 'pilot', use it as 3. guess.
+	2. guess 'somit' + hint ⬛🟨⬛🟩🟨 matches 'optik', use it as 3. guess.
+	2. guess 'somit' + hint ⬛🟩⬛🟩⬛ matches 'logik', use it as 3. guess.
+	2. guess 'somit' + hint ⬛🟩⬛🟩🟨 matches 'gotik', use it as 3. guess.
+	2. guess 'somit' + hint ⬛🟩🟨🟩⬛ matches 'mobil', use it as 3. guess.
+	2. guess 'somit' + hint ⬛🟩🟨🟩🟨 matches 'motiv', use it as 3. guess.
+	2. guess 'somit' + hint ⬛🟩🟩🟩⬛ matches 'komik', use it as 3. guess.
+	2. guess 'somit' + hint ⬛🟩🟩🟩🟩 matches 'womit', use it as 3. guess.
+	2. guess 'somit' + hint 🟨⬛⬛🟨⬛ matches 'fisch', use it as 3. guess.
+	2. guess 'somit' + hint 🟨⬛⬛🟨🟨 matches 'tisch', use it as 3. guess.
+	2. guess 'somit' + hint 🟨⬛⬛🟩🟨 matches 'iltis', use it as 3. guess.
+	2. guess 'somit' + hint 🟨⬛🟨🟨⬛ matches 'visum', use it as 3. guess.
+	2. guess 'somit' + hint 🟨⬛🟨🟩⬛ matches 'musik', use it as 3. guess.
+	2. guess 'somit' + hint 🟨🟩⬛🟩⬛ matches 'dosis', use it as 3. guess.
+	2. guess 'somit' + hint 🟩⬛⬛🟨🟩 matches 'sicht', use it as 3. guess.
+	2. guess 'somit' + hint 🟩🟩🟩🟩🟩 matches 'somit', solved as 2. guess!
+	2. guess 'somit' + hint ⬛⬛⬛🟩⬛ matches 'ulkig' and 'zivil'. Pick one at random to win by the 4. guess.
+	2. guess 'somit' + hint 🟨🟨⬛🟨⬛ matches 'disco' and 'kiosk'. Pick one at random to win by the 4. guess.
+	2. guess 'somit' + hint ⬛⬛⬛🟨🟩 matches 4 secrets 'dicht', 'gicht', 'licht', 'wicht'.
+		3. guess 'glied' + hint ⬛⬛🟨⬛⬛ matches 'wicht', use it as 4. guess.
+		3. guess 'glied' + hint ⬛⬛🟨⬛🟨 matches 'dicht', use it as 4. guess.
+		3. guess 'glied' + hint ⬛🟨🟨⬛⬛ matches 'licht', use it as 4. guess.
+		3. guess 'glied' + hint 🟩⬛🟨⬛⬛ matches 'gicht', use it as 4. guess.
+1. guess 'raine' + hint ⬛🟩⬛⬛⬛ matches 31 secrets, for example 'bauch'.
 	2. guess 'holst' + hint ⬛⬛⬛🟨⬛ matches 'samba', use it as 3. guess.
 	2. guess 'holst' + hint ⬛⬛⬛🟨🟨 matches 'pasta', use it as 3. guess.
 	2. guess 'holst' + hint ⬛⬛⬛🟩⬛ matches 'kassa', use it as 3. guess.
@@ -654,18 +657,18 @@
 	2. guess 'holst' + hint 🟩⬛⬛⬛🟩 matches 'haupt', use it as 3. guess.
 	2. guess 'holst' + hint 🟩🟨🟩⬛⬛ matches 'hallo', use it as 3. guess.
 	2. guess 'holst' + hint ⬛⬛⬛⬛🟨 matches 'datum' and 'tabak'. Pick one at random to win by the 4. guess.
-	2. guess 'holst' + hint ⬛⬛⬛🟩🟩 matches 'papst' and 'faust'. Pick one at random to win by the 4. guess.
-	2. guess 'holst' + hint ⬛🟨⬛🟨⬛ matches 'sakko' and 'famos'. Pick one at random to win by the 4. guess.
+	2. guess 'holst' + hint ⬛⬛⬛🟩🟩 matches 'faust' and 'papst'. Pick one at random to win by the 4. guess.
+	2. guess 'holst' + hint ⬛🟨⬛🟨⬛ matches 'famos' and 'sakko'. Pick one at random to win by the 4. guess.
 	2. guess 'holst' + hint 🟨⬛⬛🟨⬛ matches 'dachs' and 'wachs'. Pick one at random to win by the 4. guess.
 	2. guess 'holst' + hint ⬛⬛⬛⬛⬛ matches 3 secrets 'dampf', 'kampf', 'magma'.
-		3. guess 'abkam' + hint 🟨⬛⬛⬛🟨 matches 'dampf', use it as 4. guess.
-		3. guess 'abkam' + hint 🟨⬛⬛🟨🟨 matches 'magma', use it as 4. guess.
-		3. guess 'abkam' + hint 🟨⬛🟨⬛🟨 matches 'kampf', use it as 4. guess.
+		3. guess 'dampf' + hint ⬛🟩🟨⬛⬛ matches 'magma', use it as 4. guess.
+		3. guess 'dampf' + hint ⬛🟩🟩🟩🟩 matches 'kampf', use it as 4. guess.
+		3. guess 'dampf' + hint 🟩🟩🟩🟩🟩 matches 'dampf', solved as 3. guess!
 	2. guess 'holst' + hint 🟨⬛⬛⬛🟩 matches 3 secrets 'macht', 'pacht', 'yacht'.
 		3. guess 'ampel' + hint 🟨⬛⬛⬛⬛ matches 'yacht', use it as 4. guess.
 		3. guess 'ampel' + hint 🟨⬛🟨⬛⬛ matches 'pacht', use it as 4. guess.
 		3. guess 'ampel' + hint 🟨🟨⬛⬛⬛ matches 'macht', use it as 4. guess.
-1. guess 'raine' + hint ⬛⬛🟨⬛🟩 matches 35 secrets, for example 'diele'.
+1. guess 'raine' + hint ⬛⬛🟨⬛🟩 matches 35 secrets, for example 'bitte'.
 	2. guess 'liest' + hint ⬛🟨🟨🟨⬛ matches 'sowie', use it as 3. guess.
 	2. guess 'liest' + hint ⬛🟩🟨🟨⬛ matches 'sippe', use it as 3. guess.
 	2. guess 'liest' + hint ⬛🟩🟩🟩⬛ matches 'wiese', use it as 3. guess.
@@ -673,33 +676,33 @@
 	2. guess 'liest' + hint 🟨🟩🟨🟨⬛ matches 'silbe', use it as 3. guess.
 	2. guess 'liest' + hint 🟨🟩🟩⬛⬛ matches 'diele', use it as 3. guess.
 	2. guess 'liest' + hint 🟩🟩🟨🟨🟨 matches 'liste', use it as 3. guess.
-	2. guess 'liest' + hint ⬛🟨🟨⬛⬛ matches 'mumie' and 'kopie'. Pick one at random to win by the 4. guess.
-	2. guess 'liest' + hint ⬛🟩🟩⬛⬛ matches 'ziege' and 'wiege'. Pick one at random to win by the 4. guess.
-	2. guess 'liest' + hint ⬛🟩🟩⬛🟨 matches 'tiefe' and 'miete'. Pick one at random to win by the 4. guess.
+	2. guess 'liest' + hint ⬛🟨🟨⬛⬛ matches 'kopie' and 'mumie'. Pick one at random to win by the 4. guess.
+	2. guess 'liest' + hint ⬛🟩🟩⬛⬛ matches 'wiege' and 'ziege'. Pick one at random to win by the 4. guess.
+	2. guess 'liest' + hint ⬛🟩🟩⬛🟨 matches 'miete' and 'tiefe'. Pick one at random to win by the 4. guess.
 	2. guess 'liest' + hint 🟩🟩🟨⬛⬛ matches 'lilie' and 'lippe'. Pick one at random to win by the 4. guess.
 	2. guess 'liest' + hint 🟩🟩🟩⬛⬛ matches 'liebe' and 'liege'. Pick one at random to win by the 4. guess.
 	2. guess 'liest' + hint ⬛🟩🟨🟨🟨 matches 3 secrets 'kiste', 'piste', 'sitte'.
-		3. guess 'akten' + hint ⬛⬛🟨🟨⬛ matches 'piste', use it as 4. guess.
-		3. guess 'akten' + hint ⬛⬛🟩🟨⬛ matches 'sitte', use it as 4. guess.
-		3. guess 'akten' + hint ⬛🟨🟨🟨⬛ matches 'kiste', use it as 4. guess.
+		3. guess 'kiste' + hint ⬛🟩🟨🟩🟩 matches 'sitte', use it as 4. guess.
+		3. guess 'kiste' + hint ⬛🟩🟩🟩🟩 matches 'piste', use it as 4. guess.
+		3. guess 'kiste' + hint 🟩🟩🟩🟩🟩 matches 'kiste', solved as 3. guess!
 	2. guess 'liest' + hint ⬛🟩🟨⬛⬛ matches 4 secrets 'dicke', 'eiche', 'kippe', 'wippe'.
-		3. guess 'acker' + hint ⬛⬛⬛🟨⬛ matches 'wippe', use it as 4. guess.
-		3. guess 'acker' + hint ⬛⬛🟨🟨⬛ matches 'kippe', use it as 4. guess.
-		3. guess 'acker' + hint ⬛🟨⬛🟨⬛ matches 'eiche', use it as 4. guess.
-		3. guess 'acker' + hint ⬛🟨🟨🟨⬛ matches 'dicke', use it as 4. guess.
+		3. guess 'dicke' + hint ⬛🟩⬛⬛🟩 matches 'wippe', use it as 4. guess.
+		3. guess 'dicke' + hint ⬛🟩⬛🟨🟩 matches 'kippe', use it as 4. guess.
+		3. guess 'dicke' + hint ⬛🟩🟩⬛🟩 matches 'eiche', use it as 4. guess.
+		3. guess 'dicke' + hint 🟩🟩🟩🟩🟩 matches 'dicke', solved as 3. guess!
 	2. guess 'liest' + hint ⬛🟩🟨⬛🟨 matches 4 secrets 'bitte', 'hitze', 'mitte', 'witwe'.
-		3. guess 'barth' + hint ⬛⬛⬛🟨⬛ matches 'witwe', use it as 4. guess.
-		3. guess 'barth' + hint ⬛⬛⬛🟨🟨 matches 'hitze', use it as 4. guess.
-		3. guess 'barth' + hint ⬛⬛⬛🟩⬛ matches 'mitte', use it as 4. guess.
-		3. guess 'barth' + hint 🟩⬛⬛🟩⬛ matches 'bitte', use it as 4. guess.
+		3. guess 'blitz' + hint ⬛⬛🟨🟨⬛ matches 'witwe', use it as 4. guess.
+		3. guess 'blitz' + hint ⬛⬛🟨🟨🟨 matches 'hitze', use it as 4. guess.
+		3. guess 'blitz' + hint ⬛⬛🟨🟩⬛ matches 'mitte', use it as 4. guess.
+		3. guess 'blitz' + hint 🟩⬛🟨🟩⬛ matches 'bitte', use it as 4. guess.
 	2. guess 'liest' + hint 🟨🟩🟨⬛⬛ matches 7 secrets, for example 'hilfe'.
 		3. guess 'dampf' + hint ⬛⬛⬛⬛🟨 matches 'hilfe', use it as 4. guess.
 		3. guess 'dampf' + hint ⬛⬛⬛🟨⬛ matches 'pille', use it as 4. guess.
 		3. guess 'dampf' + hint ⬛⬛🟨⬛⬛ matches 'milbe', use it as 4. guess.
 		3. guess 'dampf' + hint 🟨⬛⬛⬛⬛ matches 'wilde', use it as 4. guess.
 		3. guess 'dampf' + hint 🟨⬛🟨⬛⬛ matches 'milde', use it as 4. guess.
-		3. guess 'dampf' + hint ⬛⬛⬛⬛⬛ matches 'zille' and 'wille'. Pick one at random to win by the 5. guess.
-1. guess 'raine' + hint 🟨🟨⬛⬛⬛ matches 39 secrets, for example 'prall'.
+		3. guess 'dampf' + hint ⬛⬛⬛⬛⬛ matches 'wille' and 'zille'. Pick one at random to win by the 5. guess.
+1. guess 'raine' + hint 🟨🟨⬛⬛⬛ matches 39 secrets, for example 'abruf'.
 	2. guess 'klaut' + hint ⬛⬛🟨⬛🟨 matches 'aorta', use it as 3. guess.
 	2. guess 'klaut' + hint ⬛⬛🟨🟨🟨 matches 'autor', use it as 3. guess.
 	2. guess 'klaut' + hint ⬛⬛🟨🟩⬛ matches 'abruf', use it as 3. guess.
@@ -719,27 +722,27 @@
 	2. guess 'klaut' + hint 🟩⬛🟩🟩🟩 matches 'kraut', use it as 3. guess.
 	2. guess 'klaut' + hint ⬛⬛🟨🟨⬛ matches 'hurra' and 'urbar'. Pick one at random to win by the 4. guess.
 	2. guess 'klaut' + hint ⬛🟨🟩⬛⬛ matches 'drall' and 'prall'. Pick one at random to win by the 4. guess.
-	2. guess 'klaut' + hint 🟨⬛🟩⬛⬛ matches 'wrack' and 'frack'. Pick one at random to win by the 4. guess.
-	2. guess 'klaut' + hint 🟩⬛🟩⬛⬛ matches 'krass' and 'krach'. Pick one at random to win by the 4. guess.
+	2. guess 'klaut' + hint 🟨⬛🟩⬛⬛ matches 'frack' and 'wrack'. Pick one at random to win by the 4. guess.
+	2. guess 'klaut' + hint 🟩⬛🟩⬛⬛ matches 'krach' and 'krass'. Pick one at random to win by the 4. guess.
 	2. guess 'klaut' + hint ⬛⬛🟩⬛⬛ matches 3 secrets 'brach', 'drama', 'gramm'.
-		3. guess 'abart' + hint ⬛⬛🟩🟨⬛ matches 'gramm', use it as 4. guess.
-		3. guess 'abart' + hint ⬛🟨🟩🟨⬛ matches 'brach', use it as 4. guess.
-		3. guess 'abart' + hint 🟨⬛🟩🟨⬛ matches 'drama', use it as 4. guess.
+		3. guess 'drama' + hint ⬛🟩🟩⬛⬛ matches 'brach', use it as 4. guess.
+		3. guess 'drama' + hint ⬛🟩🟩🟩⬛ matches 'gramm', use it as 4. guess.
+		3. guess 'drama' + hint 🟩🟩🟩🟩🟩 matches 'drama', solved as 3. guess!
 	2. guess 'klaut' + hint ⬛⬛🟩⬛🟩 matches 3 secrets 'apart', 'draht', 'start'.
-		3. guess 'aasee' + hint 🟨⬛⬛⬛⬛ matches 'draht', use it as 4. guess.
-		3. guess 'aasee' + hint 🟨⬛🟨⬛⬛ matches 'start', use it as 4. guess.
-		3. guess 'aasee' + hint 🟩🟨⬛⬛⬛ matches 'apart', use it as 4. guess.
+		3. guess 'apart' + hint ⬛⬛🟩🟨🟩 matches 'draht', use it as 4. guess.
+		3. guess 'apart' + hint ⬛⬛🟩🟩🟩 matches 'start', use it as 4. guess.
+		3. guess 'apart' + hint 🟩🟩🟩🟩🟩 matches 'apart', solved as 3. guess!
 	2. guess 'klaut' + hint ⬛🟨🟨⬛⬛ matches 3 secrets 'acryl', 'moral', 'polar'.
-		3. guess 'aalen' + hint 🟨⬛🟨⬛⬛ matches 'moral', use it as 4. guess.
-		3. guess 'aalen' + hint 🟨⬛🟩⬛⬛ matches 'polar', use it as 4. guess.
-		3. guess 'aalen' + hint 🟩⬛🟨⬛⬛ matches 'acryl', use it as 4. guess.
+		3. guess 'acryl' + hint 🟨⬛🟨⬛🟨 matches 'polar', use it as 4. guess.
+		3. guess 'acryl' + hint 🟨⬛🟩⬛🟩 matches 'moral', use it as 4. guess.
+		3. guess 'acryl' + hint 🟩🟩🟩🟩🟩 matches 'acryl', solved as 3. guess!
 	2. guess 'klaut' + hint ⬛⬛🟨⬛⬛ matches 5 secrets 'aroma', 'prosa', 'schar', 'sogar', 'vorab'.
-		3. guess 'abgas' + hint ⬛⬛⬛🟩🟨 matches 'schar', use it as 4. guess.
-		3. guess 'abgas' + hint ⬛⬛🟩🟩🟨 matches 'sogar', use it as 4. guess.
-		3. guess 'abgas' + hint ⬛🟨⬛🟩⬛ matches 'vorab', use it as 4. guess.
-		3. guess 'abgas' + hint 🟨⬛⬛⬛🟨 matches 'prosa', use it as 4. guess.
-		3. guess 'abgas' + hint 🟩⬛⬛🟨⬛ matches 'aroma', use it as 4. guess.
-1. guess 'raine' + hint 🟨⬛⬛⬛⬛ matches 41 secrets, for example 'futur'.
+		3. guess 'prosa' + hint ⬛🟨⬛🟨🟨 matches 'schar', use it as 4. guess.
+		3. guess 'prosa' + hint ⬛🟨🟨⬛🟨 matches 'vorab', use it as 4. guess.
+		3. guess 'prosa' + hint ⬛🟨🟨🟨🟨 matches 'sogar', use it as 4. guess.
+		3. guess 'prosa' + hint ⬛🟩🟩⬛🟩 matches 'aroma', use it as 4. guess.
+		3. guess 'prosa' + hint 🟩🟩🟩🟩🟩 matches 'prosa', solved as 3. guess!
+1. guess 'raine' + hint 🟨⬛⬛⬛⬛ matches 41 secrets, for example 'bruch'.
 	2. guess 'surft' + hint ⬛⬛🟨⬛🟩 matches 'trott', use it as 3. guess.
 	2. guess 'surft' + hint ⬛⬛🟩⬛⬛ matches 'chrom', use it as 3. guess.
 	2. guess 'surft' + hint ⬛⬛🟩⬛🟨 matches 'porto', use it as 3. guess.
@@ -763,22 +766,22 @@
 	2. guess 'surft' + hint ⬛⬛🟨⬛⬛ matches 'chlor' and 'groll'. Pick one at random to win by the 4. guess.
 	2. guess 'surft' + hint ⬛⬛🟨🟨⬛ matches 'fromm' and 'kropf'. Pick one at random to win by the 4. guess.
 	2. guess 'surft' + hint ⬛🟩🟨⬛⬛ matches 'humor' and 'zuvor'. Pick one at random to win by the 4. guess.
-	2. guess 'surft' + hint 🟨🟩🟩⬛🟩 matches 'wurst' and 'durst'. Pick one at random to win by the 4. guess.
+	2. guess 'surft' + hint 🟨🟩🟩⬛🟩 matches 'durst' and 'wurst'. Pick one at random to win by the 4. guess.
 	2. guess 'surft' + hint 🟩⬛🟩⬛🟨 matches 'stroh' and 'strom'. Pick one at random to win by the 4. guess.
-	2. guess 'surft' + hint 🟩🟨🟨⬛🟨 matches 'sturz' and 'sturm'. Pick one at random to win by the 4. guess.
+	2. guess 'surft' + hint 🟩🟨🟨⬛🟨 matches 'sturm' and 'sturz'. Pick one at random to win by the 4. guess.
 	2. guess 'surft' + hint ⬛⬛🟨⬛🟨 matches 3 secrets 'motor', 'troll', 'trotz'.
-		3. guess 'adler' + hint ⬛⬛⬛⬛🟨 matches 'trotz', use it as 4. guess.
-		3. guess 'adler' + hint ⬛⬛⬛⬛🟩 matches 'motor', use it as 4. guess.
-		3. guess 'adler' + hint ⬛⬛🟨⬛🟨 matches 'troll', use it as 4. guess.
+		3. guess 'troll' + hint 🟨🟨🟨⬛⬛ matches 'motor', use it as 4. guess.
+		3. guess 'troll' + hint 🟩🟩🟩⬛⬛ matches 'trotz', use it as 4. guess.
+		3. guess 'troll' + hint 🟩🟩🟩🟩🟩 matches 'troll', solved as 3. guess!
 	2. guess 'surft' + hint ⬛🟨🟨⬛⬛ matches 3 secrets 'bruch', 'druck', 'krumm'.
-		3. guess 'abend' + hint ⬛⬛⬛⬛⬛ matches 'krumm', use it as 4. guess.
-		3. guess 'abend' + hint ⬛⬛⬛⬛🟨 matches 'druck', use it as 4. guess.
-		3. guess 'abend' + hint ⬛🟨⬛⬛⬛ matches 'bruch', use it as 4. guess.
+		3. guess 'bruch' + hint ⬛🟩🟩⬛⬛ matches 'krumm', use it as 4. guess.
+		3. guess 'bruch' + hint ⬛🟩🟩🟩⬛ matches 'druck', use it as 4. guess.
+		3. guess 'bruch' + hint 🟩🟩🟩🟩🟩 matches 'bruch', solved as 3. guess!
 	2. guess 'surft' + hint ⬛🟩🟩⬛⬛ matches 3 secrets 'durch', 'juror', 'lurch'.
-		3. guess 'acryl' + hint ⬛⬛🟩⬛⬛ matches 'juror', use it as 4. guess.
-		3. guess 'acryl' + hint ⬛🟨🟩⬛⬛ matches 'durch', use it as 4. guess.
-		3. guess 'acryl' + hint ⬛🟨🟩⬛🟨 matches 'lurch', use it as 4. guess.
-1. guess 'raine' + hint ⬛⬛⬛⬛⬛ matches 47 secrets, for example 'fokus'.
+		3. guess 'durch' + hint ⬛🟩🟩⬛⬛ matches 'juror', use it as 4. guess.
+		3. guess 'durch' + hint ⬛🟩🟩🟩🟩 matches 'lurch', use it as 4. guess.
+		3. guess 'durch' + hint 🟩🟩🟩🟩🟩 matches 'durch', solved as 3. guess!
+1. guess 'raine' + hint ⬛⬛⬛⬛⬛ matches 47 secrets, for example 'block'.
 	2. guess 'kults' + hint ⬛⬛⬛⬛⬛ matches 'hobby', use it as 3. guess.
 	2. guess 'kults' + hint ⬛⬛⬛🟨⬛ matches 'docht', use it as 3. guess.
 	2. guess 'kults' + hint ⬛⬛⬛🟩⬛ matches 'motto', use it as 3. guess.
@@ -800,24 +803,24 @@
 	2. guess 'kults' + hint 🟩⬛🟨⬛🟩 matches 'kloss', use it as 3. guess.
 	2. guess 'kults' + hint 🟩⬛🟨🟩⬛ matches 'klotz', use it as 3. guess.
 	2. guess 'kults' + hint 🟩🟨🟨🟨⬛ matches 'kluft', use it as 3. guess.
-	2. guess 'kults' + hint ⬛⬛⬛🟨🟨 matches 'stopp' and 'stoff'. Pick one at random to win by the 4. guess.
-	2. guess 'kults' + hint ⬛⬛🟩⬛⬛ matches 'molch' and 'dolch'. Pick one at random to win by the 4. guess.
+	2. guess 'kults' + hint ⬛⬛⬛🟨🟨 matches 'stoff' and 'stopp'. Pick one at random to win by the 4. guess.
+	2. guess 'kults' + hint ⬛⬛🟩⬛⬛ matches 'dolch' and 'molch'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint ⬛🟨⬛⬛⬛ matches 'couch' and 'umzug'. Pick one at random to win by the 4. guess.
-	2. guess 'kults' + hint ⬛🟨⬛⬛🟨 matches 'schuh' and 'schub'. Pick one at random to win by the 4. guess.
-	2. guess 'kults' + hint ⬛🟨⬛🟨⬛ matches 'votum' and 'obhut'. Pick one at random to win by the 4. guess.
+	2. guess 'kults' + hint ⬛🟨⬛⬛🟨 matches 'schub' and 'schuh'. Pick one at random to win by the 4. guess.
+	2. guess 'kults' + hint ⬛🟨⬛🟨⬛ matches 'obhut' and 'votum'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint ⬛🟨🟨⬛🟩 matches 'flugs' and 'fluss'. Pick one at random to win by the 4. guess.
-	2. guess 'kults' + hint ⬛🟩⬛⬛⬛ matches 'zuzug' and 'dumpf'. Pick one at random to win by the 4. guess.
+	2. guess 'kults' + hint ⬛🟩⬛⬛⬛ matches 'dumpf' and 'zuzug'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint ⬛🟩⬛⬛🟨 matches 'busch' and 'sumpf'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint ⬛🟩⬛⬛🟩 matches 'fuchs' and 'wuchs'. Pick one at random to win by the 4. guess.
-	2. guess 'kults' + hint ⬛🟩🟨⬛🟩 matches 'luxus' and 'luchs'. Pick one at random to win by the 4. guess.
+	2. guess 'kults' + hint ⬛🟩🟨⬛🟩 matches 'luchs' and 'luxus'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint ⬛🟨🟨⬛⬛ matches 3 secrets 'fluch', 'modul', 'plump'.
-		3. guess 'abruf' + hint ⬛⬛⬛🟨⬛ matches 'plump', use it as 4. guess.
-		3. guess 'abruf' + hint ⬛⬛⬛🟨🟨 matches 'fluch', use it as 4. guess.
-		3. guess 'abruf' + hint ⬛⬛⬛🟩⬛ matches 'modul', use it as 4. guess.
+		3. guess 'fluch' + hint ⬛🟨🟨⬛⬛ matches 'modul', use it as 4. guess.
+		3. guess 'fluch' + hint ⬛🟩🟩⬛⬛ matches 'plump', use it as 4. guess.
+		3. guess 'fluch' + hint 🟩🟩🟩🟩🟩 matches 'fluch', solved as 3. guess!
 	2. guess 'kults' + hint ⬛🟩⬛🟨⬛ matches 3 secrets 'bucht', 'wucht', 'zucht'.
-		3. guess 'abweg' + hint ⬛⬛⬛⬛⬛ matches 'zucht', use it as 4. guess.
-		3. guess 'abweg' + hint ⬛⬛🟨⬛⬛ matches 'wucht', use it as 4. guess.
-		3. guess 'abweg' + hint ⬛🟨⬛⬛⬛ matches 'bucht', use it as 4. guess.
+		3. guess 'abzug' + hint ⬛⬛⬛🟨⬛ matches 'wucht', use it as 4. guess.
+		3. guess 'abzug' + hint ⬛⬛🟨🟨⬛ matches 'zucht', use it as 4. guess.
+		3. guess 'abzug' + hint ⬛🟨⬛🟨⬛ matches 'bucht', use it as 4. guess.
 1. guess 'raine' + hint ⬛⬛⬛⬛🟨 matches 47 secrets, for example 'beleg'.
 	2. guess 'uebel' + hint ⬛⬛🟨🟩🟨 matches 'bloed', use it as 3. guess.
 	2. guess 'uebel' + hint ⬛🟨⬛⬛🟨 matches 'fleck', use it as 3. guess.
@@ -832,42 +835,42 @@
 	2. guess 'uebel' + hint 🟨🟩⬛⬛⬛ matches 'demut', use it as 3. guess.
 	2. guess 'uebel' + hint 🟨🟩🟨⬛⬛ matches 'bezug', use it as 3. guess.
 	2. guess 'uebel' + hint 🟩⬛⬛🟩⬛ matches 'umweg', use it as 3. guess.
-	2. guess 'uebel' + hint 🟩🟩🟩🟩🟩 matches 'uebel', use it as 3. guess.
-	2. guess 'uebel' + hint ⬛⬛⬛🟩🟩 matches 'vogel' and 'hotel'. Pick one at random to win by the 4. guess.
+	2. guess 'uebel' + hint 🟩🟩🟩🟩🟩 matches 'uebel', solved as 2. guess!
+	2. guess 'uebel' + hint ⬛⬛⬛🟩🟩 matches 'hotel' and 'vogel'. Pick one at random to win by the 4. guess.
 	2. guess 'uebel' + hint ⬛⬛🟩🟩🟩 matches 'hobel' and 'zobel'. Pick one at random to win by the 4. guess.
 	2. guess 'uebel' + hint ⬛🟩⬛⬛🟨 matches 'cello' and 'kelch'. Pick one at random to win by the 4. guess.
-	2. guess 'uebel' + hint 🟨⬛⬛🟩⬛ matches 'zudem' and 'scheu'. Pick one at random to win by the 4. guess.
-	2. guess 'uebel' + hint 🟨🟨⬛⬛⬛ matches 'wuest' and 'duett'. Pick one at random to win by the 4. guess.
+	2. guess 'uebel' + hint 🟨⬛⬛🟩⬛ matches 'scheu' and 'zudem'. Pick one at random to win by the 4. guess.
+	2. guess 'uebel' + hint 🟨🟨⬛⬛⬛ matches 'duett' and 'wuest'. Pick one at random to win by the 4. guess.
 	2. guess 'uebel' + hint ⬛🟨⬛⬛⬛ matches 3 secrets 'speck', 'stets', 'zweck'.
-		3. guess 'abbas' + hint ⬛⬛⬛⬛⬛ matches 'zweck', use it as 4. guess.
-		3. guess 'abbas' + hint ⬛⬛⬛⬛🟨 matches 'speck', use it as 4. guess.
-		3. guess 'abbas' + hint ⬛⬛⬛⬛🟩 matches 'stets', use it as 4. guess.
+		3. guess 'speck' + hint ⬛⬛🟩🟩🟩 matches 'zweck', use it as 4. guess.
+		3. guess 'speck' + hint 🟩⬛🟩⬛⬛ matches 'stets', use it as 4. guess.
+		3. guess 'speck' + hint 🟩🟩🟩🟩🟩 matches 'speck', solved as 3. guess!
 	2. guess 'uebel' + hint ⬛🟩⬛🟩🟩 matches 3 secrets 'kegel', 'pegel', 'segel'.
-		3. guess 'akkus' + hint ⬛⬛⬛⬛⬛ matches 'pegel', use it as 4. guess.
-		3. guess 'akkus' + hint ⬛⬛⬛⬛🟨 matches 'segel', use it as 4. guess.
-		3. guess 'akkus' + hint ⬛🟨⬛⬛⬛ matches 'kegel', use it as 4. guess.
+		3. guess 'fokus' + hint ⬛⬛⬛⬛⬛ matches 'pegel', use it as 4. guess.
+		3. guess 'fokus' + hint ⬛⬛⬛⬛🟨 matches 'segel', use it as 4. guess.
+		3. guess 'fokus' + hint ⬛⬛🟨⬛⬛ matches 'kegel', use it as 4. guess.
 	2. guess 'uebel' + hint 🟨⬛⬛🟩🟩 matches 3 secrets 'juwel', 'kugel', 'pudel'.
-		3. guess 'abweg' + hint ⬛⬛⬛🟩⬛ matches 'pudel', use it as 4. guess.
-		3. guess 'abweg' + hint ⬛⬛⬛🟩🟨 matches 'kugel', use it as 4. guess.
-		3. guess 'abweg' + hint ⬛⬛🟩🟩⬛ matches 'juwel', use it as 4. guess.
+		3. guess 'agape' + hint ⬛⬛⬛⬛🟨 matches 'juwel', use it as 4. guess.
+		3. guess 'agape' + hint ⬛⬛⬛🟨🟨 matches 'pudel', use it as 4. guess.
+		3. guess 'agape' + hint ⬛🟨⬛⬛🟨 matches 'kugel', use it as 4. guess.
 	2. guess 'uebel' + hint 🟨🟨⬛⬛🟩 matches 3 secrets 'duell', 'kuehl', 'muell'.
-		3. guess 'abkam' + hint ⬛⬛⬛⬛⬛ matches 'duell', use it as 4. guess.
-		3. guess 'abkam' + hint ⬛⬛⬛⬛🟨 matches 'muell', use it as 4. guess.
-		3. guess 'abkam' + hint ⬛⬛🟨⬛⬛ matches 'kuehl', use it as 4. guess.
+		3. guess 'duell' + hint ⬛🟩🟩⬛🟩 matches 'kuehl', use it as 4. guess.
+		3. guess 'duell' + hint ⬛🟩🟩🟩🟩 matches 'muell', use it as 4. guess.
+		3. guess 'duell' + hint 🟩🟩🟩🟩🟩 matches 'duell', solved as 3. guess!
 	2. guess 'uebel' + hint ⬛⬛⬛🟩⬛ matches 5 secrets 'kodex', 'komet', 'modem', 'moped', 'totem'.
-		3. guess 'ahmad' + hint ⬛⬛⬛⬛🟨 matches 'kodex', use it as 4. guess.
-		3. guess 'ahmad' + hint ⬛⬛🟨⬛⬛ matches 'totem', use it as 4. guess.
-		3. guess 'ahmad' + hint ⬛⬛🟨⬛🟨 matches 'modem', use it as 4. guess.
-		3. guess 'ahmad' + hint ⬛⬛🟨⬛🟩 matches 'moped', use it as 4. guess.
-		3. guess 'ahmad' + hint ⬛⬛🟩⬛⬛ matches 'komet', use it as 4. guess.
-	2. guess 'uebel' + hint ⬛🟩⬛⬛⬛ matches 6 secrets, for example 'fesch'.
-		3. guess 'athos' + hint ⬛⬛🟨⬛🟨 matches 'fesch', use it as 4. guess.
-		3. guess 'athos' + hint ⬛⬛🟨⬛🟩 matches 'sechs', use it as 4. guess.
-		3. guess 'athos' + hint ⬛🟨⬛⬛⬛ matches 'jetzt', use it as 4. guess.
-		3. guess 'athos' + hint ⬛🟨⬛🟨⬛ matches 'tempo', use it as 4. guess.
-		3. guess 'athos' + hint ⬛🟨⬛🟩⬛ matches 'depot', use it as 4. guess.
-		3. guess 'athos' + hint ⬛🟨🟨⬛⬛ matches 'hecht', use it as 4. guess.
-1. guess 'raine' + hint ⬛🟨⬛⬛⬛ matches 50 secrets, for example 'toast'.
+		3. guess 'kodex' + hint ⬛🟩⬛🟩⬛ matches 'totem', use it as 4. guess.
+		3. guess 'kodex' + hint ⬛🟩🟨🟩⬛ matches 'moped', use it as 4. guess.
+		3. guess 'kodex' + hint ⬛🟩🟩🟩⬛ matches 'modem', use it as 4. guess.
+		3. guess 'kodex' + hint 🟩🟩⬛🟩⬛ matches 'komet', use it as 4. guess.
+		3. guess 'kodex' + hint 🟩🟩🟩🟩🟩 matches 'kodex', solved as 3. guess!
+	2. guess 'uebel' + hint ⬛🟩⬛⬛⬛ matches 6 secrets, for example 'depot'.
+		3. guess 'autos' + hint ⬛⬛⬛⬛🟨 matches 'fesch', use it as 4. guess.
+		3. guess 'autos' + hint ⬛⬛⬛⬛🟩 matches 'sechs', use it as 4. guess.
+		3. guess 'autos' + hint ⬛⬛🟨⬛⬛ matches 'hecht', use it as 4. guess.
+		3. guess 'autos' + hint ⬛⬛🟨🟨⬛ matches 'tempo', use it as 4. guess.
+		3. guess 'autos' + hint ⬛⬛🟨🟩⬛ matches 'depot', use it as 4. guess.
+		3. guess 'autos' + hint ⬛⬛🟩⬛⬛ matches 'jetzt', use it as 4. guess.
+1. guess 'raine' + hint ⬛🟨⬛⬛⬛ matches 50 secrets, for example 'abbau'.
 	2. guess 'plots' + hint ⬛⬛⬛⬛🟩 matches 'abgas', use it as 3. guess.
 	2. guess 'plots' + hint ⬛⬛⬛🟨⬛ matches 'zutat', use it as 3. guess.
 	2. guess 'plots' + hint ⬛⬛⬛🟩🟨 matches 'statt', use it as 3. guess.
@@ -886,39 +889,39 @@
 	2. guess 'plots' + hint 🟨🟨⬛🟨🟨 matches 'spalt', use it as 3. guess.
 	2. guess 'plots' + hint 🟩🟨⬛⬛⬛ matches 'pfahl', use it as 3. guess.
 	2. guess 'plots' + hint 🟩🟨⬛⬛🟨 matches 'psalm', use it as 3. guess.
-	2. guess 'plots' + hint ⬛🟨⬛⬛⬛ matches 'zumal' and 'qualm'. Pick one at random to win by the 4. guess.
-	2. guess 'plots' + hint ⬛🟨⬛⬛🟨 matches 'skala' and 'schal'. Pick one at random to win by the 4. guess.
+	2. guess 'plots' + hint ⬛🟨⬛⬛⬛ matches 'qualm' and 'zumal'. Pick one at random to win by the 4. guess.
+	2. guess 'plots' + hint ⬛🟨⬛⬛🟨 matches 'schal' and 'skala'. Pick one at random to win by the 4. guess.
 	2. guess 'plots' + hint ⬛🟨⬛🟨🟨 matches 'stahl' and 'stall'. Pick one at random to win by the 4. guess.
 	2. guess 'plots' + hint ⬛🟩⬛🟩⬛ matches 'blatt' and 'glatt'. Pick one at random to win by the 4. guess.
-	2. guess 'plots' + hint 🟩🟨🟨⬛⬛ matches 'polka' and 'pokal'. Pick one at random to win by the 4. guess.
+	2. guess 'plots' + hint 🟩🟨🟨⬛⬛ matches 'pokal' and 'polka'. Pick one at random to win by the 4. guess.
 	2. guess 'plots' + hint 🟩🟩⬛🟩⬛ matches 'platt' and 'platz'. Pick one at random to win by the 4. guess.
 	2. guess 'plots' + hint ⬛⬛⬛⬛⬛ matches 3 secrets 'abbau', 'abzug', 'umbau'.
-		3. guess 'aalen' + hint 🟨⬛⬛⬛⬛ matches 'umbau', use it as 4. guess.
-		3. guess 'aalen' + hint 🟩⬛⬛⬛⬛ matches 'abzug', use it as 4. guess.
-		3. guess 'aalen' + hint 🟩🟨⬛⬛⬛ matches 'abbau', use it as 4. guess.
+		3. guess 'abbau' + hint ⬛⬛🟩🟩🟩 matches 'umbau', use it as 4. guess.
+		3. guess 'abbau' + hint 🟩🟩⬛⬛🟨 matches 'abzug', use it as 4. guess.
+		3. guess 'abbau' + hint 🟩🟩🟩🟩🟩 matches 'abbau', solved as 3. guess!
 	2. guess 'plots' + hint ⬛⬛⬛⬛🟨 matches 3 secrets 'schaf', 'scham', 'schau'.
 		3. guess 'abruf' + hint 🟨⬛⬛⬛⬛ matches 'scham', use it as 4. guess.
 		3. guess 'abruf' + hint 🟨⬛⬛⬛🟩 matches 'schaf', use it as 4. guess.
 		3. guess 'abruf' + hint 🟨⬛⬛🟨⬛ matches 'schau', use it as 4. guess.
 	2. guess 'plots' + hint ⬛⬛🟨⬛⬛ matches 3 secrets 'coach', 'dogma', 'komma'.
-		3. guess 'abkam' + hint 🟨⬛⬛⬛⬛ matches 'coach', use it as 4. guess.
-		3. guess 'abkam' + hint 🟨⬛⬛⬛🟨 matches 'dogma', use it as 4. guess.
-		3. guess 'abkam' + hint 🟨⬛🟨⬛🟨 matches 'komma', use it as 4. guess.
+		3. guess 'dogma' + hint ⬛🟩⬛⬛🟨 matches 'coach', use it as 4. guess.
+		3. guess 'dogma' + hint ⬛🟩⬛🟩🟩 matches 'komma', use it as 4. guess.
+		3. guess 'dogma' + hint 🟩🟩🟩🟩🟩 matches 'dogma', solved as 3. guess!
 	2. guess 'plots' + hint ⬛🟩⬛⬛⬛ matches 3 secrets 'album', 'flach', 'klamm'.
-		3. guess 'abkam' + hint 🟨⬛⬛⬛⬛ matches 'flach', use it as 4. guess.
-		3. guess 'abkam' + hint 🟨⬛🟨⬛🟩 matches 'klamm', use it as 4. guess.
-		3. guess 'abkam' + hint 🟩🟨⬛⬛🟩 matches 'album', use it as 4. guess.
+		3. guess 'album' + hint 🟨🟩⬛⬛⬛ matches 'flach', use it as 4. guess.
+		3. guess 'album' + hint 🟨🟩⬛⬛🟩 matches 'klamm', use it as 4. guess.
+		3. guess 'album' + hint 🟩🟩🟩🟩🟩 matches 'album', solved as 3. guess!
 	2. guess 'plots' + hint ⬛⬛⬛🟨🟨 matches 4 secrets 'staat', 'stadt', 'stamm', 'staub'.
-		3. guess 'abart' + hint ⬛⬛🟩⬛🟨 matches 'stamm', use it as 4. guess.
-		3. guess 'abart' + hint ⬛⬛🟩⬛🟩 matches 'stadt', use it as 4. guess.
-		3. guess 'abart' + hint ⬛🟨🟩⬛🟨 matches 'staub', use it as 4. guess.
-		3. guess 'abart' + hint 🟨⬛🟩⬛🟩 matches 'staat', use it as 4. guess.
+		3. guess 'damit' + hint ⬛🟨⬛⬛🟨 matches 'staub', use it as 4. guess.
+		3. guess 'damit' + hint ⬛🟨⬛⬛🟩 matches 'staat', use it as 4. guess.
+		3. guess 'damit' + hint ⬛🟨🟨⬛🟨 matches 'stamm', use it as 4. guess.
+		3. guess 'damit' + hint 🟨🟨⬛⬛🟩 matches 'stadt', use it as 4. guess.
 	2. guess 'plots' + hint ⬛🟨🟨⬛⬛ matches 4 secrets 'lokal', 'loyal', 'modal', 'vokal'.
-		3. guess 'idyll' + hint ⬛⬛⬛⬛🟩 matches 'vokal', use it as 4. guess.
-		3. guess 'idyll' + hint ⬛⬛⬛🟨🟩 matches 'lokal', use it as 4. guess.
-		3. guess 'idyll' + hint ⬛⬛🟩🟨🟩 matches 'loyal', use it as 4. guess.
-		3. guess 'idyll' + hint ⬛🟨⬛⬛🟩 matches 'modal', use it as 4. guess.
-1. guess 'raine' + hint ⬛🟩⬛⬛🟩 matches 51 secrets, for example 'waage'.
+		3. guess 'lokal' + hint ⬛🟩⬛🟩🟩 matches 'modal', use it as 4. guess.
+		3. guess 'lokal' + hint ⬛🟩🟩🟩🟩 matches 'vokal', use it as 4. guess.
+		3. guess 'lokal' + hint 🟩🟩⬛🟩🟩 matches 'loyal', use it as 4. guess.
+		3. guess 'lokal' + hint 🟩🟩🟩🟩🟩 matches 'lokal', solved as 3. guess!
+1. guess 'raine' + hint ⬛🟩⬛⬛🟩 matches 51 secrets, for example 'bache'.
 	2. guess 'kults' + hint ⬛⬛⬛🟨⬛ matches 'tatze', use it as 3. guess.
 	2. guess 'kults' + hint ⬛⬛⬛🟨🟨 matches 'tasse', use it as 3. guess.
 	2. guess 'kults' + hint ⬛⬛⬛🟩🟨 matches 'taste', use it as 3. guess.
@@ -933,33 +936,33 @@
 	2. guess 'kults' + hint 🟩⬛⬛🟨⬛ matches 'katze', use it as 3. guess.
 	2. guess 'kults' + hint 🟩⬛⬛🟩🟨 matches 'kaste', use it as 3. guess.
 	2. guess 'kults' + hint ⬛⬛🟨⬛⬛ matches 'lache' and 'lampe'. Pick one at random to win by the 4. guess.
-	2. guess 'kults' + hint ⬛⬛🟩⬛🟨 matches 'salve' and 'salbe'. Pick one at random to win by the 4. guess.
+	2. guess 'kults' + hint ⬛⬛🟩⬛🟨 matches 'salbe' and 'salve'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint ⬛🟨⬛⬛🟨 matches 'jause' and 'pause'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint ⬛🟨⬛🟨⬛ matches 'taube' and 'taufe'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint ⬛🟨🟨⬛⬛ matches 'laube' and 'lauge'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint 🟩⬛⬛⬛🟨 matches 'kaese' and 'kasse'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint ⬛⬛⬛🟩⬛ matches 3 secrets 'gatte', 'matte', 'watte'.
-		3. guess 'abweg' + hint 🟨⬛⬛🟨⬛ matches 'matte', use it as 4. guess.
-		3. guess 'abweg' + hint 🟨⬛⬛🟨🟨 matches 'gatte', use it as 4. guess.
-		3. guess 'abweg' + hint 🟨⬛🟨🟨⬛ matches 'watte', use it as 4. guess.
+		3. guess 'dogma' + hint ⬛⬛⬛⬛🟨 matches 'watte', use it as 4. guess.
+		3. guess 'dogma' + hint ⬛⬛⬛🟨🟨 matches 'matte', use it as 4. guess.
+		3. guess 'dogma' + hint ⬛⬛🟨⬛🟨 matches 'gatte', use it as 4. guess.
 	2. guess 'kults' + hint ⬛⬛⬛⬛🟨 matches 4 secrets 'gasse', 'masse', 'sache', 'saege'.
-		3. guess 'amiga' + hint 🟨⬛⬛⬛⬛ matches 'sache', use it as 4. guess.
-		3. guess 'amiga' + hint 🟨⬛⬛🟨⬛ matches 'gasse', use it as 4. guess.
-		3. guess 'amiga' + hint 🟨⬛⬛🟩⬛ matches 'saege', use it as 4. guess.
-		3. guess 'amiga' + hint 🟨🟨⬛⬛⬛ matches 'masse', use it as 4. guess.
+		3. guess 'gasse' + hint ⬛🟩🟨⬛🟩 matches 'sache', use it as 4. guess.
+		3. guess 'gasse' + hint ⬛🟩🟩🟩🟩 matches 'masse', use it as 4. guess.
+		3. guess 'gasse' + hint 🟨🟩🟨⬛🟩 matches 'saege', use it as 4. guess.
+		3. guess 'gasse' + hint 🟩🟩🟩🟩🟩 matches 'gasse', solved as 3. guess!
 	2. guess 'kults' + hint 🟨⬛⬛⬛⬛ matches 5 secrets 'backe', 'hacke', 'jacke', 'macke', 'zacke'.
-		3. guess 'abkam' + hint 🟨⬛🟨⬛🟨 matches 'macke', use it as 4. guess.
-		3. guess 'abkam' + hint 🟨🟨🟨⬛⬛ matches 'backe', use it as 4. guess.
-		3. guess 'abkam' + hint 🟨⬛🟨⬛⬛ matches 3 secrets 'hacke', 'jacke', 'zacke'.
-			4. guess 'hajek' + hint ⬛🟩⬛🟨🟨 matches 'zacke', use it as 5. guess.
-			4. guess 'hajek' + hint ⬛🟩🟨🟨🟨 matches 'jacke', use it as 5. guess.
-			4. guess 'hajek' + hint 🟩🟩⬛🟨🟨 matches 'hacke', use it as 5. guess.
-	2. guess 'kults' + hint ⬛⬛🟩⬛⬛ matches 6 secrets, for example 'palme'.
+		3. guess 'abzug' + hint 🟨⬛🟨⬛⬛ matches 'zacke', use it as 4. guess.
+		3. guess 'abzug' + hint 🟨🟨⬛⬛⬛ matches 'backe', use it as 4. guess.
+		3. guess 'abzug' + hint 🟨⬛⬛⬛⬛ matches 3 secrets 'hacke', 'jacke', 'macke'.
+			4. guess 'chrom' + hint 🟨⬛⬛⬛⬛ matches 'jacke', use it as 5. guess.
+			4. guess 'chrom' + hint 🟨⬛⬛⬛🟨 matches 'macke', use it as 5. guess.
+			4. guess 'chrom' + hint 🟨🟨⬛⬛⬛ matches 'hacke', use it as 5. guess.
+	2. guess 'kults' + hint ⬛⬛🟩⬛⬛ matches 6 secrets, for example 'falle'.
 		3. guess 'fehle' + hint ⬛⬛⬛🟩🟩 matches 'galle', use it as 4. guess.
 		3. guess 'fehle' + hint ⬛⬛🟨🟨🟩 matches 'halde', use it as 4. guess.
 		3. guess 'fehle' + hint ⬛⬛🟨🟩🟩 matches 'halle', use it as 4. guess.
 		3. guess 'fehle' + hint 🟩⬛⬛🟩🟩 matches 'falle', use it as 4. guess.
-		3. guess 'fehle' + hint ⬛⬛⬛🟨🟩 matches 'walze' and 'palme'. Pick one at random to win by the 5. guess.
+		3. guess 'fehle' + hint ⬛⬛⬛🟨🟩 matches 'palme' and 'walze'. Pick one at random to win by the 5. guess.
 	2. guess 'kults' + hint ⬛⬛⬛⬛⬛ matches 8 secrets, for example 'bache'.
 		3. guess 'pfahl' + hint ⬛⬛🟨⬛⬛ matches 'gambe', use it as 4. guess.
 		3. guess 'pfahl' + hint ⬛⬛🟨🟨⬛ matches 'haeme', use it as 4. guess.
@@ -967,8 +970,8 @@
 		3. guess 'pfahl' + hint ⬛🟨🟨⬛⬛ matches 'waffe', use it as 4. guess.
 		3. guess 'pfahl' + hint 🟨⬛🟨⬛⬛ matches 'mappe', use it as 4. guess.
 		3. guess 'pfahl' + hint 🟩⬛🟨⬛⬛ matches 'pappe', use it as 4. guess.
-		3. guess 'pfahl' + hint ⬛⬛🟨🟩⬛ matches 'wache' and 'bache'. Pick one at random to win by the 5. guess.
-1. guess 'raine' + hint 🟨⬛⬛⬛🟨 matches 52 secrets, for example 'otter'.
+		3. guess 'pfahl' + hint ⬛⬛🟨🟩⬛ matches 'bache' and 'wache'. Pick one at random to win by the 5. guess.
+1. guess 'raine' + hint 🟨⬛⬛⬛🟨 matches 52 secrets, for example 'beruf'.
 	2. guess 'uebel' + hint ⬛⬛⬛🟩🟩 matches 'orgel', use it as 3. guess.
 	2. guess 'uebel' + hint ⬛⬛🟨🟩⬛ matches 'boxer', use it as 3. guess.
 	2. guess 'uebel' + hint ⬛🟨⬛⬛🟩 matches 'grell', use it as 3. guess.
@@ -981,36 +984,36 @@
 	2. guess 'uebel' + hint 🟨🟩🟨⬛⬛ matches 'beruf', use it as 3. guess.
 	2. guess 'uebel' + hint 🟩⬛⬛🟩⬛ matches 'umher', use it as 3. guess.
 	2. guess 'uebel' + hint 🟩🟩🟩🟩⬛ matches 'ueber', use it as 3. guess.
-	2. guess 'uebel' + hint ⬛🟨⬛🟩⬛ matches 'speer' and 'erker'. Pick one at random to win by the 4. guess.
+	2. guess 'uebel' + hint ⬛🟨⬛🟩⬛ matches 'erker' and 'speer'. Pick one at random to win by the 4. guess.
 	2. guess 'uebel' + hint ⬛🟨🟨⬛⬛ matches 'brett' and 'krebs'. Pick one at random to win by the 4. guess.
-	2. guess 'uebel' + hint ⬛🟩⬛⬛⬛ matches 'werft' and 'dekor'. Pick one at random to win by the 4. guess.
+	2. guess 'uebel' + hint ⬛🟩⬛⬛⬛ matches 'dekor' and 'werft'. Pick one at random to win by the 4. guess.
 	2. guess 'uebel' + hint ⬛🟩⬛🟩🟨 matches 'leder' and 'leser'. Pick one at random to win by the 4. guess.
 	2. guess 'uebel' + hint 🟨🟨⬛⬛⬛ matches 'duerr' and 'kreuz'. Pick one at random to win by the 4. guess.
 	2. guess 'uebel' + hint 🟨🟨🟨⬛⬛ matches 'buero' and 'muerb'. Pick one at random to win by the 4. guess.
 	2. guess 'uebel' + hint 🟨🟩⬛⬛⬛ matches 'herum' and 'serum'. Pick one at random to win by the 4. guess.
 	2. guess 'uebel' + hint 🟨🟩⬛🟩⬛ matches 3 secrets 'feuer', 'heuer', 'teuer'.
-		3. guess 'achat' + hint ⬛⬛⬛⬛⬛ matches 'feuer', use it as 4. guess.
-		3. guess 'achat' + hint ⬛⬛⬛⬛🟨 matches 'teuer', use it as 4. guess.
-		3. guess 'achat' + hint ⬛⬛🟨⬛⬛ matches 'heuer', use it as 4. guess.
+		3. guess 'bucht' + hint ⬛🟨⬛⬛⬛ matches 'feuer', use it as 4. guess.
+		3. guess 'bucht' + hint ⬛🟨⬛⬛🟨 matches 'teuer', use it as 4. guess.
+		3. guess 'bucht' + hint ⬛🟨⬛🟨⬛ matches 'heuer', use it as 4. guess.
 	2. guess 'uebel' + hint 🟨⬛⬛🟩⬛ matches 4 secrets 'frueh', 'puder', 'spreu', 'super'.
-		3. guess 'amper' + hint ⬛⬛⬛🟩🟨 matches 'frueh', use it as 4. guess.
-		3. guess 'amper' + hint ⬛⬛🟨🟩🟨 matches 'spreu', use it as 4. guess.
-		3. guess 'amper' + hint ⬛⬛🟨🟩🟩 matches 'puder', use it as 4. guess.
-		3. guess 'amper' + hint ⬛⬛🟩🟩🟩 matches 'super', use it as 4. guess.
+		3. guess 'puder' + hint ⬛🟨⬛🟩🟨 matches 'frueh', use it as 4. guess.
+		3. guess 'puder' + hint 🟨🟨⬛🟩🟨 matches 'spreu', use it as 4. guess.
+		3. guess 'puder' + hint 🟨🟩⬛🟩🟩 matches 'super', use it as 4. guess.
+		3. guess 'puder' + hint 🟩🟩🟩🟩🟩 matches 'puder', solved as 3. guess!
 	2. guess 'uebel' + hint ⬛🟩⬛🟩⬛ matches 5 secrets 'feder', 'jeher', 'meter', 'seher', 'weder'.
 		3. guess 'dufts' + hint ⬛⬛⬛⬛⬛ matches 'jeher', use it as 4. guess.
 		3. guess 'dufts' + hint ⬛⬛⬛⬛🟨 matches 'seher', use it as 4. guess.
 		3. guess 'dufts' + hint ⬛⬛⬛🟨⬛ matches 'meter', use it as 4. guess.
 		3. guess 'dufts' + hint 🟨⬛⬛⬛⬛ matches 'weder', use it as 4. guess.
 		3. guess 'dufts' + hint 🟨⬛🟨⬛⬛ matches 'feder', use it as 4. guess.
-	2. guess 'uebel' + hint ⬛🟨⬛⬛⬛ matches 6 secrets, for example 'zwerg'.
-		3. guess 'adorf' + hint ⬛⬛⬛🟨🟨 matches 'frech', use it as 4. guess.
-		3. guess 'adorf' + hint ⬛⬛⬛🟩⬛ matches 'zwerg', use it as 4. guess.
-		3. guess 'adorf' + hint ⬛⬛🟨🟨⬛ matches 'empor', use it as 4. guess.
-		3. guess 'adorf' + hint ⬛🟨⬛🟨⬛ matches 'dreck', use it as 4. guess.
-		3. guess 'adorf' + hint ⬛🟨⬛🟨🟨 matches 'fremd', use it as 4. guess.
-		3. guess 'adorf' + hint ⬛🟨⬛🟩🟨 matches 'pferd', use it as 4. guess.
-	2. guess 'uebel' + hint ⬛⬛⬛🟩⬛ matches 8 secrets, for example 'joker'.
+	2. guess 'uebel' + hint ⬛🟨⬛⬛⬛ matches 6 secrets, for example 'dreck'.
+		3. guess 'dreck' + hint ⬛🟨🟨⬛⬛ matches 'empor', use it as 4. guess.
+		3. guess 'dreck' + hint ⬛🟨🟩⬛⬛ matches 'zwerg', use it as 4. guess.
+		3. guess 'dreck' + hint ⬛🟩🟩🟩⬛ matches 'frech', use it as 4. guess.
+		3. guess 'dreck' + hint 🟨🟨🟩⬛⬛ matches 'pferd', use it as 4. guess.
+		3. guess 'dreck' + hint 🟨🟩🟩⬛⬛ matches 'fremd', use it as 4. guess.
+		3. guess 'dreck' + hint 🟩🟩🟩🟩🟩 matches 'dreck', solved as 3. guess!
+	2. guess 'uebel' + hint ⬛⬛⬛🟩⬛ matches 8 secrets, for example 'foyer'.
 		3. guess 'kopfs' + hint ⬛🟨⬛⬛⬛ matches 'otter', use it as 4. guess.
 		3. guess 'kopfs' + hint ⬛🟨⬛⬛🟨 matches 'stoer', use it as 4. guess.
 		3. guess 'kopfs' + hint ⬛🟨🟨🟨⬛ matches 'opfer', use it as 4. guess.
@@ -1018,7 +1021,7 @@
 		3. guess 'kopfs' + hint 🟨🟩⬛⬛⬛ matches 'joker', use it as 4. guess.
 		3. guess 'kopfs' + hint 🟨🟩🟨⬛⬛ matches 'poker', use it as 4. guess.
 		3. guess 'kopfs' + hint ⬛🟩⬛⬛⬛ matches 'moder' and 'woher'. Pick one at random to win by the 5. guess.
-1. guess 'raine' + hint ⬛⬛⬛🟨🟨 matches 59 secrets, for example 'toben'.
+1. guess 'raine' + hint ⬛⬛⬛🟨🟨 matches 59 secrets, for example 'beben'.
 	2. guess 'hebel' + hint ⬛⬛🟩🟩⬛ matches 'toben', use it as 3. guess.
 	2. guess 'hebel' + hint ⬛⬛🟩🟩🟨 matches 'loben', use it as 3. guess.
 	2. guess 'hebel' + hint ⬛⬛🟩🟩🟩 matches 'nobel', use it as 3. guess.
@@ -1032,53 +1035,53 @@
 	2. guess 'hebel' + hint 🟩⬛⬛🟩⬛ matches 'hupen', use it as 3. guess.
 	2. guess 'hebel' + hint 🟩⬛⬛🟩🟨 matches 'holen', use it as 3. guess.
 	2. guess 'hebel' + hint 🟩🟩🟩🟩⬛ matches 'heben', use it as 3. guess.
-	2. guess 'hebel' + hint ⬛⬛⬛🟩🟩 matches 'onkel' and 'nudel'. Pick one at random to win by the 4. guess.
+	2. guess 'hebel' + hint ⬛⬛⬛🟩🟩 matches 'nudel' and 'onkel'. Pick one at random to win by the 4. guess.
 	2. guess 'hebel' + hint ⬛🟨⬛🟩⬛ matches 'enden' and 'essen'. Pick one at random to win by the 4. guess.
 	2. guess 'hebel' + hint ⬛🟨⬛🟩🟩 matches 'engel' and 'enkel'. Pick one at random to win by the 4. guess.
-	2. guess 'hebel' + hint ⬛🟩🟨🟩⬛ matches 'beten' and 'besen'. Pick one at random to win by the 4. guess.
+	2. guess 'hebel' + hint ⬛🟩🟨🟩⬛ matches 'besen' and 'beten'. Pick one at random to win by the 4. guess.
 	2. guess 'hebel' + hint 🟨🟨⬛⬛⬛ matches 'foehn' and 'kuehn'. Pick one at random to win by the 4. guess.
 	2. guess 'hebel' + hint 🟩🟩⬛🟩⬛ matches 'hegen' and 'hexen'. Pick one at random to win by the 4. guess.
 	2. guess 'hebel' + hint ⬛⬛⬛🟩🟨 matches 3 secrets 'loden', 'losen', 'ulken'.
-		3. guess 'adams' + hint ⬛⬛⬛⬛⬛ matches 'ulken', use it as 4. guess.
-		3. guess 'adams' + hint ⬛⬛⬛⬛🟨 matches 'losen', use it as 4. guess.
-		3. guess 'adams' + hint ⬛🟨⬛⬛⬛ matches 'loden', use it as 4. guess.
+		3. guess 'loden' + hint 🟨⬛⬛🟩🟩 matches 'ulken', use it as 4. guess.
+		3. guess 'loden' + hint 🟩🟩⬛🟩🟩 matches 'losen', use it as 4. guess.
+		3. guess 'loden' + hint 🟩🟩🟩🟩🟩 matches 'loden', solved as 3. guess!
 	2. guess 'hebel' + hint ⬛⬛🟨🟩⬛ matches 3 secrets 'boden', 'bogen', 'boxen'.
-		3. guess 'adige' + hint ⬛⬛⬛⬛🟨 matches 'boxen', use it as 4. guess.
-		3. guess 'adige' + hint ⬛⬛⬛🟨🟨 matches 'bogen', use it as 4. guess.
-		3. guess 'adige' + hint ⬛🟨⬛⬛🟨 matches 'boden', use it as 4. guess.
+		3. guess 'degen' + hint ⬛⬛⬛🟩🟩 matches 'boxen', use it as 4. guess.
+		3. guess 'degen' + hint ⬛⬛🟩🟩🟩 matches 'bogen', use it as 4. guess.
+		3. guess 'degen' + hint 🟨⬛⬛🟩🟩 matches 'boden', use it as 4. guess.
 	2. guess 'hebel' + hint ⬛🟩⬛🟩🟨 matches 3 secrets 'legen', 'lesen', 'oelen'.
-		3. guess 'abgas' + hint ⬛⬛⬛⬛⬛ matches 'oelen', use it as 4. guess.
-		3. guess 'abgas' + hint ⬛⬛⬛⬛🟨 matches 'lesen', use it as 4. guess.
-		3. guess 'abgas' + hint ⬛⬛🟩⬛⬛ matches 'legen', use it as 4. guess.
+		3. guess 'legen' + hint 🟨🟩⬛🟩🟩 matches 'oelen', use it as 4. guess.
+		3. guess 'legen' + hint 🟩🟩⬛🟩🟩 matches 'lesen', use it as 4. guess.
+		3. guess 'legen' + hint 🟩🟩🟩🟩🟩 matches 'legen', solved as 3. guess!
 	2. guess 'hebel' + hint 🟨🟩⬛🟩⬛ matches 3 secrets 'gehen', 'sehen', 'wehen'.
 		3. guess 'abgas' + hint ⬛⬛⬛⬛⬛ matches 'wehen', use it as 4. guess.
 		3. guess 'abgas' + hint ⬛⬛⬛⬛🟨 matches 'sehen', use it as 4. guess.
 		3. guess 'abgas' + hint ⬛⬛🟨⬛⬛ matches 'gehen', use it as 4. guess.
 	2. guess 'hebel' + hint ⬛🟩⬛⬛⬛ matches 4 secrets 'genom', 'genug', 'netto', 'venus'.
-		3. guess 'abzug' + hint ⬛⬛⬛⬛⬛ matches 'netto', use it as 4. guess.
-		3. guess 'abzug' + hint ⬛⬛⬛⬛🟨 matches 'genom', use it as 4. guess.
-		3. guess 'abzug' + hint ⬛⬛⬛🟩⬛ matches 'venus', use it as 4. guess.
-		3. guess 'abzug' + hint ⬛⬛⬛🟩🟩 matches 'genug', use it as 4. guess.
+		3. guess 'genom' + hint ⬛🟩🟨🟨⬛ matches 'netto', use it as 4. guess.
+		3. guess 'genom' + hint ⬛🟩🟩⬛⬛ matches 'venus', use it as 4. guess.
+		3. guess 'genom' + hint 🟩🟩🟩⬛⬛ matches 'genug', use it as 4. guess.
+		3. guess 'genom' + hint 🟩🟩🟩🟩🟩 matches 'genom', solved as 3. guess!
 	2. guess 'hebel' + hint ⬛🟩🟩🟩⬛ matches 5 secrets 'beben', 'geben', 'neben', 'ueben', 'weben'.
 		3. guess 'beuge' + hint 🟨🟩⬛🟨🟨 matches 'geben', use it as 4. guess.
 		3. guess 'beuge' + hint 🟨🟩🟨⬛🟨 matches 'ueben', use it as 4. guess.
 		3. guess 'beuge' + hint 🟩🟩⬛⬛🟨 matches 'beben', use it as 4. guess.
-		3. guess 'beuge' + hint 🟨🟩⬛⬛🟨 matches 'weben' and 'neben'. Pick one at random to win by the 5. guess.
-	2. guess 'hebel' + hint ⬛🟩⬛🟩⬛ matches 6 secrets, for example 'segen'.
+		3. guess 'beuge' + hint 🟨🟩⬛⬛🟨 matches 'neben' and 'weben'. Pick one at random to win by the 5. guess.
+	2. guess 'hebel' + hint ⬛🟩⬛🟩⬛ matches 6 secrets, for example 'degen'.
 		3. guess 'flows' + hint ⬛⬛⬛⬛🟨 matches 'segen', use it as 4. guess.
 		3. guess 'flows' + hint ⬛⬛⬛🟨⬛ matches 'wegen', use it as 4. guess.
 		3. guess 'flows' + hint ⬛⬛⬛🟨🟨 matches 'wesen', use it as 4. guess.
 		3. guess 'flows' + hint 🟩⬛⬛⬛⬛ matches 'fegen', use it as 4. guess.
-		3. guess 'flows' + hint ⬛⬛⬛⬛⬛ matches 'gegen' and 'degen'. Pick one at random to win by the 5. guess.
-	2. guess 'hebel' + hint ⬛⬛⬛🟩⬛ matches 7 secrets, for example 'osten'.
-		3. guess 'boten' + hint ⬛⬛🟨🟩🟩 matches 'typen', use it as 4. guess.
-		3. guess 'boten' + hint ⬛⬛🟩🟩🟩 matches 'unten', use it as 4. guess.
-		3. guess 'boten' + hint ⬛🟨⬛🟩🟩 matches 'offen', use it as 4. guess.
-		3. guess 'boten' + hint ⬛🟨🟩🟩🟩 matches 'osten', use it as 4. guess.
-		3. guess 'boten' + hint ⬛🟩⬛🟩🟩 matches 'wogen', use it as 4. guess.
-		3. guess 'boten' + hint ⬛🟩🟨🟩🟩 matches 'tosen', use it as 4. guess.
-		3. guess 'boten' + hint ⬛🟩🟩🟩🟩 matches 'noten', use it as 4. guess.
-1. guess 'raine' + hint ⬛⬛⬛⬛🟩 matches 86 secrets, for example 'tulpe'.
+		3. guess 'flows' + hint ⬛⬛⬛⬛⬛ matches 'degen' and 'gegen'. Pick one at random to win by the 5. guess.
+	2. guess 'hebel' + hint ⬛⬛⬛🟩⬛ matches 7 secrets, for example 'noten'.
+		3. guess 'noten' + hint ⬛⬛🟨🟩🟩 matches 'typen', use it as 4. guess.
+		3. guess 'noten' + hint ⬛🟨⬛🟩🟩 matches 'offen', use it as 4. guess.
+		3. guess 'noten' + hint ⬛🟨🟩🟩🟩 matches 'osten', use it as 4. guess.
+		3. guess 'noten' + hint ⬛🟩⬛🟩🟩 matches 'wogen', use it as 4. guess.
+		3. guess 'noten' + hint ⬛🟩🟨🟩🟩 matches 'tosen', use it as 4. guess.
+		3. guess 'noten' + hint 🟨⬛🟩🟩🟩 matches 'unten', use it as 4. guess.
+		3. guess 'noten' + hint 🟩🟩🟩🟩🟩 matches 'noten', solved as 3. guess!
+1. guess 'raine' + hint ⬛⬛⬛⬛🟩 matches 86 secrets, for example 'beuge'.
 	2. guess 'kults' + hint ⬛⬛⬛🟨⬛ matches 'hetze', use it as 3. guess.
 	2. guess 'kults' + hint ⬛⬛⬛🟨🟨 matches 'these', use it as 3. guess.
 	2. guess 'kults' + hint ⬛⬛🟨🟨🟨 matches 'lotse', use it as 3. guess.
@@ -1099,72 +1102,72 @@
 	2. guess 'kults' + hint 🟩🟩⬛⬛⬛ matches 'kuppe', use it as 3. guess.
 	2. guess 'kults' + hint 🟩🟩⬛🟩⬛ matches 'kutte', use it as 3. guess.
 	2. guess 'kults' + hint ⬛⬛🟨⬛🟨 matches 'seele' and 'sohle'. Pick one at random to win by the 4. guess.
-	2. guess 'kults' + hint ⬛🟨⬛⬛⬛ matches 'zeuge' and 'beuge'. Pick one at random to win by the 4. guess.
-	2. guess 'kults' + hint ⬛🟨⬛🟨🟨 matches 'stufe' and 'stube'. Pick one at random to win by the 4. guess.
-	2. guess 'kults' + hint ⬛🟨🟨⬛⬛ matches 'blume' and 'beule'. Pick one at random to win by the 4. guess.
-	2. guess 'kults' + hint ⬛🟨🟨⬛🟨 matches 'spule' and 'bluse'. Pick one at random to win by the 4. guess.
+	2. guess 'kults' + hint ⬛🟨⬛⬛⬛ matches 'beuge' and 'zeuge'. Pick one at random to win by the 4. guess.
+	2. guess 'kults' + hint ⬛🟨⬛🟨🟨 matches 'stube' and 'stufe'. Pick one at random to win by the 4. guess.
+	2. guess 'kults' + hint ⬛🟨🟨⬛⬛ matches 'beule' and 'blume'. Pick one at random to win by the 4. guess.
+	2. guess 'kults' + hint ⬛🟨🟨⬛🟨 matches 'bluse' and 'spule'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint ⬛🟩🟩⬛⬛ matches 'bulle' and 'mulde'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint 🟩⬛🟨⬛⬛ matches 'kehle' and 'kohle'. Pick one at random to win by the 4. guess.
 	2. guess 'kults' + hint ⬛🟨⬛🟩⬛ matches 3 secrets 'beute', 'heute', 'meute'.
-		3. guess 'abkam' + hint ⬛⬛⬛⬛⬛ matches 'heute', use it as 4. guess.
-		3. guess 'abkam' + hint ⬛⬛⬛⬛🟨 matches 'meute', use it as 4. guess.
-		3. guess 'abkam' + hint ⬛🟨⬛⬛⬛ matches 'beute', use it as 4. guess.
+		3. guess 'album' + hint ⬛⬛⬛🟨⬛ matches 'heute', use it as 4. guess.
+		3. guess 'album' + hint ⬛⬛⬛🟨🟨 matches 'meute', use it as 4. guess.
+		3. guess 'album' + hint ⬛⬛🟨🟨⬛ matches 'beute', use it as 4. guess.
 	2. guess 'kults' + hint ⬛🟩⬛🟩⬛ matches 3 secrets 'guete', 'quote', 'tuete'.
-		3. guess 'agent' + hint ⬛⬛🟨⬛🟨 matches 'quote', use it as 4. guess.
-		3. guess 'agent' + hint ⬛⬛🟩⬛🟨 matches 'tuete', use it as 4. guess.
-		3. guess 'agent' + hint ⬛🟨🟩⬛🟨 matches 'guete', use it as 4. guess.
+		3. guess 'guete' + hint ⬛🟩⬛🟩🟩 matches 'quote', use it as 4. guess.
+		3. guess 'guete' + hint ⬛🟩🟩🟩🟩 matches 'tuete', use it as 4. guess.
+		3. guess 'guete' + hint 🟩🟩🟩🟩🟩 matches 'guete', solved as 3. guess!
 	2. guess 'kults' + hint ⬛⬛⬛🟩🟨 matches 4 secrets 'feste', 'geste', 'weste', 'zyste'.
-		3. guess 'ewige' + hint ⬛⬛⬛⬛🟩 matches 'zyste', use it as 4. guess.
-		3. guess 'ewige' + hint 🟨⬛⬛⬛🟩 matches 'feste', use it as 4. guess.
-		3. guess 'ewige' + hint 🟨⬛⬛🟨🟩 matches 'geste', use it as 4. guess.
-		3. guess 'ewige' + hint 🟨🟨⬛⬛🟩 matches 'weste', use it as 4. guess.
+		3. guess 'fegen' + hint ⬛🟨⬛⬛⬛ matches 'zyste', use it as 4. guess.
+		3. guess 'fegen' + hint ⬛🟩⬛🟨⬛ matches 'weste', use it as 4. guess.
+		3. guess 'fegen' + hint ⬛🟩🟨🟨⬛ matches 'geste', use it as 4. guess.
+		3. guess 'fegen' + hint 🟩🟩⬛🟨⬛ matches 'feste', use it as 4. guess.
 	2. guess 'kults' + hint ⬛⬛🟨⬛⬛ matches 4 secrets 'dohle', 'eleve', 'lefze', 'loewe'.
-		3. guess 'adolf' + hint ⬛⬛⬛🟨⬛ matches 'eleve', use it as 4. guess.
-		3. guess 'adolf' + hint ⬛⬛⬛🟨🟨 matches 'lefze', use it as 4. guess.
-		3. guess 'adolf' + hint ⬛⬛🟨🟨⬛ matches 'loewe', use it as 4. guess.
-		3. guess 'adolf' + hint ⬛🟨🟨🟩⬛ matches 'dohle', use it as 4. guess.
+		3. guess 'eleve' + hint ⬛🟨⬛⬛🟩 matches 'dohle', use it as 4. guess.
+		3. guess 'eleve' + hint ⬛🟨🟩⬛🟩 matches 'loewe', use it as 4. guess.
+		3. guess 'eleve' + hint 🟨🟨⬛⬛🟩 matches 'lefze', use it as 4. guess.
+		3. guess 'eleve' + hint 🟩🟩🟩🟩🟩 matches 'eleve', solved as 3. guess!
 	2. guess 'kults' + hint ⬛🟩⬛⬛🟨 matches 4 secrets 'duese', 'suche', 'summe', 'suppe'.
-		3. guess 'ahmad' + hint ⬛⬛⬛⬛⬛ matches 'suppe', use it as 4. guess.
-		3. guess 'ahmad' + hint ⬛⬛⬛⬛🟨 matches 'duese', use it as 4. guess.
-		3. guess 'ahmad' + hint ⬛⬛🟩⬛⬛ matches 'summe', use it as 4. guess.
-		3. guess 'ahmad' + hint ⬛🟨⬛⬛⬛ matches 'suche', use it as 4. guess.
+		3. guess 'dampf' + hint ⬛⬛⬛⬛⬛ matches 'suche', use it as 4. guess.
+		3. guess 'dampf' + hint ⬛⬛⬛🟩⬛ matches 'suppe', use it as 4. guess.
+		3. guess 'dampf' + hint ⬛⬛🟩⬛⬛ matches 'summe', use it as 4. guess.
+		3. guess 'dampf' + hint 🟩⬛⬛⬛⬛ matches 'duese', use it as 4. guess.
 	2. guess 'kults' + hint 🟨⬛⬛⬛⬛ matches 4 secrets 'decke', 'hecke', 'hocke', 'zecke'.
-		3. guess 'dehne' + hint ⬛⬛🟨⬛🟩 matches 'hocke', use it as 4. guess.
-		3. guess 'dehne' + hint ⬛🟩⬛⬛🟩 matches 'zecke', use it as 4. guess.
-		3. guess 'dehne' + hint ⬛🟩🟨⬛🟩 matches 'hecke', use it as 4. guess.
-		3. guess 'dehne' + hint 🟩🟩⬛⬛🟩 matches 'decke', use it as 4. guess.
+		3. guess 'deich' + hint ⬛🟨⬛🟨🟨 matches 'hocke', use it as 4. guess.
+		3. guess 'deich' + hint ⬛🟩⬛🟨⬛ matches 'zecke', use it as 4. guess.
+		3. guess 'deich' + hint ⬛🟩⬛🟨🟨 matches 'hecke', use it as 4. guess.
+		3. guess 'deich' + hint 🟩🟩⬛🟨⬛ matches 'decke', use it as 4. guess.
 	2. guess 'kults' + hint ⬛⬛⬛🟩⬛ matches 5 secrets 'mette', 'motte', 'pfote', 'wette', 'zotte'.
-		3. guess 'aroma' + hint ⬛⬛⬛⬛⬛ matches 'wette', use it as 4. guess.
-		3. guess 'aroma' + hint ⬛⬛⬛🟨⬛ matches 'mette', use it as 4. guess.
-		3. guess 'aroma' + hint ⬛⬛🟨⬛⬛ matches 'zotte', use it as 4. guess.
-		3. guess 'aroma' + hint ⬛⬛🟨🟨⬛ matches 'motte', use it as 4. guess.
-		3. guess 'aroma' + hint ⬛⬛🟩⬛⬛ matches 'pfote', use it as 4. guess.
+		3. guess 'mette' + hint ⬛⬛⬛🟩🟩 matches 'pfote', use it as 4. guess.
+		3. guess 'mette' + hint ⬛⬛🟩🟩🟩 matches 'zotte', use it as 4. guess.
+		3. guess 'mette' + hint ⬛🟩🟩🟩🟩 matches 'wette', use it as 4. guess.
+		3. guess 'mette' + hint 🟩⬛🟩🟩🟩 matches 'motte', use it as 4. guess.
+		3. guess 'mette' + hint 🟩🟩🟩🟩🟩 matches 'mette', solved as 3. guess!
 	2. guess 'kults' + hint ⬛🟩⬛⬛⬛ matches 5 secrets 'buche', 'muede', 'muehe', 'pumpe', 'puppe'.
-		3. guess 'ahmad' + hint ⬛⬛⬛⬛⬛ matches 'puppe', use it as 4. guess.
-		3. guess 'ahmad' + hint ⬛⬛🟨⬛🟨 matches 'muede', use it as 4. guess.
-		3. guess 'ahmad' + hint ⬛⬛🟩⬛⬛ matches 'pumpe', use it as 4. guess.
-		3. guess 'ahmad' + hint ⬛🟨⬛⬛⬛ matches 'buche', use it as 4. guess.
-		3. guess 'ahmad' + hint ⬛🟨🟨⬛⬛ matches 'muehe', use it as 4. guess.
-	2. guess 'kults' + hint ⬛⬛⬛⬛⬛ matches 7 secrets, for example 'dogge'.
-		3. guess 'chemo' + hint ⬛⬛🟨⬛🟨 matches 'dogge', use it as 4. guess.
-		3. guess 'chemo' + hint ⬛⬛🟨🟨🟨 matches 'bombe', use it as 4. guess.
-		3. guess 'chemo' + hint ⬛⬛🟩🟨🟨 matches 'moewe', use it as 4. guess.
-		3. guess 'chemo' + hint ⬛🟨🟨⬛⬛ matches 'fehde', use it as 4. guess.
-		3. guess 'chemo' + hint ⬛🟨🟩⬛🟨 matches 'hoehe', use it as 4. guess.
-		3. guess 'chemo' + hint 🟨🟨🟨⬛⬛ matches 'zeche', use it as 4. guess.
-		3. guess 'chemo' + hint 🟨🟨🟨⬛🟨 matches 'woche', use it as 4. guess.
-	2. guess 'kults' + hint ⬛⬛⬛⬛🟨 matches 7 secrets, for example 'wespe'.
-		3. guess 'bosse' + hint ⬛⬛⬛🟩🟩 matches 'echse', use it as 4. guess.
-		3. guess 'bosse' + hint ⬛⬛🟨⬛🟩 matches 'esche', use it as 4. guess.
-		3. guess 'bosse' + hint ⬛⬛🟩⬛🟩 matches 'wespe', use it as 4. guess.
-		3. guess 'bosse' + hint ⬛⬛🟩🟩🟩 matches 'messe', use it as 4. guess.
-		3. guess 'bosse' + hint ⬛🟨⬛🟩🟩 matches 'ochse', use it as 4. guess.
-		3. guess 'bosse' + hint ⬛🟩🟩🟩🟩 matches 'posse', use it as 4. guess.
-		3. guess 'bosse' + hint 🟩🟩⬛🟩🟩 matches 'boese', use it as 4. guess.
-	2. guess 'kults' + hint ⬛⬛🟩⬛⬛ matches 7 secrets, for example 'zelle'.
-		3. guess 'adolf' + hint ⬛⬛⬛🟨⬛ matches 'welpe', use it as 4. guess.
-		3. guess 'adolf' + hint ⬛⬛⬛🟨🟨 matches 'felge', use it as 4. guess.
-		3. guess 'adolf' + hint ⬛⬛🟨🟨🟨 matches 'folge', use it as 4. guess.
-		3. guess 'adolf' + hint ⬛⬛🟨🟩⬛ matches 'wolle', use it as 4. guess.
-		3. guess 'adolf' + hint ⬛🟨⬛🟩⬛ matches 'delle', use it as 4. guess.
-		3. guess 'adolf' + hint ⬛⬛⬛🟩⬛ matches 'zelle' and 'welle'. Pick one at random to win by the 5. guess.
+		3. guess 'muehe' + hint ⬛🟩⬛⬛🟩 matches 'puppe', use it as 4. guess.
+		3. guess 'muehe' + hint ⬛🟩⬛🟩🟩 matches 'buche', use it as 4. guess.
+		3. guess 'muehe' + hint 🟨🟩⬛⬛🟩 matches 'pumpe', use it as 4. guess.
+		3. guess 'muehe' + hint 🟩🟩🟩⬛🟩 matches 'muede', use it as 4. guess.
+		3. guess 'muehe' + hint 🟩🟩🟩🟩🟩 matches 'muehe', solved as 3. guess!
+	2. guess 'kults' + hint ⬛⬛⬛⬛⬛ matches 7 secrets, for example 'bombe'.
+		3. guess 'fehde' + hint ⬛⬛⬛⬛🟩 matches 'bombe', use it as 4. guess.
+		3. guess 'fehde' + hint ⬛⬛⬛🟨🟩 matches 'dogge', use it as 4. guess.
+		3. guess 'fehde' + hint ⬛⬛🟨⬛🟩 matches 'woche', use it as 4. guess.
+		3. guess 'fehde' + hint ⬛🟨⬛⬛🟩 matches 'moewe', use it as 4. guess.
+		3. guess 'fehde' + hint ⬛🟨🟨⬛🟩 matches 'hoehe', use it as 4. guess.
+		3. guess 'fehde' + hint ⬛🟩🟨⬛🟩 matches 'zeche', use it as 4. guess.
+		3. guess 'fehde' + hint 🟩🟩🟩🟩🟩 matches 'fehde', solved as 3. guess!
+	2. guess 'kults' + hint ⬛⬛⬛⬛🟨 matches 7 secrets, for example 'boese'.
+		3. guess 'posse' + hint ⬛⬛⬛🟩🟩 matches 'echse', use it as 4. guess.
+		3. guess 'posse' + hint ⬛⬛🟨⬛🟩 matches 'esche', use it as 4. guess.
+		3. guess 'posse' + hint ⬛⬛🟩🟩🟩 matches 'messe', use it as 4. guess.
+		3. guess 'posse' + hint ⬛🟨⬛🟩🟩 matches 'ochse', use it as 4. guess.
+		3. guess 'posse' + hint ⬛🟩⬛🟩🟩 matches 'boese', use it as 4. guess.
+		3. guess 'posse' + hint 🟨⬛🟩⬛🟩 matches 'wespe', use it as 4. guess.
+		3. guess 'posse' + hint 🟩🟩🟩🟩🟩 matches 'posse', solved as 3. guess!
+	2. guess 'kults' + hint ⬛⬛🟩⬛⬛ matches 7 secrets, for example 'delle'.
+		3. guess 'welle' + hint ⬛⬛🟩⬛🟩 matches 'folge', use it as 4. guess.
+		3. guess 'welle' + hint ⬛🟩🟩⬛🟩 matches 'felge', use it as 4. guess.
+		3. guess 'welle' + hint 🟩⬛🟩🟩🟩 matches 'wolle', use it as 4. guess.
+		3. guess 'welle' + hint 🟩🟩🟩⬛🟩 matches 'welpe', use it as 4. guess.
+		3. guess 'welle' + hint 🟩🟩🟩🟩🟩 matches 'welle', solved as 3. guess!
+		3. guess 'welle' + hint ⬛🟩🟩🟩🟩 matches 'delle' and 'zelle'. Pick one at random to win by the 5. guess.

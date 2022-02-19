@@ -1,8 +1,6 @@
 use std::env::args;
 
-use wordle_helper::cache::{Cache, HintsBySecretByGuess, SolutionsByHintByGuess};
-use wordle_helper::words::Language::English;
-use wordle_helper::words::{Language, Words};
+use wordle_helper::words::Language;
 use wordle_helper::{autoplay_and_print_stats_with_language, FixedGuessList, Wordle};
 
 fn main() {
@@ -15,7 +13,7 @@ fn main() {
             consumed_args = 2;
         }
     }
-    let lang = lang.unwrap_or(English);
+    let lang = lang.unwrap_or(Language::English);
     println!(
         "Language: {}. Choices: English, NYTimes, At, Ch, De, Uber, Primal.",
         lang
@@ -29,11 +27,7 @@ fn main() {
         let strategy = FixedGuessList::new(guesses);
         autoplay_and_print_stats_with_language(strategy, lang);
     } else {
-        let words = Words::new(lang);
-        let hsg = HintsBySecretByGuess::of(&words);
-        let shg = SolutionsByHintByGuess::of(&words, &hsg);
-        let cache = Cache::new(&words, &hsg, &shg);
-        let mut game = Wordle::with(&words, &cache);
+        let mut game = Wordle::with(lang);
         game.play();
     }
 }
