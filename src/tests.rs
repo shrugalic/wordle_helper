@@ -62,16 +62,16 @@ fn compare_best_word_strategies() {
     // panic!(); // ~8s
     println!("\ndifferences between fewest total and expected remaining:");
     let (mut different, mut same) = (0, 0);
-    for (i, ((low_w, count), (rem_w, remaining))) in totals.iter().zip(remaining.iter()).enumerate()
+    for (i, ((low_i, count), (rem_i, remaining))) in totals.iter().zip(remaining.iter()).enumerate()
     {
-        if low_w != rem_w {
+        if low_i != rem_i {
             different += 1;
             println!(
                 "{} ({}, {}) ({}, {})",
                 i,
-                low_w.to_string(),
+                words.get_string(*low_i),
                 count,
-                rem_w.to_string(),
+                words.get_string(*rem_i),
                 remaining
             );
         } else {
@@ -112,16 +112,16 @@ fn compare_best_word_strategies() {
 
     println!("differences between fewest total and lowest variance:");
     let (mut different, mut same) = (0, 0);
-    for (i, ((low_w, count), (var_w, variance))) in totals.iter().zip(variances.iter()).enumerate()
+    for (i, ((low_i, count), (var_i, variance))) in totals.iter().zip(variances.iter()).enumerate()
     {
-        if low_w != var_w {
+        if low_i != var_i {
             different += 1;
             println!(
                 "{} ({}, {}) ({}, {})",
                 i,
-                low_w.to_string(),
+                words.get_string(*low_i),
                 count,
-                var_w.to_string(),
+                words.get_string(*var_i),
                 variance
             );
         } else {
@@ -385,62 +385,15 @@ fn test_small_turn_sums() {
 //      8007 'raile', 8012 'artel', 8017 'alter', 8019 'raise', 8021 'arose',
 //      8022 'orate', 8026 'irate', 8026 'taler', 8036 'ariel', 8041 'ratel',
 //      8048 'later', 8049 'arise', 8058 'arles', 8112 'realo', 8114 'aesir' (10min 31s)
-// ----- scores below are wrong! ----------------------------------------------------------
-//  30: 8045 'slate', 8055 'reast', 8068 'salet', 8101 'stare', 8111 'taser', 8117 'snare',
-//      8122 'raile', 8123 'roate', 8125 'tares', 8134 'soare', 8141 'saner', 8143 'raine',
-//      8144 'orate', 8145 'artel', 8147 'raise', 8151 'alert', 8153 'taler', 8156 'arose',
-//      8163 'alter', 8164 'irate', 8169 'ratel', 8178 'ariel', 8179 'arise', 8182 'later',
-//      8201 'lares', 8202 'arles', 8232 'aesir', 8234 'oater', 8246 'realo', 8274 'reais'
-//      (63min)
-//  50: 8043 'slate', 8053 'reast', 8055 'trace', 8066 'salet', 8071 'crate', 8073 'carle',
-//      8074 'slane', 8081 'carte', 8096 'stare', 8107 'carse', 8110 'taser', 8114 'snare',
-//      8116 'roate', 8117 'toile', 8121 'raile', 8124 'tares', 8130 'soare', 8136 'antre',
-//      8138 'orate', 8139 'alert', 8139 'raine', 8139 'saner', 8141 'strae', 8142 'artel',
-//      8143 'taler', 8144 'raise', 8146 'seral', 8147 'saine', 8148 'coate', 8152 'arose',
-//      8160 'alter', 8164 'irate', 8164 'ratel', 8176 'arise', 8177 'ariel', 8178 'later',
-//      8178 'rates', 8193 'reals', 8198 'arles', 8201 'lares', 8203 'urate', 8210 'laser',
-//      8211 'rales', 8222 'stoae', 8229 'aesir', 8230 'oater', 8236 'realo', 8243 'terai',
-//      8274 'reais', 8278 'serai' (5h 20min)
-//  60: 8043 'slate', 8052 'reast', 8054 'trace', 8059 'salet', 8068 'carle', 8070 'crate',
-//      8074 'slane', 8081 'carte', 8084 'stale', 8088 'caret', 8096 'stare', 8107 'carse',
-//      8108 'taser', 8114 'snare', 8115 'toile', 8116 'roate', 8121 'raile', 8122 'sorel',
-//      8122 'tares', 8128 'liane', 8128 'soare', 8129 'resat', 8135 'alert', 8136 'antre',
-//      8137 'orate', 8139 'raine', 8139 'saner', 8139 'tears', 8140 'artel', 8141 'strae',
-//      8143 'taler', 8144 'raise', 8145 'coate', 8145 'seral', 8146 'saine', 8152 'arose',
-//      8155 'alter', 8156 'slier', 8159 'ratel', 8162 'irate', 8167 'tales', 8174 'ariel',
-//      8174 'rates', 8175 'arise', 8176 'later', 8192 'reals', 8198 'arles', 8199 'lares',
-//      8201 'urate', 8209 'laser', 8209 'rales', 8222 'stoae', 8229 'aesir', 8229 'oater',
-//      8231 'alure', 8236 'realo', 8243 'terai', 8268 'aeros', 8274 'reais', 8278 'serai'
-//      (10h 49min)
-//  70: 8043 'slate', 8052 'reast', 8054 'trace', 8059 'salet', 8068 'carle', 8070 'crate',
-//      8074 'slane', 8079 'carte', 8082 'stale', 8088 'caret', 8094 'stare', 8104 'earst',
-//      8104 'taser', 8107 'carse', 8114 'snare', 8114 'toile', 8116 'roate', 8121 'raile',
-//      8122 'sorel', 8122 'tares', 8126 'earnt', 8128 'liane', 8128 'soare', 8129 'resat',
-//      8135 'alert', 8136 'antre', 8137 'orate', 8137 'raine', 8139 'saner', 8139 'tears',
-//      8140 'artel', 8141 'strae', 8143 'taler', 8144 'coate', 8144 'raise', 8144 'seral',
-//      8146 'saine', 8152 'arose', 8155 'alter', 8156 'slier', 8157 'saice', 8159 'ratel',
-//      8162 'irate', 8167 'tales', 8171 'rates', 8172 'aisle', 8173 'learn', 8174 'ariel',
-//      8175 'arise', 8176 'later', 8178 'litre', 8180 'paire', 8192 'reals', 8198 'arles',
-//      8198 'lares', 8201 'urate', 8208 'laser', 8209 'rales', 8220 'stoae', 8224 'lears',
-//      8228 'nares', 8229 'aesir', 8229 'oater', 8230 'alure', 8236 'realo', 8243 'terai',
-//      8247 'oriel', 8268 'aeros', 8274 'reais', 8278 'serai'
-//      (22h 6min)
-//  80: 8043 'slate', 8052 'reast', 8052 'trace', 8059 'salet', 8067 'carle', 8068 'crate',
-//      8074 'slane', 8077 'least', 8079 'carte', 8082 'stale', 8088 'caret', 8088 'torse',
-//      8094 'stare', 8104 'earst', 8104 'taser', 8107 'carse', 8108 'leant', 8114 'roate',
-//      8114 'snare', 8114 'toile', 8120 'raile', 8122 'sorel', 8122 'tares', 8126 'earnt',
-//      8128 'liane', 8128 'soare', 8129 'resat', 8135 'alert', 8136 'antre', 8136 'artel',
-//      8136 'orate', 8136 'tears', 8137 'raine', 8139 'saner', 8141 'strae', 8141 'taler',
-//      8143 'seral', 8144 'coate', 8144 'raise', 8146 'saine', 8150 'alone', 8151 'arose',
-//      8153 'alter', 8156 'slier', 8157 'saice', 8159 'ratel', 8162 'irate', 8163 'teras',
-//      8165 'tales', 8171 'rates', 8172 'aisle', 8173 'learn', 8174 'ariel', 8174 'later',
-//      8175 'arise', 8178 'litre', 8180 'paire', 8182 'arets', 8191 'reals', 8197 'lares',
-//      8198 'arles', 8201 'urate', 8207 'rales', 8208 'laser', 8216 'stoae', 8222 'lears',
-//      8228 'nares', 8228 'oater', 8229 'aesir', 8230 'alure', 8234 'aster', 8236 'realo',
-//      8243 'reoil', 8243 'terai', 8243 'urase', 8244 'oriel', 8249 'aloes', 8268 'aeros',
-//      8273 'reais', 8277 'serai'
-//      (39h)
-// #[ignore]
+//  30: 7929 'salet', 7930 'slate', 7930 'reast', 7980 'stare', 7981 'snare',
+//      7982 'taser', 7994 'saner', 7997 'soare', 8002 'roate', 8004 'raine',
+//      8004 'tares', 8005 'artel', 8007 'raile', 8014 'alter', 8014 'arose',
+//      8015 'raise', 8018 'orate', 8020 'taler', 8023 'irate', 8026 'alert',
+//      8036 'ariel', 8037 'ratel', 8043 'later', 8048 'arise', 8057 'arles',
+//      8061 'lares', 8094 'oater', 8110 'realo', 8113 'aesir', 8146 'reais' (30min)
+// --- previous times, with buggy code that was about half as fast ---
+//  50: (5h 20min), 60: (10h 49min), 70: (22h 6min), 80: (39h)
+/#[ignore]
 #[test]
 fn test_medium_turn_sums() {
     let lang = English;
@@ -449,7 +402,7 @@ fn test_medium_turn_sums() {
     let guessed = vec![];
     let cache = Cache::new(&words);
 
-    let picks = 30;
+    let picks = 60;
     let log = false;
     let scores = turn_sums(&words, &secrets, &guessed, &cache, picks, log);
     println!("Turn sums: {}", words.scores_to_string(&scores, picks));
@@ -639,7 +592,7 @@ fn does_hint_cache_help_part_1_without_cache() {
 #[ignore] // ~ 3s
 #[test]
 // Top 5: 60.425 'roate', 61.000 'raise', 61.331 'raile', 62.301 'soare', 63.725 'arise'
-fn find_optimal_first_word_english() {
+fn run_fewest_remaining_solutions_with_depth_1() {
     let words = Words::new(English);
     let cache = Cache::new(&words);
     let solutions: BTreeSet<WordIndex> = words.secret_indices();
@@ -654,6 +607,114 @@ fn find_optimal_first_word_english() {
 
     let optimal = words.get(scores.first().unwrap().0).clone();
     assert_eq!("roate".to_word(), optimal);
+}
+
+#[ignore] // ~1h 45min
+#[test]
+// Top 16:  257.015 'roate', 263.165 'raile', 279.479 'ariel', 280.538 'raise', 281.829 'orate',
+//          283.356 'soare', 285.917 'irate', 286.842 'arose', 293.042 'artel', 293.387 'taler',
+//          298.339 'arles', 303.208 'raine', 308.310 'arise', 309.080 'realo', 309.359 'ratel',
+//          339.410 'aesir'
+fn run_fewest_remaining_solutions_with_depth_2() {
+    let words = Words::new(English);
+    let cache = Cache::new(&words);
+    let solutions: BTreeSet<WordIndex> = words.secret_indices();
+    let guessed = vec![];
+
+    let picks = 16;
+    let depth = 2;
+    let start = Instant::now();
+    let scores =
+        fewest_remaining_solutions_recursive(&words, &solutions, &guessed, &cache, picks, depth);
+    let elapsed = start.elapsed();
+    println!("{:?} to calc {} scores", elapsed, scores.len());
+
+    println!("Top {picks}: {}", words.scores_to_string(&scores, picks));
+
+    let optimal = words.get(scores.first().unwrap().0).clone();
+    assert_eq!("roate".to_word(), optimal);
+}
+fn fewest_remaining_solutions_recursive(
+    words: &Words,
+    solutions: &SolutionsIndex,
+    guessed: &[WordIndex],
+    cache: &Cache,
+    picks: usize,
+    depth: usize,
+) -> Vec<(WordIndex, f64)> {
+    if depth == 1 {
+        return fewest_remaining_solutions(words, solutions, guessed, cache);
+    }
+    let is_first_turn = solutions.len() as WordIndex == words.secret_count();
+    let first_words = if is_first_turn {
+        fewest_remaining_solutions(words, solutions, guessed, cache)
+            // println!("{}", words.scores_to_string(&scores, picks));
+            .into_iter()
+            .take(picks)
+            .map(|(i, _s)| i)
+            .collect()
+    } else {
+        words.guess_indices()
+    };
+
+    let solution_count = solutions.len() as f64;
+    let mut scores: Vec<(WordIndex, f64)> = first_words
+        .into_par_iter()
+        .filter(|guess_idx| !guessed.contains(guess_idx))
+        .map(|guess| {
+            let mut guessed = guessed.to_vec();
+            guessed.push(guess);
+            let sum: usize = solutions
+                .iter() //.take(200)
+                .map(|&secret| {
+                    if guess == secret {
+                        0
+                    } else {
+                        let solutions = cache.solutions(guess, secret);
+                        if is_first_turn {
+                            let count = solutions.len();
+                            let (score, i) = fewest_remaining_solutions_recursive(
+                                words,
+                                solutions,
+                                &guessed,
+                                cache,
+                                picks,
+                                depth - 1,
+                            )
+                            .lowest_pair()
+                            .unwrap();
+                            (count as f64 * score) as usize
+                        } else {
+                            let solutions: SolutionsIndex =
+                                solutions.intersection(solutions).cloned().collect();
+                            let count = solutions.len() as f64;
+                            let score = fewest_remaining_solutions_recursive(
+                                words,
+                                &solutions,
+                                &guessed,
+                                cache,
+                                picks,
+                                depth - 1,
+                            )
+                            .lowest_score()
+                            .unwrap();
+                            (count * score) as usize
+                        }
+                    }
+                })
+                .sum();
+            // panic!();
+            (guess as WordIndex, sum as f64 / solution_count)
+        })
+        .collect();
+
+    scores.sort_unstable_by(|(a_idx, a_score), (b_idx, b_score)| {
+        match a_score.partial_cmp(b_score) {
+            Some(Ordering::Equal) | None => a_idx.cmp(b_idx),
+            Some(by_value) => by_value,
+        }
+    });
+    scores
 }
 
 #[ignore] // ~0.4s

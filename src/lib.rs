@@ -51,7 +51,7 @@ impl Wordle {
                 &FirstOfTwoOrFewerRemainingSolutions,
                 &WordWithMostNewCharsFromRemainingSolutions,
                 &WordThatResultsInFewestRemainingSolutions,
-                // &WordThatResultsInShortestGameApproximation,
+                &WordThatResultsInShortestGameApproximation,
             ],
             PickFirstSolution,
         );
@@ -543,7 +543,7 @@ pub trait TryToPickWord {
 struct WordThatResultsInShortestGameApproximation;
 impl TryToPickWord for WordThatResultsInShortestGameApproximation {
     fn pick(&self, game: &Wordle) -> Option<Word> {
-        let picks = 10;
+        let picks = 20;
         let mut scores: Vec<_> = turn_sums(
             &game.words,
             &game.solutions,
@@ -723,9 +723,9 @@ impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
     fn pick(&self, game: &Wordle) -> Option<Word> {
         // Use this for first guess, because the more complicated
         // methods are too slow with all possible solutions
-        // if !game.guessed.is_empty() {
-        //     return None;
-        // }
+        if !game.guessed.is_empty() {
+            return None;
+        }
         let mut scores =
             fewest_remaining_solutions(&game.words, &game.solutions, &game.guessed, &game.cache);
         if game.print_output {
