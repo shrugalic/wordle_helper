@@ -1,11 +1,9 @@
 use std::fmt::{Display, Formatter};
-use std::iter::Map;
-use std::str::Lines;
 
 use Language::*;
 
 use crate::cache::WordIndex;
-use crate::{SolutionsIndex, WordAsCharVec};
+use crate::{SecretIndices, WordAsCharVec};
 
 pub type Word = Vec<char>;
 
@@ -16,21 +14,29 @@ pub struct Words {
 }
 impl Words {
     pub fn new(lang: Language) -> Self {
-        let guesses = Words::from_str(GUESSES[lang as usize]);
-        let secrets = Words::from_str(SOLUTIONS[lang as usize]).collect();
+        const USE_FULL_WORD_LIST: usize = 1;
+        let guesses = Words::from_str(GUESSES[lang as usize], USE_FULL_WORD_LIST);
+        let secrets = Words::from_str(SOLUTIONS[lang as usize], USE_FULL_WORD_LIST).collect();
+        Self::of(guesses, secrets, lang)
+    }
+    #[cfg(test)] // Partial dictionary for exhaustive testing
+    pub fn fractional(lang: Language, step_by: usize) -> Self {
+        let guesses = Words::from_str(GUESSES[lang as usize], step_by);
+        let secrets = Words::from_str(SOLUTIONS[lang as usize], step_by).collect();
         Self::of(guesses, secrets, lang)
     }
     pub fn of(guesses: impl Iterator<Item = Word>, secrets: Vec<Word>, lang: Language) -> Self {
         let secret_cnt = secrets.len();
         let words: Vec<Word> = secrets.into_iter().chain(guesses).collect();
+        println!("{lang}: {secret_cnt} secrets in {} words", words.len());
         Words {
             lang,
             secret_cnt,
             words,
         }
     }
-    fn from_str(txt: &str) -> Map<Lines<'_>, fn(&'_ str) -> Word> {
-        txt.trim().lines().map(|w| w.to_word())
+    fn from_str(txt: &str, step_by: usize) -> impl Iterator<Item = Word> + '_ {
+        txt.trim().lines().step_by(step_by).map(|w| w.to_word())
     }
     pub(crate) fn lang(&self) -> &Language {
         &self.lang
@@ -56,17 +62,17 @@ impl Words {
     pub fn secret_count(&self) -> WordIndex {
         self.secret_cnt as WordIndex
     }
-    pub fn secret_indices(&self) -> SolutionsIndex {
+    pub fn secret_indices(&self) -> SecretIndices {
         (0..self.secret_cnt as WordIndex).into_iter().collect()
     }
     pub fn scores_to_string<Score: PartialOrd + Display>(
         &self,
         scores: &[(WordIndex, Score)],
-        count: usize,
+        picks: usize,
     ) -> String {
         scores
             .iter()
-            .take(count)
+            .take(picks)
             .map(|(idx, score)| format!("{:.3} {}", score, self.get(*idx).to_string()))
             .collect::<Vec<_>>()
             .join(", ")

@@ -7,7 +7,7 @@ use rayon::prelude::*;
 
 use Hint::*;
 
-use crate::cache::{Cache, SolutionsIndex, WordIndex};
+use crate::cache::{Cache, SecretIndices, WordIndex};
 use crate::words::Language::*;
 use crate::words::{Language, ToWord, Word, Words};
 
@@ -26,7 +26,7 @@ pub mod words;
 
 pub struct Wordle {
     words: Words,
-    solutions: SolutionsIndex,
+    solutions: SecretIndices,
     cache: Cache,
     pub guessed: Vec<WordIndex>,
     print_output: bool,
@@ -566,21 +566,22 @@ impl TryToPickWord for WordThatResultsInShortestGameApproximation {
 /// for a guess is this sum divided by number of solutions left
 fn turn_sums(
     words: &Words,
-    secrets: &SolutionsIndex,
+    remaining_solutions: &SecretIndices,
     guessed: &[WordIndex],
     cache: &Cache,
     picks: usize,
     log: bool,
 ) -> Vec<(WordIndex, usize)> {
-    if secrets.len() <= 2 {
-        return trivial_turn_sum(words, secrets, guessed, log);
+    if remaining_solutions.len() <= 2 {
+        return trivial_turn_sum(words, remaining_solutions, guessed, log);
     } else if guessed.len() >= 6 {
-        panic!();
+        return vec![(0, usize::MAX)];
     }
-    let best: Vec<_> = fewest_remaining_solutions(words, secrets, guessed, cache);
-    let mut sum_by_solutions_cache: HashMap<SolutionsIndex, usize> = HashMap::new();
+    let best: Vec<_> = fewest_remaining_solutions(words, remaining_solutions, guessed, cache);
+    // let mut sum_by_solutions_cache: HashMap<SolutionsIndex, usize> = HashMap::new();
+
     let mut scores: Vec<(WordIndex, usize)> = best
-        .into_iter()
+        .into_par_iter()
         .enumerate()
         .take(picks) // only the best ${picks} guesses
         .inspect(|&(i, (guess, score))| {
@@ -591,7 +592,7 @@ fn turn_sums(
                     i + 1,
                     guessed.len() + 1,
                     words.get_string(guess),
-                    secrets.len(),
+                    remaining_solutions.len(),
                 );
             }
         })
@@ -600,15 +601,15 @@ fn turn_sums(
             guessed.push(guess);
 
             let sum: usize = if true {
-                let mut solutions_by_hint: HashMap<HintValue, SolutionsIndex> = HashMap::new();
-                for &secret in secrets {
+                let mut solutions_by_hint: HashMap<HintValue, SecretIndices> = HashMap::new();
+                for &secret in remaining_solutions {
                     let hint = cache.hint(guess, secret);
                     solutions_by_hint.entry(hint).or_default().insert(secret);
                 }
                 solutions_by_hint
                     .into_par_iter()
                     .map(|(_k, v)| v)
-                    .map(|rem_solutions: SolutionsIndex| {
+                    .map(|rem_solutions: SecretIndices| {
                         let guess_is_a_solution = rem_solutions.contains(&guess);
                         if rem_solutions.len() == 1 {
                             if guess_is_a_solution {
@@ -634,23 +635,23 @@ fn turn_sums(
                     .solutions_by_hint_for(guess)
                     .iter()
                     .filter(|solutions| !solutions.is_empty())
-                    .map(|solutions| solutions.intersect(secrets))
+                    .map(|solutions| solutions.intersect(remaining_solutions))
                     .filter(|intersection| !intersection.is_empty())
                     .map(|intersection| {
                         if intersection.len() == 1 {
                             guessed.len() + 1
                         } else if intersection.len() == 2 {
                             2 * (guessed.len() + 1) + 1
-                        } else if intersection.len() > 3
-                            && sum_by_solutions_cache.contains_key(&intersection)
-                        {
-                            *sum_by_solutions_cache.get(&intersection).unwrap()
+                        // } else if intersection.len() > 3
+                        //     && sum_by_solutions_cache.contains_key(&intersection)
+                        // {
+                        //     *sum_by_solutions_cache.get(&intersection).unwrap()
                         } else {
                             let min_score =
                                 turn_sums(words, &intersection, &guessed, cache, picks, log)
                                     .lowest_score()
                                     .unwrap();
-                            sum_by_solutions_cache.insert(intersection, min_score);
+                            // sum_by_solutions_cache.insert(intersection, min_score);
                             min_score
                         }
                     })
@@ -664,7 +665,7 @@ fn turn_sums(
                     picks,
                     guessed.len(),
                     words.get_string(guess),
-                    secrets.len(),
+                    remaining_solutions.len(),
                     score,
                     sum
                 );
@@ -678,15 +679,17 @@ fn turn_sums(
 
 fn trivial_turn_sum(
     words: &Words,
-    secrets: &SolutionsIndex,
+    secrets: &SecretIndices,
     guessed: &[WordIndex],
     log: bool,
 ) -> Vec<(WordIndex, usize)> {
-    assert!(secrets.len() <= 2);
-    let first = *secrets.iter().next().unwrap();
+    let secrets_count = secrets.len();
+    assert!(secrets_count <= 2);
+    let mut secrets = secrets.iter();
+    let first = *secrets.next().unwrap();
 
     let this_turn = guessed.len() + 1;
-    return if secrets.len() == 1 {
+    return if secrets_count == 1 {
         // With only one solution left, the optimal "strategy" picks it
         if log {
             println!(
@@ -698,7 +701,7 @@ fn trivial_turn_sum(
         }
         vec![(first, this_turn)]
     } else {
-        let second = *secrets.iter().nth(1).unwrap();
+        let second = *secrets.next().unwrap();
         let next_turn = this_turn + 1;
         let sum = this_turn + next_turn;
         // With two remaining solutions there is no better strategy than choosing either,
@@ -741,7 +744,7 @@ impl TryToPickWord for WordThatResultsInFewestRemainingSolutions {
 
 fn fewest_remaining_solutions(
     words: &Words,
-    solutions: &SolutionsIndex,
+    solutions: &SecretIndices,
     guessed: &[WordIndex],
     cache: &Cache,
 ) -> Vec<(WordIndex, f64)> {
@@ -1285,7 +1288,7 @@ impl Intersect for Solutions<'_> {
         self.intersection(other).into_iter().cloned().collect()
     }
 }
-impl Intersect for SolutionsIndex {
+impl Intersect for SecretIndices {
     fn intersect(&self, other: &Self) -> Self {
         self.intersection(other).into_iter().cloned().collect()
     }

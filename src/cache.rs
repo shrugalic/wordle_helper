@@ -5,7 +5,7 @@ use rayon::prelude::*;
 use crate::{CalcHintValue, GetHint, Words};
 
 pub type WordIndex = u16; // max 65'565 words
-pub type SolutionsIndex = BTreeSet<WordIndex>;
+pub type SecretIndices = BTreeSet<WordIndex>;
 pub type HintValue = u8;
 
 pub struct Cache {

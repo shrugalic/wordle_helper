@@ -193,7 +193,7 @@ fn test_print_full_guess_tree() {
 }
 fn print_full_guess_tree(lang: Language) {
     let words = Words::new(lang);
-    let secrets: SolutionsIndex = words.secret_indices();
+    let secrets: SecretIndices = words.secret_indices();
     let cache = Cache::new(&words);
     let guessed = vec![];
 
@@ -221,7 +221,7 @@ fn test_print_partial_guess_tree() {
     println!("{} feued secrets", secrets2.len());
     assert_eq!(149, secrets2.len());
 
-    let secrets: SolutionsIndex = secrets1.intersect(secrets2);
+    let secrets: SecretIndices = secrets1.intersect(secrets2);
     println!(
         "{} intersected secrets {}",
         secrets.len(),
@@ -232,7 +232,7 @@ fn test_print_partial_guess_tree() {
     let guessed = vec![guess1_idx, guess2_idx];
     explore_tree(&words, &secrets, &guessed, &cache);
 }
-fn explore_tree(words: &Words, secrets: &SolutionsIndex, guessed: &[WordIndex], cache: &Cache) {
+fn explore_tree(words: &Words, secrets: &SecretIndices, guessed: &[WordIndex], cache: &Cache) {
     if guessed.len() == MAX_ATTEMPTS {
         println!(
             "            7. Still not found after 6 guesses {}. Secrets: {}",
@@ -244,7 +244,7 @@ fn explore_tree(words: &Words, secrets: &SolutionsIndex, guessed: &[WordIndex], 
         // 1 and 2 already printed info on how to proceed
         return;
     }
-    let scores = fewest_remaining_solutions(words, secrets, &guessed, cache);
+    let scores = fewest_remaining_solutions(words, secrets, guessed, cache);
     let guess = scores.lowest().unwrap();
     let mut guessed = guessed.to_vec();
     guessed.push(guess);
@@ -266,7 +266,7 @@ fn explore_tree(words: &Words, secrets: &SolutionsIndex, guessed: &[WordIndex], 
         explore_tree(words, &secrets, &guessed, cache)
     }
 }
-fn print_info(words: &Words, guessed: &[WordIndex], hint: HintValue, secrets: &SolutionsIndex) {
+fn print_info(words: &Words, guessed: &[WordIndex], hint: HintValue, secrets: &SecretIndices) {
     let turn = guessed.len();
     let next = turn + 1;
     let after_next = turn + 2;
@@ -301,7 +301,7 @@ fn test_trivial_turn_sums() {
     let cache = Cache::new(&words);
 
     // if there's only one secret left, its score is 1
-    let secrets1: SolutionsIndex = [0].into_iter().collect();
+    let secrets1: SecretIndices = [0].into_iter().collect();
     let guessed = vec![];
     let picks = secrets1.len();
     let scores = turn_sums(&words, &secrets1, &guessed, &cache, picks, true);
@@ -310,10 +310,10 @@ fn test_trivial_turn_sums() {
     }
 
     // With 2 secrets left, their score (turn sum) is 3
-    let secrets2: SolutionsIndex = [0, 1].into_iter().collect();
+    let secrets2: SecretIndices = [0, 1].into_iter().collect();
     let guessed = &vec![];
     let picks = secrets2.len();
-    let scores = turn_sums(&words, &secrets2, &guessed, &cache, picks, true);
+    let scores = turn_sums(&words, &secrets2, guessed, &cache, picks, true);
     for (_, score) in scores {
         assert_eq!(score, 3);
     }
@@ -329,7 +329,7 @@ fn test_very_small_turn_sums() {
 
     let log = true;
     let count = 4;
-    let secrets: SolutionsIndex = words.secret_indices().into_iter().take(count).collect();
+    let secrets: SecretIndices = words.secret_indices().into_iter().take(count).collect();
     let scores = turn_sums(&words, &secrets, &guessed, &cache, count, log);
     let (_, min) = scores.first().unwrap();
     let count = scores.iter().filter(|(_, s)| s == min).count();
@@ -355,7 +355,7 @@ fn test_small_turn_sums() {
 
     let log = true;
     let count = 500;
-    let secrets: SolutionsIndex = words.secret_indices().into_iter().take(count).collect();
+    let secrets: SecretIndices = words.secret_indices().into_iter().take(count).collect();
     let picks = 5;
     if log {
         println!(
@@ -376,6 +376,7 @@ fn test_small_turn_sums() {
 }
 
 // Times cached and un-cached (UC)
+// picks:
 //   1: 8060 'roate' (6s)
 //   2: 8043 'roate', 8049 'raise' (11s)
 //   5: 8007 'soare', 8020 'raile', 8024 'roate', 8030 'raise', 8062 'arise' (40s)
@@ -391,9 +392,29 @@ fn test_small_turn_sums() {
 //      8015 'raise', 8018 'orate', 8020 'taler', 8023 'irate', 8026 'alert',
 //      8036 'ariel', 8037 'ratel', 8043 'later', 8048 'arise', 8057 'arles',
 //      8061 'lares', 8094 'oater', 8110 'realo', 8113 'aesir', 8146 'reais' (30min)
-// --- previous times, with buggy code that was about half as fast ---
-//  50: (5h 20min), 60: (10h 49min), 70: (22h 6min), 80: (39h)
-/#[ignore]
+//  40: 7927 'crate', 7927 'reast', 7928 'salet', 7930 'slate', 7980 'stare',
+//      7981 'snare', 7982 'taser', 7986 'toile', 7994 'saner', 7997 'soare',
+//      8000 'roate', 8003 'artel', 8004 'raine', 8004 'tares', 8006 'raile',
+//      8007 'saine', 8010 'strae', 8012 'arose', 8014 'alter', 8014 'seral',
+//      8015 'raise', 8015 'orate', 8020 'taler', 8023 'irate', 8025 'alert',
+//      8035 'ariel', 8035 'ratel', 8042 'later', 8044 'rates', 8048 'arise',
+//      8057 'arles', 8060 'laser', 8061 'lares', 8068 'urate', 8071 'rales',
+//      8094 'oater', 8109 'realo', 8113 'aesir', 8146 'reais', 8153 'serai' (90min)
+//  70: 7920 'salet', 7924 'reast', 7927 'crate', 7928 'slate', 7928 'trace',
+//      7941 'carle', 7943 'slane', 7949 'carte', 7968 'stale', 7969 'caret',
+//      7970 'carse', 7974 'stare', 7975 'earst', 7978 'taser', 7980 'snare',
+//      7986 'toile', 7993 'sorel', 7994 'saner', 7997 'soare', 8000 'roate',
+//      8000 'tares', 8001 'resat', 8003 'artel', 8003 'liane', 8003 'raine',
+//      8005 'antre', 8005 'raile', 8006 'saine', 8006 'strae', 8007 'tears',
+//      8011 'arose', 8012 'seral', 8013 'alter', 8014 'earnt', 8015 'raise',
+//      8015 'orate', 8016 'taler', 8018 'slier', 8020 'tales', 8022 'alert',
+//      8023 'irate', 8027 'saice', 8031 'paire', 8032 'aisle', 8032 'coate',
+//      8033 'ariel', 8034 'ratel', 8035 'learn', 8035 'litre', 8039 'rates',
+//      8042 'later', 8046 'arise', 8057 'arles', 8059 'laser', 8061 'lares',
+//      8063 'reals', 8068 'urate', 8070 'rales', 8082 'lears', 8089 'stoae',
+//      8090 'nares', 8093 'oater', 8096 'oriel', 8102 'realo', 8107 'alure',
+//      8113 'aesir', 8113 'terai', 8125 'aeros', 8146 'reais', 8152 'serai' (8h 16min)
+#[ignore]
 #[test]
 fn test_medium_turn_sums() {
     let lang = English;
@@ -402,7 +423,7 @@ fn test_medium_turn_sums() {
     let guessed = vec![];
     let cache = Cache::new(&words);
 
-    let picks = 60;
+    let picks = 70;
     let log = false;
     let scores = turn_sums(&words, &secrets, &guessed, &cache, picks, log);
     println!("Turn sums: {}", words.scores_to_string(&scores, picks));
@@ -435,7 +456,7 @@ fn test_tree_depth() {
 
 fn count_by_attempts(
     words: &Words,
-    secrets: &SolutionsIndex,
+    secrets: &SecretIndices,
     guessed: &[WordIndex],
     cache: &Cache,
 ) -> BTreeMap<Attempt, Count> {
@@ -636,7 +657,7 @@ fn run_fewest_remaining_solutions_with_depth_2() {
 }
 fn fewest_remaining_solutions_recursive(
     words: &Words,
-    solutions: &SolutionsIndex,
+    solutions: &SecretIndices,
     guessed: &[WordIndex],
     cache: &Cache,
     picks: usize,
@@ -673,7 +694,7 @@ fn fewest_remaining_solutions_recursive(
                         let solutions = cache.solutions(guess, secret);
                         if is_first_turn {
                             let count = solutions.len();
-                            let (score, i) = fewest_remaining_solutions_recursive(
+                            let (score, _i) = fewest_remaining_solutions_recursive(
                                 words,
                                 solutions,
                                 &guessed,
@@ -685,7 +706,7 @@ fn fewest_remaining_solutions_recursive(
                             .unwrap();
                             (count as f64 * score) as usize
                         } else {
-                            let solutions: SolutionsIndex =
+                            let solutions: SecretIndices =
                                 solutions.intersection(solutions).cloned().collect();
                             let count = solutions.len() as f64;
                             let score = fewest_remaining_solutions_recursive(
