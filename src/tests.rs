@@ -626,8 +626,8 @@ fn run_fewest_remaining_solutions_with_depth_1() {
 
     println!("Top 5: {}", words.scores_to_string(&scores, 5));
 
-    let optimal = words.get(scores.first().unwrap().0).clone();
-    assert_eq!("roate".to_word(), optimal);
+    let best = words.get(scores.first().unwrap().0).clone();
+    assert_eq!("roate".to_word(), best);
 }
 
 #[ignore] // ~1h 45min
@@ -652,8 +652,8 @@ fn run_fewest_remaining_solutions_with_depth_2() {
 
     println!("Top {picks}: {}", words.scores_to_string(&scores, picks));
 
-    let optimal = words.get(scores.first().unwrap().0).clone();
-    assert_eq!("roate".to_word(), optimal);
+    let best = words.get(scores.first().unwrap().0).clone();
+    assert_eq!("roate".to_word(), best);
 }
 fn fewest_remaining_solutions_recursive(
     words: &Words,
@@ -741,7 +741,7 @@ fn fewest_remaining_solutions_recursive(
 #[ignore] // ~0.4s
 #[test]
 // Top 5: 31.302 'raine', 35.260 'taler', 36.212 'raten', 36.260 'laser', 36.633 'reale'
-fn find_optimal_first_word_german() {
+fn find_good_first_word_german() {
     let lang = At;
     let words = Words::new(lang);
     let cache = Cache::new(&words);
@@ -749,8 +749,8 @@ fn find_optimal_first_word_german() {
     let guessed = vec![];
     let scores = fewest_remaining_solutions(&words, &solutions, &guessed, &cache);
     println!("Top 5 {}", words.scores_to_string(&scores, 5));
-    let optimal = words.get(scores.first().unwrap().0).clone();
-    assert_eq!("raine".to_word(), optimal);
+    let best = words.get(scores.first().unwrap().0).clone();
+    assert_eq!("raine".to_word(), best);
 }
 
 // ~10s (i9) or ~13s (M1) or 6.5s (M1 Max) for 5 single German words
@@ -831,7 +831,7 @@ fn find_optimal_first_word_german() {
 // Best 5. guesses after 1. 'raise' and 2. 'cloth' and 3. 'bundy' and 4. 'gramp': 2407 wakfs, 2413 fewer, 2415 wheft, 2415 fetwa, 2417 swift
 #[ignore]
 #[test]
-fn find_optimal_word_combos() {
+fn find_good_word_combos() {
     let lang = NYTimes;
     let words = Words::new(lang);
     let cache = Cache::new(&words);
