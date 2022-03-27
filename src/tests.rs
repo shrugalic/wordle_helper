@@ -753,8 +753,8 @@ fn find_good_first_word_german() {
     assert_eq!("raine".to_word(), best);
 }
 
-// ~10s (i9) or ~13s (M1) or 6.5s (M1 Max) for 5 single German words
-// ~1min 51s (i9) or ~2min 21s (M1) or 67s (M1 Max) for 5 single English words
+// ~10s (i9) or ~13s (M1) or 6.5s (M1 Max) or 2.1s (M1 Ultra) for 5 single German words
+// ~1min 51s (i9) or ~2min 21s (M1) or 67s (M1 Max) or 19.6s (M1 Ultra) for 5 single English words
 //
 // At:
 // Best 1. guesses: 31.30 'raine', 35.26 'taler', 36.21 'raten', 36.26 'laser', 36.63 'reale'
@@ -832,7 +832,7 @@ fn find_good_first_word_german() {
 #[ignore]
 #[test]
 fn find_good_word_combos() {
-    let lang = NYTimes;
+    let lang = English;
     let words = Words::new(lang);
     let cache = Cache::new(&words);
 
@@ -938,14 +938,14 @@ fn test_hint_from_value_and_back() {
     }
 }
 
-#[ignore] // ~26 min (i9) or ~39 min (M1) or 21.7min (M1 Max)
+#[ignore] // ~26 min (i9) or ~39 min (M1) or 21.7min (M1 Max) or 53 min (M1 Ultra)
 #[test]
 // 3.55 average attempts; 2: 40, 3: 999, 4: 1234, 5: 42
 fn autoplay_word_that_results_in_fewest_remaining_solutions() {
     autoplay_and_print_stats(WordThatResultsInFewestRemainingSolutions);
 }
 
-#[ignore] // 1min 38s (i9) or 1min 53s (M1) or 74s (M1 Max)
+#[ignore] // 1min 38s (i9) or 1min 53s (M1) or 74s (M1 Max) or 237s (M1 Ultra)
 #[test]
 // 3.36 average attempts; 2: 42, 3: 685, 4: 429, 5: 15
 fn autoplay_word_that_results_in_fewest_remaining_solutions_german() {
