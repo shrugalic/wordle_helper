@@ -753,8 +753,8 @@ fn find_good_first_word_german() {
     assert_eq!("raine".to_word(), best);
 }
 
-// ~3.8s (i9) or ~13s (M1) or 6.5s (M1 Max) or 1.5s (M1 Ultra) for 5 single Language::At words
-// ~39s (i9) or ~2min 21s (M1) or 67s (M1 Max) or 14s (M1 Ultra) for 5 single Language::English words
+// ~3.8s (i9) or ~3.8s (M1) or 6.5s (M1 Max) or 1.5s (M1 Ultra) for 5 single Language::At words
+// ~39s (i9) or 43s (M1) or 67s (M1 Max) or 14s (M1 Ultra) for 5 single Language::English words
 //
 // At:
 // Best 1. guesses: 31.30 'raine', 35.26 'taler', 36.21 'raten', 36.26 'laser', 36.63 'reale'
@@ -938,14 +938,14 @@ fn test_hint_from_value_and_back() {
     }
 }
 
-#[ignore] // 62.3min (i9) or ~39 min (M1) or 21.7min (M1 Max) or 39.8min (M1 Ultra)
+#[ignore] // 62.3min (i9) or ~58.3min (M1) or 21.7min (M1 Max) or 39.8min (M1 Ultra)
 #[test]
 // 3.55 average attempts; 2: 40, 3: 999, 4: 1234, 5: 42
 fn autoplay_word_that_results_in_fewest_remaining_solutions() {
     autoplay_and_print_stats(WordThatResultsInFewestRemainingSolutions);
 }
 
-#[ignore] // 279s (i9) or 113s (M1) or 74s (M1 Max) or 176s (M1 Ultra)
+#[ignore] // 279s (i9) or 244s (M1) or 74s (M1 Max) or 176s (M1 Ultra)
 #[test]
 // 3.36 average attempts; 2: 42, 3: 685, 4: 429, 5: 15
 fn autoplay_word_that_results_in_fewest_remaining_solutions_german() {
